@@ -10,14 +10,20 @@ import time
 ALLRECIPES_BASE = 'http://allrecipes.com'
 def scrape_recipe(url,session=requests.Session()):
     # time.sleep(1)
-    content = session.get(ALLRECIPES_BASE + url)
-    soup = BeautifulSoup(content.text,'html.parser')
-    title = soup.title.get_text()
+    content = session.get(ALLRECIPES_BASE + url) # use http session to pull html from given page
+    soup = BeautifulSoup(content.text,'html.parser') # parse http we get back
+    title = soup.title.get_text() # extract page name
+
+    # extract ingredients list
     ingredients = [ingredient.get_text() for ingredient in soup.select('span[class="recipe-ingred_txt added"]')]
+    
+    # extract directions list
     directions = [step.get_text() for step in soup.select('span[class="recipe-directions__list--item"]')]
     return {'title':title,'ingredients':ingredients,'directions':directions,'url':url}
 
 
+# if we run just this script, it will pull a single recipe from the url below
+# good for lightweight testing of parse algorithms and such
 if __name__ == '__main__':
     recipe = scrape_recipe("/recipe/68868/chicken-florentine-casserole/?internalSource=recipe hub&referringId=80&referringContentType=recipe hub&clickId=cardslot 69")
     title = recipe['title']

@@ -16,6 +16,7 @@ cookbook = dict()
 session = requests.Session();
 session.headers.update({'user-agent':'YandexBot'})
 
+# this needs a 1s delay per request so we dont get blocked
 def parse_page(page_number):
     # if random.randrange(10) < 2:
     #     time.sleep(5)
