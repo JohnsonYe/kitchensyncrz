@@ -15,15 +15,15 @@ def load_obj(name ):
 
 recipes = load_obj('recipes_pages_1_to_10')
 
-
 units = set(['cup','clove','tablespoon','teaspoon','ounce','halves','half','pint','pound',
-'package','head','can','packet','taste','envelope','jar','container','dash','bottle'])
+'package','head','can','packet','taste','envelope','jar','container','dash','bottle',
+'small','medium','large','stalk','quart'])
 
 special = set(['sauce'])
 
 counter = 0
 numeric_regex = re.compile('\d')
-punctuation_strip = str.maketrans(dict.fromkeys(string.punctuation.replace('-','')))
+punctuation_strip = str.maketrans(dict.fromkeys(string.punctuation.replace('-.','')))
 ingredient_words = {}
 for recipe in recipes:
     for ingredient in recipes[recipe]['ingredients']:
@@ -48,64 +48,28 @@ for ingredient in ingredient_word_list:
 
 print(recipes['Baked Teriyaki Chicken Recipe - Allrecipes.com'])
 
-# rank tokens in each ingredient string
-# for ingredient in recipes['Baked Teriyaki Chicken Recipe - Allrecipes.com']['ingredients']:
-#     print('unprocessed: ' + ingredient)
-#     sanitized = re.sub(r'[^\x00-\x7f]',r'', ingredient.translate(punctuation_strip).lower());
-#     print('sanitized: ' + sanitized)
-#     print('ranked: ' + str.join(' ',[str(ingredient_words[token]['count']) if token in ingredient_words else '#' for token in sanitized.split()]))
-#     print()
-
-modifier_list = set(['skinless','boneless','fresh','large','hot','cold'])
+modifier_list = set(['skinless','boneless','fresh','hot','cold','raw','black','dry'])
 modifier_total = 0;
-vowel_unmatch = '(?<![aeou])'
-find_verb = re.compile('({}ed|ground|{}(?<![hk])en)$'.format(vowel_unmatch,vowel_unmatch))
+vowel_unmatch = '(?<![aeou]|^r)'
+find_verb = re.compile('({}ed|ground|{}(?<![hk])en|ly$|.+-.+)$'.format(vowel_unmatch,vowel_unmatch))
 
 test_recipe = 'Baked Teriyaki Chicken Recipe - Allrecipes.com'
 
-for ingredient in ingredient_word_list:
-    if find_verb.search(ingredient):
-        modifier_list.add(ingredient)
+modifier_exclude = {'half-and-half'}
 
+for ingredient in ingredient_word_list:
+    if find_verb.search(ingredient) and ingredient not in modifier_exclude:
+        modifier_list.add(ingredient)
 for modifier in modifier_list:
+    # print(modifier + ' : ' + str(find_verb.search(modifier)))
     ingredient_words.pop(modifier)
 # print(modifier_list)
 
 
-# for ingredient in recipes['Baked Teriyaki Chicken Recipe - Allrecipes.com']['ingredients']:
-#     print('unprocessed: ' + ingredient)
-#     sanitized = re.sub(r'[^\x00-\x7f]',r'', ingredient.translate(punctuation_strip).lower())
-#     raw_split = re.sub(r'[^\x00-\x7f]',r'', ingredient.lower()).split()
-#     print('sanitized: ' + sanitized)
-#     # ranked = [(token,ingredient_words[token]['count']) if token in ingredient_words else (token,0) for token in sanitized.split()]
-#     ing_name = [];
-#     ing_mods = [];
-#     ing_amt = {'unit':None,'measurement':None};
-#     counter = 0
-#     for item in sanitized.split():
-#         if item in ingredient_words:
-#             ing_name.append(raw_split[counter])
-#         elif item in modifier_list:
-#             ing_mods.append(raw_split[counter])
-#         elif numeric_regex.search(item):
-#             ing_amt['measurement'] = float(sum(Fraction(s) for s in raw_split[counter].split()))
-#         else:
-#             ing_amt['unit'] = raw_split[counter]
-#         counter = counter + 1
-#     # print('ranked: ' + str.join(' ',[item[0] for item in ranked]))
-
-#     # construct ingredient name from non-amount non-modifiers
-
-#     name_string = str.join(' ',ing_name)
-#     ingredient_struct = {'name':name_string,'amount':ing_amt,'modifiers':str.join(', ', ing_mods)}
- 
-#     print('processed: ' + str(ingredient_struct))
-#     print()
-
 all_ingredients = {}
 
 triggers = set(['-','(','to'])
-tr_regex = re.compile('to|,')
+tr_regex = re.compile('^to$|^and$|^for$|,$|^-$|^with$')
 paren_regex = re.compile('\(|\)')
 articles = set(['or'])
 adverb = re.compile('ly$')
@@ -115,6 +79,7 @@ adverb = re.compile('ly$')
 
 
 def extract_ingredient_info(ingredient_string):
+    print('\n' + ingredient_string)
     sanitized = re.sub(r'[^\x00-\x7f]',r'', ingredient_string.translate(punctuation_strip).lower()).split()
     raw_split = re.sub(r'[^\x00-\x7f]',r'', ingredient_string.lower()).split()
     ing_name = [];
@@ -122,7 +87,7 @@ def extract_ingredient_info(ingredient_string):
     triggered = False
 
     numeric_tokens = [True if numeric_regex.search(token) else False for token in raw_split]
-    unit_tokens = [True if token in units else False for token in sanitized]
+    unit_tokens = [True if (token in units or token[0:-1] in units) else False for token in sanitized]
     trigger_tokens = [True if tr_regex.search(token) else False for token in raw_split]
     modifier_tokens= [i if sanitized[i-1] in modifier_list else 0 for i in range(1,len(sanitized)+1)]
     paren_token = [True if paren_regex.search(token) else False for token in raw_split]
@@ -132,7 +97,8 @@ def extract_ingredient_info(ingredient_string):
     for i in range(0,len(paren_token)):
         if paren_token[i]:
             if not toggle:
-                toggle = modifier_tokens[i]
+                toggle = i
+                modifier_tokens[i] = i
             else:
                 modifier_tokens[i] = toggle
                 toggle = 0
@@ -147,16 +113,34 @@ def extract_ingredient_info(ingredient_string):
     ingredient_string_tokens = []
     ingredient_final = ''
     for i in range(0,len(paren_token)):
-        if modifier_tokens[i]:
+        if triggered:
+            if trigger_tokens[i] and modifier_string:
+                modifier_strings.append(str.join(' ',modifier_string))
+                modifier_string = []
+                if sanitized[i] != 'and':
+                    modifier_tokens[i] = toggle
+            else:
+                modifier_tokens[i] = toggle
+        if trigger_tokens[i] and not modifier_tokens[i]: 
+            print('[' + raw_split[i] + ']' + raw_split[i][-1])   
+            if raw_split[i][-1] == ',':
+                # print('got here')
+                ingredient_string_tokens.append(sanitized[i])
+            triggered = True
+            toggle = i+1
+            if modifier_string:
+                modifier_strings.append(str.join(' ',modifier_string))
+                modifier_string = []
+        elif modifier_tokens[i]:
             if modifier_tokens[i] == toggle:
                 modifier_string.append(sanitized[i])
             else:
-                if modifier_strings:
+                if modifier_string:
                     modifier_strings.append(str.join(' ',modifier_string))
                 modifier_string = [sanitized[i]]
                 toggle = modifier_tokens[i]
-        elif numeric_tokens[i]:
-            measurement = float(sum(Fraction(s) for s in raw_split[counter].split()))
+        elif numeric_tokens[i] and sanitized[i].isdigit():
+            measurement = float(Fraction(raw_split[i])) + measurement
         elif unit_tokens[i]:
             unit = sanitized[i]
         elif not ingredient_final:
@@ -171,73 +155,28 @@ def extract_ingredient_info(ingredient_string):
 
     # print(ingredient_final)
     # print(raw_split)
-    # print(modifier_strings)
-    print({'original':ingredient_string,
+    print('modifier: ' + str(modifier_tokens))
+    print('numeric: '  + str(numeric_tokens))
+    print('paren: '    + str(paren_token))
+    ingredient = {'original':ingredient_string,
         'ingredient':ingredient_final,
         'amount':{'measurement':measurement,'unit':unit},
-        'modifiers':modifier_strings})
+        'modifiers':modifier_strings}
+    print(ingredient)
+    return ingredient
 
 # extract_ingredient_info(recipes[test_recipe]['ingredients'][8])
+all_ingredients = {}
 for recipe in recipes:
     for ingredient in recipes[recipe]['ingredients']:
-        extract_ingredient_info(ingredient)
+        ingredient_info = extract_ingredient_info(ingredient)
+        if ingredient_info['ingredient'] in all_ingredients:
+            all_ingredients[ingredient_info['ingredient']].append(ingredient_info)
+        else:
+            all_ingredients[ingredient_info['ingredient']] = [ingredient_info]
 
-# for recipe in recipes:
-#     for ingredient in recipes[recipe]['ingredients']:
-#         sanitized = re.sub(r'[^\x00-\x7f]',r'', ingredient.translate(punctuation_strip).lower())
-#         raw_split = re.sub(r'[^\x00-\x7f]',r'', ingredient.lower()).split()
-#         ing_name = [];
-#         counter = 0
-#         triggered = False
-
-#         trigger_tokens = [True if tr_regex.search(token) else False for token in raw_split]
-#         modifier_tokens= [i if sanitized[i-1] in modifier_list else 0 for i in range(1,len(sanitized)+1)]
-#         paren_token = [True if paren_regex.search(token) else False for token in raw_split]
-
-#         # find pairs of parenthesis
-#         toggle = 0
-#         for i in range(0,len(paren_token)):
-#             if paren_token[i]:
-#                 if not toggle:
-#                     toggle = modifier_tokens[i]
-#                 else:
-#                     modifier_tokens = toggle
-#                     toggle = 0
-#             elif toggle:
-#                 modifier_tokens[i] = toggle
-
-
-#         for item in sanitized.split():
-#             if raw_split[counter][-1] == ')':
-#                 triggered = False
-#             elif triggered:
-#                 pass
-#             elif item in triggers:
-#                 triggered = True
-#             elif adverb.search(item) or item in articles:
-#                 pass
-#             elif raw_split[counter][0] in triggers:
-#                 triggered = True # add to modifier list
-#             elif raw_split[counter][-1] in triggers:
-#                 triggered = True # add to ingredient list
-#                 if item in ingredient_words:
-#                     ing_name.append(item)
-#             elif item in ingredient_words:
-#                 ing_name.append(raw_split[counter])
-#             counter = counter + 1
-#         name_string = str.join(' ',ing_name)
-
-#         if not name_string:
-#             print(ingredient)
-
-#         if name_string in all_ingredients:
-#             all_ingredients[name_string].append(recipe)
-#         else:
-#             all_ingredients[name_string] = [recipe]
-
-# print(all_ingredients)
-# print([all_ingredients.keys()])
-# print(all_ingredients[''])
+print([all_ingredients.keys()])
+# print([all_ingredients['']])
 
 
 
