@@ -4,6 +4,7 @@ import pickle
 import re
 import string
 from fractions import Fraction
+import sys
 
 def save_obj(obj, name):
     with open('obj/'+ name + '.pkl', 'wb') as f:
@@ -46,7 +47,7 @@ for ingredient in ingredient_word_list:
 
 # print(sorted(ingredient_words.items(),key=lambda item: item[1]))
 
-print(recipes['Baked Teriyaki Chicken Recipe - Allrecipes.com'])
+# print(recipes['Baked Teriyaki Chicken Recipe - Allrecipes.com'])
 
 modifier_list = set(['skinless','boneless','fresh','hot','cold','raw','black','dry'])
 modifier_total = 0;
@@ -79,7 +80,7 @@ adverb = re.compile('ly$')
 
 
 def extract_ingredient_info(ingredient_string):
-    print('\n' + ingredient_string)
+    # print('\n' + ingredient_string)
     sanitized = re.sub(r'[^\x00-\x7f]',r'', ingredient_string.translate(punctuation_strip).lower()).split()
     raw_split = re.sub(r'[^\x00-\x7f]',r'', ingredient_string.lower()).split()
     ing_name = [];
@@ -122,7 +123,7 @@ def extract_ingredient_info(ingredient_string):
             else:
                 modifier_tokens[i] = toggle
         if trigger_tokens[i] and not modifier_tokens[i]: 
-            print('[' + raw_split[i] + ']' + raw_split[i][-1])   
+            # print('[' + raw_split[i] + ']' + raw_split[i][-1])   
             if raw_split[i][-1] == ',':
                 # print('got here')
                 ingredient_string_tokens.append(sanitized[i])
@@ -155,27 +156,42 @@ def extract_ingredient_info(ingredient_string):
 
     # print(ingredient_final)
     # print(raw_split)
-    print('modifier: ' + str(modifier_tokens))
-    print('numeric: '  + str(numeric_tokens))
-    print('paren: '    + str(paren_token))
+    # print('modifier: ' + str(modifier_tokens))
+    # print('numeric: '  + str(numeric_tokens))
+    # print('paren: '    + str(paren_token))
     ingredient = {'original':ingredient_string,
         'ingredient':ingredient_final,
         'amount':{'measurement':measurement,'unit':unit},
         'modifiers':modifier_strings}
-    print(ingredient)
+    # print(ingredient)
     return ingredient
 
 # extract_ingredient_info(recipes[test_recipe]['ingredients'][8])
 all_ingredients = {}
+all_recipes = {}
 for recipe in recipes:
+    all_recipes[recipe] = {'directions':recipes[recipe]['directions'],'ingredients':[]}
     for ingredient in recipes[recipe]['ingredients']:
         ingredient_info = extract_ingredient_info(ingredient)
+        ingredient_info['recipe'] = recipe
         if ingredient_info['ingredient'] in all_ingredients:
             all_ingredients[ingredient_info['ingredient']].append(ingredient_info)
         else:
             all_ingredients[ingredient_info['ingredient']] = [ingredient_info]
+        all_recipes[recipe]['ingredients'].append(ingredient_info)
 
-print([all_ingredients.keys()])
+# print([all_ingredients['vegetable oil']])
+_ingredients = sys.argv[1:]
+print('\n\nRecipes Containing: \'{}\'\n\n'.format(str.join('\' and \'',_ingredients)))
+recipe_list = [info['recipe'] for _ingredient in _ingredients for info in all_ingredients[_ingredient]]
+recipe_counter = dict()
+for recipe in recipe_list:
+    if recipe in recipe_counter:
+        recipe_counter[recipe] = recipe_counter[recipe] + 1
+    else:
+        recipe_counter[recipe] = 1
+print(str.join('',[_recipe[0] + '\n' if _recipe[1] > len(sys.argv)-1 else '' for _recipe in recipe_counter.items()]))
+print(len(recipes))
 # print([all_ingredients['']])
 
 
