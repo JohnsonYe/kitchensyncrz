@@ -190,7 +190,7 @@ for recipe in recipe_list:
         recipe_counter[recipe] = recipe_counter[recipe] + 1
     else:
         recipe_counter[recipe] = 1
-print(str.join('',[_recipe[0] + '\n' if _recipe[1] > len(sys.argv)-1 else '' for _recipe in recipe_counter.items()]))
+print(str.join('',[_recipe[0] + '\n' if _recipe[1] > len(sys.argv)-2 else '' for _recipe in recipe_counter.items()]))
 print(len(recipes))
 # print([all_ingredients['']])
 
