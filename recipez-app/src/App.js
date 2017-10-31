@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import './css/App.min.css';
 
 class App extends Component {
   render() {
@@ -13,7 +13,9 @@ class App extends Component {
         <p className="App-intro">
           Our website is currently under construction.
         </p>
+
 	<h2>Hello world!</h2>
+          <p>Testing UI stuff</p>
       </div>
     );
   }
