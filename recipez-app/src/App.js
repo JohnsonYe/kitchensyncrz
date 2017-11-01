@@ -16,6 +16,9 @@ class App extends Component {
 
 	<h2>Hello world!</h2>
           <p>Testing UI stuff</p>
+
+          <img src="https://media.giphy.com/media/hhGnYTgU2Dplu/giphy.gif" alt="Jake" title="Jake"/>
+
       </div>
     );
   }
