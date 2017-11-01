@@ -37,6 +37,16 @@ def update_ingredient(recipe_name,ingredient_name,num_in_recipe):
         UpdateExpression=update_expression,ExpressionAttributeNames=expression_attribute_names,
         ExpressionAttributeValues=expression_attribute_values)
 
+def format_recipe(recipe_name,ingredients,directions):
+    ingredients_formatted = [{'S':ingredient} for ingredient in ingredients]
+    directions_formatted = [{'S':direction} for direction in directions if direction]
+    return {'Name':{'S':recipe_name},'Directions':{'L':directions_formatted},'Ingredients':{'L':ingredients_formatted}} 
+
+def add_recipe(recipe):
+    print('Updating Recipe: ' + recipe['Name']['S'])
+
+    client.put_item(TableName='Recipes',Item=recipe)
+
 def lambda_handler(event, context):
     title,ingredients,directions = scrape_recipe(url)
     ingredient_info_list = []
@@ -46,6 +56,8 @@ def lambda_handler(event, context):
             ingredient_info_list.append(extracted_ingredient)
     for ingredient_info in ingredient_info_list:
         update_ingredient(title,ingredient_info['name'],len(ingredient_info_list))
+
+    add_recipe(title,ingredients,directions)
 
     # print(client.list_tables()['TableNames'])
 
@@ -67,8 +79,10 @@ for ingredient in ingredients:
     extracted_ingredients = extract_ingredient_info_2(ingredient)
     for extracted_ingredient in extracted_ingredients:
         ingredient_info_list.append(extracted_ingredient)
-for ingredient_info in ingredient_info_list:
-    update_ingredient(title,ingredient_info['name'],len(ingredient_info))
+# for ingredient_info in ingredient_info_list:
+#     update_ingredient(title,ingredient_info['name'],len(ingredient_info))
+add_recipe(format_recipe(title,ingredients,directions))
+
 
 
 
