@@ -9,7 +9,7 @@ import time
 
 ALLRECIPES_BASE = 'http://allrecipes.com'
 def scrape_recipe(url,session=requests.Session()):
-    # time.sleep(1)
+    time.sleep(1)
     content = session.get(ALLRECIPES_BASE + url) # use http session to pull html from given page
     soup = BeautifulSoup(content.text,'html.parser') # parse http we get back
     title = soup.title.get_text() # extract page name
@@ -19,6 +19,7 @@ def scrape_recipe(url,session=requests.Session()):
     
     # extract directions list
     directions = [step.get_text() for step in soup.select('span[class="recipe-directions__list--item"]')]
+    print('Found recipe: {}'.format(title))
     return {'title':title,'ingredients':ingredients,'directions':directions,'url':url}
 
 

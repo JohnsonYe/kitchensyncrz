@@ -93,7 +93,7 @@ def organize_token(range,token_list,clean_token_list,core_flag,and_flag,ingredie
     else:
         ingredient_info['modifiers'].append(singularize(str.join(' ',clean_token_list[range[0]:range[1]])))
 
-def extract_ingredient_info_2(ingredient_string,recipe_string):
+def extract_ingredient_info_2(ingredient_string):
     raw_tokens = re.sub(r'[^\x00-\x7f]',r'', ingredient_string.lower()).split()
     san_tokens = re.sub(r'[^\x00-\x7f]',r'', ingredient_string.translate(punctuation_strip).lower()).split()
 
@@ -112,13 +112,15 @@ def extract_ingredient_info_2(ingredient_string,recipe_string):
     for i in range(1,len(categorized)):
         if is_paren(raw_tokens[i]):
             categorized[i] = PAREN_FLAG
+            paren_flag = True
             if prev == PAREN_FLAG:
                 override_flag = True
+                paren_flag = False
                 continue
 
         # print('prev: ' + str(prev))
         # print('curr: ' + str(categorized[i]))
-        if categorized[i] == MODIFIER_FLAG or categorized[i] != prev or comma_flag or override_flag:
+        if categorized[i] == MODIFIER_FLAG or (categorized[i] != prev and not paren_flag) or comma_flag or override_flag:
             # print('grouped: ' + str.join(' ',san_tokens[marker:i]))
 
             # put previous markers in the right place
@@ -169,7 +171,7 @@ def process_scraper_file(filename):
         trunc_recipe = recipe[0:-17]
         all_recipes[trunc_recipe] = {'directions':recipes[recipe]['directions'],'ingredients':[]}
         for ingredient in recipes[recipe]['ingredients']:
-            ingredient_infos = extract_ingredient_info_2(ingredient,trunc_recipe)
+            ingredient_infos = extract_ingredient_info_2(ingredient)
             for ingredient_info in ingredient_infos:
                 if ingredient_info['name'] in all_ingredients:
                     all_ingredients[ingredient_info['name']].append(trunc_recipe)
