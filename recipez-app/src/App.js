@@ -1,25 +1,42 @@
+/**
+ * Title: App.js
+ * Author: Andrew Sanchez
+ * Date Created: 11/2/2017
+ * Description: This file will server as the driver of the app,
+ * containing all the components
+ */
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './css/App.min.css';
+//Styling
+import './css/App.css';
+
+//Router
+import {
+    BrowserRouter as Router,
+    Route,
+    Link
+} from 'react-router-dom'
+
+//Components
+import Header from './components/headerComponent/header';
+import Footer from './components/footerComponent/footer';
+import Homepage from './components/pages/homePage';
+import Search from './components/pages/search';
+import Kitchen from './components/pages/myKitchen';
+import Planner from './components/pages/myPlanner';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to the Recipe-Z Homepage</h1>
-        </header>
-        <p className="App-intro">
-          Our website is currently under construction.
-        </p>
-
-	<h2>Hello world!</h2>
-          <p>Testing UI stuff</p>
-
-          <img src="https://media.giphy.com/media/hhGnYTgU2Dplu/giphy.gif" alt="Jake" title="Jake"/>
-
-      </div>
+        <Router>
+        <div className="App">
+          <Header />
+            <Route exact path='/' component={Homepage} />
+            <Route exact path='/Search' component={Search} />
+            <Route exact path='/Kitchen' component={Kitchen} />
+            <Route exact path='/Planner' component={Planner} />
+          <Footer />
+        </div>
+        </Router>
     );
   }
 }
