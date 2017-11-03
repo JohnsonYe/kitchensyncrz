@@ -6,31 +6,34 @@
  * other header(e) things.
  */
 import React, { Component } from 'react';
+import {
+    Link
+} from 'react-router-dom';
 
 class Header extends Component {
     render() {
         return (
-            <header className="App-header">
-                <div className="App-logo">
+            <header>
+                <div className="Logo">
                     <img src="https://68.media.tumblr.com/avatar_acbfaaa90b06_128.png"/>
                 </div>
 
                 <nav>
                     <ul>
-                        <li>
-                            <a href={"#"}>Home</a>
+                        <li className="first">
+                            <Link to="/">Home</Link>
                         </li>
 
                         <li>
-                            <a href={"#"}>My Kitchen</a>
+                            <Link to="/Search">Search/Browse</Link>
                         </li>
 
                         <li>
-                            <a href={"#"}>My Pantry</a>
+                            <Link to="/Kitchen">MyKitchen</Link>
                         </li>
 
-                        <li>
-                            <a href={"#"}>My Planner</a>
+                        <li className="last">
+                            <Link to="/Planner">MyPlanner</Link>
                         </li>
                     </ul>
                 </nav>

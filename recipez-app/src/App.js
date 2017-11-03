@@ -6,19 +6,37 @@
  * containing all the components
  */
 import React, { Component } from 'react';
+//Styling
 import './css/App.css';
+
+//Router
+import {
+    BrowserRouter as Router,
+    Route,
+    Link
+} from 'react-router-dom'
+
+//Components
 import Header from './components/headerComponent/header';
 import Footer from './components/footerComponent/footer';
-import Homepage from './components/pages/homePage.js';
+import Homepage from './components/pages/homePage';
+import Search from './components/pages/search';
+import Kitchen from './components/pages/myKitchen';
+import Planner from './components/pages/myPlanner';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <Header />
-          <Homepage />
-        <Footer />
-      </div>
+        <Router>
+        <div className="App">
+          <Header />
+            <Route exact path='/' component={Homepage} />
+            <Route exact path='/Search' component={Search} />
+            <Route exact path='/Kitchen' component={Kitchen} />
+            <Route exact path='/Planner' component={Planner} />
+          <Footer />
+        </div>
+        </Router>
     );
   }
 }

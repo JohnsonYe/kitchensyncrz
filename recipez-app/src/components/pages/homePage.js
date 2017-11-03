@@ -10,7 +10,7 @@ class Homepage extends Component {
     render() {
         return (
             <div className="container-fluid">
-                Homepage content goes here
+                Homepage content goes here ... Our Website is currently under construction
             </div>
         );
 
