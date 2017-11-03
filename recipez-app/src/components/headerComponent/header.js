@@ -29,6 +29,10 @@ class Header extends Component {
                         </li>
 
                         <li>
+                            <Link to="/Cookbook">My Cookbook</Link>
+                        </li>
+
+                        <li>
                             <Link to="/Kitchen">MyKitchen</Link>
                         </li>
 

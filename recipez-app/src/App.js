@@ -23,6 +23,7 @@ import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
 import Kitchen from './components/pages/myKitchen';
 import Planner from './components/pages/myPlanner';
+import Cookbook from "./components/pages/myCookbook";
 
 class App extends Component {
   render() {
@@ -32,6 +33,7 @@ class App extends Component {
           <Header />
             <Route exact path='/' component={Homepage} />
             <Route exact path='/Search' component={Search} />
+            <Route exact path='/Cookbook' component={Cookbook} />
             <Route exact path='/Kitchen' component={Kitchen} />
             <Route exact path='/Planner' component={Planner} />
           <Footer />
