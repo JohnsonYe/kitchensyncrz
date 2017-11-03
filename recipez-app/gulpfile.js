@@ -1,3 +1,4 @@
+'use strict';
 // Include gulp
 var gulp = require('gulp');
 
@@ -20,5 +21,5 @@ gulp.task('compile_scss', function() {
 
 // Default
 gulp.task('default', function(){
-   gulp.watch(SCSS_SRC, ['compile_scss']);
+    gulp.watch(SCSS_SRC, ['compile_scss']);
 });
