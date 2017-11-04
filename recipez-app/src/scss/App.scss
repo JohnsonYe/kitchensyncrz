@@ -11,7 +11,6 @@ header {
     position: absolute;
     top: 50%; left: 15px;
     @include translateY(-50%);
-
   }
 
   nav,
@@ -38,7 +37,7 @@ header {
       a {
         font-size: 19px;
         line-height: normal;
-        color: white;
+        color: gray;
       }
     }
   }

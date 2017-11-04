@@ -1,11 +1,12 @@
 /**
  * Title: App.js
- * Author: Andrew Sanchez
+ * Authors: Andrew Sanchez, Vivian Lam
  * Date Created: 11/2/2017
  * Description: This file will server as the driver of the app,
  * containing all the components
  */
 import React, { Component } from 'react';
+
 //Styling
 import './css/App.css';
 
@@ -13,7 +14,6 @@ import './css/App.css';
 import {
     BrowserRouter as Router,
     Route,
-    Link
 } from 'react-router-dom'
 
 //Components
@@ -25,17 +25,29 @@ import Kitchen from './components/pages/myKitchen';
 import Planner from './components/pages/myPlanner';
 import Cookbook from "./components/pages/myCookbook";
 
+import Pantry from './components/pages/pantry';
+import Exclude from './components/pages/exclude';
+import Tools from './components/pages/tools';
+
+
 class App extends Component {
   render() {
     return (
         <Router>
         <div className="App">
-          <Header />
+            <Header />
             <Route exact path='/' component={Homepage} />
             <Route exact path='/Search' component={Search} />
             <Route exact path='/Cookbook' component={Cookbook} />
-            <Route exact path='/Kitchen' component={Kitchen} />
+            <Route path='/Kitchen' component={Kitchen} />
             <Route exact path='/Planner' component={Planner} />
+
+            <div className="Kitchen">
+                <Route exact path='/Kitchen/Pantry' component={Pantry} />
+                <Route exact path='/Kitchen/Exclude' component={Exclude} />
+                <Route exact path='/Kitchen/Tools' component={Tools} />
+            </div>
+
           <Footer />
         </div>
         </Router>
