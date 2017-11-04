@@ -25,10 +25,6 @@ import Kitchen from './components/pages/myKitchen';
 import Planner from './components/pages/myPlanner';
 import Cookbook from "./components/pages/myCookbook";
 
-import Pantry from './components/pages/pantry';
-import Exclude from './components/pages/exclude';
-import Tools from './components/pages/tools';
-
 
 class App extends Component {
   render() {
@@ -39,15 +35,8 @@ class App extends Component {
             <Route exact path='/' component={Homepage} />
             <Route exact path='/Search' component={Search} />
             <Route exact path='/Cookbook' component={Cookbook} />
-            <Route path='/Kitchen' component={Kitchen} />
+            <Route exact path='/Kitchen' component={Kitchen} />
             <Route exact path='/Planner' component={Planner} />
-
-            <div className="Kitchen">
-                <Route exact path='/Kitchen/Pantry' component={Pantry} />
-                <Route exact path='/Kitchen/Exclude' component={Exclude} />
-                <Route exact path='/Kitchen/Tools' component={Tools} />
-            </div>
-
           <Footer />
         </div>
         </Router>

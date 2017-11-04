@@ -6,19 +6,39 @@
  */
 import React, { Component } from 'react';
 
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 //Components
-import KitchenHeader from '../headerComponent/kitchenHeader'
-
+import Pantry from './pantry'
+import Exclude from './exclude'
+import Tools from './tools'
 
 class Kitchen extends Component {
     render() {
         return (
-            <div className="container-fluid">
-                <h3>
-                    <KitchenHeader />
-                </h3>
-                Good luck Team Vivian !
+            <div id="Kitchen-Tabs">
+
+                <Tabs>
+                    <TabList id="Kitchen-List">
+                        <Tab id="tab"> Pantry </Tab>
+                        <Tab id="tab"> Exclude </Tab>
+                        <Tab id="tab"> Tools </Tab>
+                    </TabList>
+
+                    <TabPanel title="Pantry">
+                        <h2> Pantry! </h2>
+                        <Pantry />
+                    </TabPanel>
+                    <TabPanel title="Exclude">
+                        <h2> Exclude! </h2>
+                        <Exclude />
+                    </TabPanel>
+                    <TabPanel title="Tools">
+                        <h2> Tools! </h2>
+                        <Tools />
+                    </TabPanel>
+                </Tabs>
+
             </div>
         );
 
