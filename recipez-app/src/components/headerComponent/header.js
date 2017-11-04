@@ -15,7 +15,7 @@ class Header extends Component {
         return (
             <header>
                 <div className="Logo">
-                    <img src="https://68.media.tumblr.com/avatar_acbfaaa90b06_128.png"/>
+                    <img src="https://68.media.tumblr.com/avatar_acbfaaa90b06_128.png" alt="Logo" />
                 </div>
 
                 <nav>
