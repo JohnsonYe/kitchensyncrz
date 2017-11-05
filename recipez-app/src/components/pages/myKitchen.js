@@ -6,7 +6,7 @@
  */
 import React, { Component } from 'react';
 
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
 
 //Components
 import Pantry from './pantry'
@@ -16,29 +16,34 @@ import Tools from './tools'
 class Kitchen extends Component {
     render() {
         return (
-            <div id="Kitchen-Tabs">
 
-                <Tabs>
-                    <TabList id="Kitchen-List">
-                        <Tab id="tab"> Pantry </Tab>
-                        <Tab id="tab"> Exclude </Tab>
-                        <Tab id="tab"> Tools </Tab>
-                    </TabList>
+            <div>
+                <Tabs defaultTab="Pantry" >
 
-                    <TabPanel title="Pantry">
+                    <div id="theTabs">
+                    <TabLink to="Pantry" id="pantry"> Pantry </TabLink>
+                    <TabLink to="Exclude" id="exclude"> Exclude </TabLink>
+                    <TabLink to="Tools" id="tools"> Tools </TabLink>
+                    </div>
+
+                    <TabPanel>
+                    <TabContent for="Pantry">
                         <h2> Pantry! </h2>
-                        <div id="P-List">
-                          <Pantry />
-                        </div>
+                        <Pantry />
+                    </TabContent>
                     </TabPanel>
                     <TabPanel title="Exclude">
+                    <TabContent for="Exclude">
                         <h2> Exclude! </h2>
                         <Exclude />
+                    </TabContent>
                     </TabPanel>
-                    <TabPanel title="Tools">
+                    <TabContent for="Tools">
+                        <TabPanel>
                         <h2> Tools! </h2>
                         <Tools />
-                    </TabPanel>
+                        </TabPanel>
+                    </TabContent>
                 </Tabs>
 
             </div>

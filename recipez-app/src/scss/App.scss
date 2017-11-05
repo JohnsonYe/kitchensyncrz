@@ -37,22 +37,36 @@ header {
       a {
         font-size: 19px;
         line-height: normal;
-        color: gray;
+        color: white;
       }
     }
   }
 }
 
 body {
-  #Kitchen-List{
+  #theTabs{
     position: relative;
     display: inline-block ;
-    background: powderblue;
-    color: white;
     list-style-type: none;
-    top: 50%; right: 15px;
+    background: powderblue;
     width: 100%;
 
+
+    #pantry{
+      display: inline-block;
+      margin: 10px;
+      color: dimgray;
+    }
+    #exclude{
+      display: inline-block;
+      margin: 10px;
+      color: dimgray;
+    }
+    #tools{
+      display: inline-block;
+      margin: 10px;
+      color: dimgray;
+    }
   }
 
 
