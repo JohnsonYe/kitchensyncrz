@@ -4,13 +4,16 @@
   "private": true,
   "homepage": "https://recipez.github.io/recipez-app",
   "dependencies": {
+    "axios": "^0.17.0",
     "gh-pages": "^1.0.0",
     "node-sass-chokidar": "0.0.3",
     "react": "^16.0.0",
+    "react-axios": "^1.0.3",
     "react-dom": "^16.0.0",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "^1.0.14"
+    "react-scripts": "^1.0.17",
+    "react-tabs": "^2.1.0"
   },
   "scripts": {
     "predeploy": "npm run build",

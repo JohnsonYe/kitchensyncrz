@@ -27,7 +27,9 @@ class Kitchen extends Component {
 
                     <TabPanel title="Pantry">
                         <h2> Pantry! </h2>
-                        <Pantry />
+                        <div id="P-List">
+                          <Pantry />
+                        </div>
                     </TabPanel>
                     <TabPanel title="Exclude">
                         <h2> Exclude! </h2>
