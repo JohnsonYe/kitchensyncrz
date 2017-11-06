@@ -1,16 +1,47 @@
 /**
  * Title: myKitchen.js
- * Author: Andrew Sanchez
+ * Authors: Andrew Sanchez, Vivian Lam
  * Date Created: 11/2/2017
  * Description: This file will serve as the Kitchen page
  */
 import React, { Component } from 'react';
 
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
+
+//Components
+import Pantry from './pantry'
+import Exclude from './exclude'
+import Tools from './tools'
+
 class Kitchen extends Component {
     render() {
         return (
-            <div className="container-fluid">
-                Good luck Team Vivian !
+
+            <div>
+                <Tabs defaultTab="Pantry" >
+
+                    <div id="Kitchen-Tabs">
+                        <TabLink to="Pantry" id="pantry"> Pantry </TabLink>
+                        <TabLink to="Exclude" id="exclude"> Exclude </TabLink>
+                        <TabLink to="Tools" id="tools"> Tools </TabLink>
+                    </div>
+
+                    <div id="Kitchen-Content">
+                    <TabContent for="Pantry">
+                        <h2> Pantry! </h2>
+                        <Pantry />
+                    </TabContent>
+                    <TabContent for="Exclude">
+                        <h2> Exclude! </h2>
+                        <Exclude />
+                    </TabContent>
+                    <TabContent for="Tools">
+                        <h2> Tools! </h2>
+                        <Tools />
+                    </TabContent>
+                    </div>
+                </Tabs>
+
             </div>
         );
 

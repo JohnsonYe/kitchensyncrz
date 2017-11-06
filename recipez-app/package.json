@@ -4,14 +4,17 @@
   "private": true,
   "homepage": "https://tonikhd.github.io/recipez.github.io/recipez-app",
   "dependencies": {
+    "axios": "^0.17.0",
     "gh-pages": "^1.0.0",
     "node-sass-chokidar": "0.0.3",
     "react": "^16.0.0",
     "react-bootstrap": "^0.31.5",
+    "react-axios": "^1.0.3",
     "react-dom": "^16.0.0",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "^1.0.14"
+    "react-scripts": "^1.0.14",
+    "react-tabs-redux": "^2.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
