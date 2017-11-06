@@ -12,13 +12,8 @@
     "react-dom": "^16.0.0",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-<<<<<<< HEAD
-    "react-scripts": "^1.0.17",
-    "react-tabs": "^2.1.0"
-=======
     "react-scripts": "^1.0.14",
     "react-tabs-redux": "^2.0.1"
->>>>>>> refs/remotes/origin/kitchen
   },
   "scripts": {
     "predeploy": "npm run build",

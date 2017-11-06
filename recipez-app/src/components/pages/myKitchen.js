@@ -20,30 +20,26 @@ class Kitchen extends Component {
             <div>
                 <Tabs defaultTab="Pantry" >
 
-                    <div id="theTabs">
-                    <TabLink to="Pantry" id="pantry"> Pantry </TabLink>
-                    <TabLink to="Exclude" id="exclude"> Exclude </TabLink>
-                    <TabLink to="Tools" id="tools"> Tools </TabLink>
+                    <div id="Kitchen-Tabs">
+                        <TabLink to="Pantry" id="pantry"> Pantry </TabLink>
+                        <TabLink to="Exclude" id="exclude"> Exclude </TabLink>
+                        <TabLink to="Tools" id="tools"> Tools </TabLink>
                     </div>
 
-                    <TabPanel>
+                    <div id="Kitchen-Content">
                     <TabContent for="Pantry">
                         <h2> Pantry! </h2>
                         <Pantry />
                     </TabContent>
-                    </TabPanel>
-                    <TabPanel title="Exclude">
                     <TabContent for="Exclude">
                         <h2> Exclude! </h2>
                         <Exclude />
                     </TabContent>
-                    </TabPanel>
                     <TabContent for="Tools">
-                        <TabPanel>
                         <h2> Tools! </h2>
                         <Tools />
-                        </TabPanel>
                     </TabContent>
+                    </div>
                 </Tabs>
 
             </div>
