@@ -1,8 +1,8 @@
 /**
- * Title: pantry.js
- * Author: Vivian Lam
+ * Title: exclude.js
+ * Author: Vivian Lam, Osama Qarni
  * Date Created: 11/3/2017
- * Description: This file will serve as the pantry page.
+ * Description: This file will serve as the exclude page.
  */
 import React, { Component } from 'react';
 import axios from 'axios';
@@ -13,7 +13,7 @@ const Title = ({todoCount}) => {
     return (
         <div>
             <div>
-                <h3>Pantry items: ({todoCount})</h3>
+                <h3>Exclusion List: ({todoCount})</h3>
             </div>
         </div>
     );

@@ -28,15 +28,12 @@ class Kitchen extends Component {
 
                     <div id="Kitchen-Content">
                     <TabContent for="Pantry">
-                        <h2> Pantry! </h2>
                         <Pantry />
                     </TabContent>
                     <TabContent for="Exclude">
-                        <h2> Exclude! </h2>
                         <Exclude />
                     </TabContent>
                     <TabContent for="Tools">
-                        <h2> Tools! </h2>
                         <Tools />
                     </TabContent>
                     </div>
