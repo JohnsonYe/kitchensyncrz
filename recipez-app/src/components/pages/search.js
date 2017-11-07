@@ -1,12 +1,13 @@
 /**
  * Title: search.js
- * Author: Andrew Sanchez
+ * Author: Andrew Sanchez, Alexander Haggart
  * Date Created: 11/2/2017
  * Description: This file will serve as the browse/search recipe page
  */
 import React, { Component } from 'react';
 import AWS from 'aws-sdk';
 
+//these need to go somewhere else eventaully
 var creds = new AWS.Credentials('AKIAIE53QCYJWP7TMHBQ','oa2r8OnLqfYwndX2Ig4mp8YD6H1WlK2FNOCpJDPJ')
 var db = new AWS.DynamoDB({region:'us-east-2',credentials:creds});
 
