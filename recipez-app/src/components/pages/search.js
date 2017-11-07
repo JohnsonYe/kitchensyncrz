@@ -10,7 +10,7 @@ class Search extends Component {
     render() {
         return (
             <div className="container-fluid">
-                Good luck Team Alex !
+                Search Team has arrived !
             </div>
         );
 
