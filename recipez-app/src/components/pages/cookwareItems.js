@@ -1,5 +1,5 @@
 /**
- * Title: tools.js
+ * Title: cookwareItems.js
  * Author: Vivian Lam, Osama Qarni
  * Date Created: 11/3/2017
  * Description: This file will serve as the tools page.
@@ -13,7 +13,7 @@ const Title = ({todoCount}) => {
     return (
         <div>
             <div>
-                <h3>Tools: ({todoCount})</h3>
+                <h3>Cookware Items: ({todoCount})</h3>
             </div>
         </div>
     );
@@ -53,7 +53,7 @@ const TodoList = ({todos, remove}) => {
 // Contaner Component
 // Todo Id
 window.id = 0;
-class Tools extends React.Component{
+class cookwareItems extends React.Component{
     constructor(props){
         // Pass props to parent class
         super(props);
@@ -110,4 +110,4 @@ class Tools extends React.Component{
         );
     }
 }
-export default Tools;
+export default cookwareItems;

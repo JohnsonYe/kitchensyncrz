@@ -51,21 +51,14 @@ body {
     background: powderblue;
     width: 100%;
 
-    #pantry{
+    #foodItems{
       display: inline-block;
       margin: 10px;
       color: dimgray;
       cursor: pointer;
     }
 
-    #exclude{
-      display: inline-block;
-      margin: 10px;
-      color: dimgray;
-      cursor: pointer;
-    }
-
-    #tools{
+    #cookwareItems{
       display: inline-block;
       margin: 10px;
       color: dimgray;

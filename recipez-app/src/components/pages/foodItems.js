@@ -1,8 +1,8 @@
 /**
- * Title: pantry.js
+ * Title: foodItems.js
  * Author: Vivian Lam
  * Date Created: 11/3/2017
- * Description: This file will serve as the pantry page.
+ * Description: This file will serve as the food items page.
  */
 import React, { Component } from 'react';
 import axios from 'axios';
@@ -13,7 +13,7 @@ const Title = ({todoCount}) => {
     return (
         <div>
             <div>
-                <h3>Pantry items: ({todoCount})</h3>
+                <h3>Food Items: ({todoCount})</h3>
             </div>
         </div>
     );
@@ -53,7 +53,7 @@ const TodoList = ({todos, remove}) => {
 // Contaner Component
 // Todo Id
 window.id = 0;
-class Pantry extends React.Component{
+class foodItems extends React.Component{
     constructor(props){
         // Pass props to parent class
         super(props);
@@ -110,4 +110,4 @@ class Pantry extends React.Component{
         );
     }
 }
-export default Pantry;
+export default foodItems;
