@@ -6,13 +6,16 @@
  */
 import React, { Component } from 'react';
 import AWS from 'aws-sdk';
+import DBClient from '../classes/aws_database_client';
 
 //these need to go somewhere else eventaully
-var creds = new AWS.CognitoIdentityCredentials({
-  IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
-});
-AWS.config.update({region:'us-east-2',credentials:creds});
-var db = new AWS.DynamoDB();
+// var creds = new AWS.CognitoIdentityCredentials({
+//   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
+// });
+// AWS.config.update({region:'us-east-2',credentials:creds});
+// var db = new AWS.DynamoDB();
+
+var client = new DBClient();
 
 
 class Search extends Component {
@@ -21,35 +24,23 @@ class Search extends Component {
 
 		this.test = 'test '
 		this.dataPullTest = this.dataPullTest.bind(this);
+        this.dataReciever = this.dataReciever.bind(this);
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
 		this.state = {test_field:'Search!',field:'',test_output:null,data_pulled:false};
 	}
 	dataPullTest(e){
 		e.preventDefault();
-		// this.test = 'clicked the button? ';
-		// this.setState({test_field:'clicked button!'})
-		var params = {
-			RequestItems:{
-				"Ingredients":{
-					Keys:[
-						{
-							Name: {
-								S: this.state.field
-							}
-						}
-					]
-				}
-			}
-		}
-		db.batchGetItem(params,function(err,data){
-			if(err){
-				this.setState({test_field:'failed :(',test_output:err});
-			} else {
-				this.setState({test_field:'Success!',test_output:data,data_pulled:true});
-			}
-		}.bind(this))
+        client.ingredientSearch([this.state.field],this.dataReciever)
+
 		// alert(this.state.field);
 	}
+    dataReciever(result){
+        if(!result.status){
+            this.setState({test_field:'failed :(',test_output:result.payload});
+        } else {
+            this.setState({test_field:'Success!', test_output:result.payload,data_pulled:true});
+        }
+    }
     render() {
     	// alert(JSON.stringify(this.state.test_output))
         var records;
