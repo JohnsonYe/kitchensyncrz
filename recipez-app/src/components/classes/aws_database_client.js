@@ -17,15 +17,38 @@ var db = new AWS.DynamoDB();
         this.ingredientSearch = this.ingredientSearch.bind(this);
         this.getDBItems = this.getDBItems.bind(this);
         this.buildBatchRequest = this.buildBatchRequest.bind(this);
-        this.result = {};
-        this.buildBatchRequest('not a real table',['test','test2'])
+        this.login = this.login.bind(this);
     }
+
+    /*
+     * Retrieve a DB entries for a list of ingredient names
+     *
+     * [string] ingredients: list of ingredient names to use as DB keys
+     * handle target: function handle to send items to
+     */
     ingredientSearch(ingredients,target) {
-        return this.getDBItems('Ingredients',ingredients,target)
+        this.getDBItems('Ingredients',ingredients,target)
     }
+
+    /*
+     * Retrieve a DB entries for a list of recipe names
+     *
+     * [string] recipes: list of recipe names to use as DB keys
+     * handle target: function handle to send items to
+     */
     recipeSearch(recipes,target) {
-        return this.getDBItems('Recipes',ingredients,target)
+        this.getDBItems('Recipes',recipes,target)
     }
+
+    /*
+     * Retrieve an object containing database items matching the given key list
+     * the retrieved object will be sent to the given 'target' function handle
+     * and marked as successful or unsuccessful
+     *
+     * string tableName: name of the table to retrieve items from
+     * [string] keys: list of ingredient names to use as DB keys
+     * handle target: function handle to send items to
+     */
     getDBItems(tableName,keys,target){
         db.batchGetItem(this.buildBatchRequest(tableName,keys),function(err,data){
             if(err){
@@ -35,11 +58,25 @@ var db = new AWS.DynamoDB();
             }
         }.bind(this))
     }
+
+    /*
+     * Construct an SQS object to retrieve a list of keys from a table
+     * 
+     * string tableName: name of table to retrieve keys from 
+     * [string] keys: DB keys to retrieve
+     *
+     * return: JSON object set up as SQS query
+     */
     buildBatchRequest(tableName,keys) {
         var keyList = keys.map(key => ({Name:{S: key }}));
-        // alert(JSON.stringify(keyList));
         return { RequestItems:{ [tableName]:{ Keys: keyList }}}
-        // return {}['RequestItems'][tableName]['Keys'] = keyList;
+    }
+
+    /*
+     * log the user in to allow them to upload to DB and view user-specific data
+     */
+    login() {
+
     }
 
  }
