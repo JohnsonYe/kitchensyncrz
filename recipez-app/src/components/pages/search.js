@@ -69,10 +69,7 @@ class Search extends Component {
         var records;
         if(this.state.data_pulled){
         	const results = this.state.test_output
-        	records = results.map((results) => 
-        		<tr>
-        			<td>{results}</td>
-    			</tr>);
+        	records = results.map((results) => <li>{results}</li>);
         } else {
             records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
         }
@@ -108,7 +105,9 @@ class Search extends Component {
                                 </ul>
                             </td>
                             <td>
-                		      {records ? records : ''}
+                                <ol>
+                	               {records ? records : ''}
+                                </ol>
                             </td>
                         </tr>
               		</tbody>
