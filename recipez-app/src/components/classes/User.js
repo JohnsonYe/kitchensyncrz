@@ -12,6 +12,8 @@
         this.loadUserData = this.loadUserData.bind(this);
         this.getUserData = this.getUserData.bind(this);
 
+        this.getPantry = this.getPantry.bind(this);
+
         this.userData = null
     }
 
@@ -21,7 +23,42 @@
     }
 
     getPantry(){
-        return this.getUserData('Pantry');
+        /*
+         * What should this object look like? We need to decide on formatting/nesting of data
+         */
+         return ['egg','flour','water','bread','sugar']        
+    }
+
+    getCookbook(){
+        /*
+         * What should this object look like? We need to decide on formatting/nesting of data
+         */
+         return ["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
+                    "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]
+    }
+
+    getCookware(){
+        /*
+         * What should this object look like? We need to decide on formatting/nesting of data
+         */
+        return [{Name:'spoon',difficulty:1},{Name:'whisk',difficulty:2},{Name:'food processor',difficulty:8}]
+    }
+
+    getPlanner(){
+        /*
+         * What should this object look like? We need to decide on formatting/nesting of data
+         */
+        return {Monday:['cook'],Tuesday:['eat'],Wednesday:['sleep'],Thursday:['grocery shopping']}
+    }
+
+    getNotes(){
+        /*
+         * What should this object look like? We need to decide on formatting/nesting of data
+         */
+         return {"Good Old Fashioned Pancakes":
+                    {target:{type:'ingredient',id:'blueberry'},
+                    text:'use frozen blueberries for that dank artifical taste'}}
+
     }
 
     getUserData(name){
