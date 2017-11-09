@@ -26,13 +26,14 @@ class Search extends Component {
 		this.dataPullTest = this.dataPullTest.bind(this);
         this.dataReciever = this.dataReciever.bind(this);
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
-		this.state = {test_field:'Search!',field:'',test_output:null,data_pulled:false};
+		this.state = {test_field:'Search!',field:'',test_output:null,data_pulled:false,entries:[{value:'',index:0}]};
+        this.fieldChange = this.fieldChange.bind(this);
 	}
 	dataPullTest(e){
 		e.preventDefault();
-        client.ingredientSearch([this.state.field],this.dataReciever)
+        client.relevanceSearch(this.state.field.split(' '),this.dataReciever)
 
-		// alert(this.state.field);
+		// alert(this.state.field.split(' '));
 	}
     dataReciever(result){
         if(!result.status){
@@ -41,26 +42,34 @@ class Search extends Component {
             this.setState({test_field:'Success!', test_output:result.payload,data_pulled:true});
         }
     }
+    fieldChange(event,index){
+        if(index == this.state.entries.length - 1){
+
+        }
+    }
     render() {
     	// alert(JSON.stringify(this.state.test_output))
         var records;
         if(this.state.data_pulled){
-        	const results = (this.state.test_output.Responses.Ingredients.length ?
-        		this.state.test_output.Responses.Ingredients[0].recipes.L : [{M:{Name:{S:'None :('}}}] )
+        	const results = this.state.test_output
         	records = results.map((results) => 
         		<tr>
-        			<td>{results.M.Name.S}</td>
+        			<td>{results}</td>
     			</tr>);
         } else {
             records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
         }
 		// const records = <tr><td>{JSON.stringify(this.state.test_output)}</td></tr>;
+        const entry_list = this.state.entries.map( (entry) => 
+                <label>
+                    <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
+                </label>
+            )
         return (
             <div className="container-fluid">
                 <div>Search Team has arrived!</div>
  				<form onSubmit={this.dataPullTest}>
                       <label>
-                          {this.state.test_field} 
                           <input type="text" value={this.state.field} onChange={e => this.setState({field:e.target.value})}/>
                       </label>
                       <button>Submit!</button>

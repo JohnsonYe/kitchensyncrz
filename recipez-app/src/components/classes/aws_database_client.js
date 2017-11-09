@@ -18,6 +18,62 @@ var db = new AWS.DynamoDB();
         this.getDBItems = this.getDBItems.bind(this);
         this.buildBatchRequest = this.buildBatchRequest.bind(this);
         this.login = this.login.bind(this);
+        this.relevanceSearch = this.relevanceSearch.bind(this);
+        this.unpackRecipeList = this.unpackRecipeList.bind(this);
+        this.sortRecipes = this.sortRecipes.bind(this);
+        this.loadUserData = this.loadUserData.bind(this);
+        this.getUserData = this.getUserData.bind(this);
+
+        this.authenticated = false
+        this.userData = null;
+    }
+
+    loadUserData(username){
+        this.getDBItems('User',username,(response) =>
+            this.userData = response.status ? response.payload : null)
+    }
+
+    getPantry(){
+        return this.getUserData('Pantry');
+    }
+
+    getUserData(name){
+        if(!this.userData || this.userData[name]){
+            return 'Could not fetch user data';
+        } else {
+            return this.userData[name];
+        }
+    }
+
+    relevanceSearch(ingredients,target)
+    {
+        this.getDBItems('Ingredients',ingredients,(response) => this.sortRecipes(response,target))
+    }
+
+    sortRecipes(response,target){
+        var sorted = Object.entries(this.unpackRecipeList(response)).sort((a,b) => (b[1]-a[1])).map(e => e[0]);
+        // alert(JSON.stringify(sorted));
+        target({status:true,payload:sorted})
+    }
+
+    unpackRecipeList(response,rank_object) {
+        if(!recipeRank || Object.prototype.toString.call(recipeRank) != '[object Map]'){
+            var recipeRank = new Map()
+        } else {
+            var recipeRank = rank_object
+        }
+        if(!response.status)
+            return recipeRank
+        response.payload.Responses.Ingredients.forEach((ingredient) =>
+            ingredient.recipes.L.forEach(function(recipe) {
+                if(recipeRank[ recipe.M.Name.S] ){
+                    recipeRank[ recipe.M.Name.S ] += +recipe.M.Importance.N;
+                } else {
+                    recipeRank[ recipe.M.Name.S ]  = +recipe.M.Importance.N;
+                }
+            })
+        )
+        return recipeRank
     }
 
     /*
@@ -69,14 +125,19 @@ var db = new AWS.DynamoDB();
      */
     buildBatchRequest(tableName,keys) {
         var keyList = keys.map(key => ({Name:{S: key }}));
+        // alert(JSON.stringify(keyList))
         return { RequestItems:{ [tableName]:{ Keys: keyList }}}
     }
 
     /*
      * log the user in to allow them to upload to DB and view user-specific data
      */
-    login() {
+    login(username,password) {
+        return this.authenticated = true
+    }
 
+    isLoggedIn(){
+        return this.authenticated
     }
 
  }
