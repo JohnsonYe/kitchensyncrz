@@ -33,6 +33,7 @@ class Search extends Component {
                         data_pulled:false,
                         entries:[{value:'',index:0}],
                         ingredients:new Set(),
+                        selected:null
                     };
         this.fieldChange = this.fieldChange.bind(this);
 	}
@@ -42,15 +43,23 @@ class Search extends Component {
 
 		// alert(this.state.field.split(' '));
 	}
+    changeIngredientFocus(ingredient){
+        this.setState({selected:ingredient})
+    }
     addIngredient(e){
         e.preventDefault();
         if(this.state.field != ''){
             this.state.ingredients.add(this.state.field)
             this.state.recipeMap = client.relevanceSearch([this.state.field],this.dataReciever)
-            this.setState({field:''})
+            this.setState({field:'',selected:this.state.field})
         }
 
         // alert(this.state.field.split(' '));
+    }
+    removeIngredient(e){
+        // e.preventDefault();
+        this.state.ingredients.delete(this.state.selected)
+        this.setState({selected:null})
     }
     dataReciever(result){
         if(!result.status){
@@ -74,13 +83,14 @@ class Search extends Component {
             records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
         }
         var ingredient_list = []
-        this.state.ingredients.forEach((ingredient) => ingredient_list.push(<li>{ingredient}</li>))
+        this.state.ingredients.forEach((ingredient) => ingredient_list.push(<li onClick={e => this.changeIngredientFocus(ingredient)}>{ingredient}</li>))
 		// const records = <tr><td>{JSON.stringify(this.state.test_output)}</td></tr>;
         const entry_list = this.state.entries.map( (entry) => 
                 <label>
                     <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
                 </label>
             )
+        const ingredient_editor = this.state.selected ? (<div>Selected: {this.state.selected} <button onClick={e => this.removeIngredient(this.state.selected)}>Remove</button></div> ) : <div>Selected: None</div>;
         return (
             <div className="container-fluid">
                 <div>Search Team has arrived!</div>
@@ -89,7 +99,9 @@ class Search extends Component {
                           <input type="text" value={this.state.field} onChange={e => this.setState({field:e.target.value})}/>
                       </label>
                       <button>Add!</button>
-            	</form>                
+            	</form>  
+                {/* "modify ingredient" UI element  */}    
+                {ingredient_editor}         
             	<table style={{border:'1px solid black'}}>
 	            	<thead>
                         <tr>
