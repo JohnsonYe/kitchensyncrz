@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 
+#Intelij shit
+/.idea
+
 # testing
 /coverage
 
@@ -20,3 +23,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/.idea/libraries
+/.idea/workspace.iml
+/.idea/tasks.iml
