@@ -16,13 +16,13 @@ import {
     Link
 } from 'react-router-dom'
 
-//Components
+//Components Pages
 import Header from './components/headerComponent/header';
 import Footer from './components/footerComponent/footer';
 import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
 import Kitchen from './components/pages/myKitchen';
-import Planner from './components/pages/myPlanner';
+import PlannerPage from './components/pages/myPlanner';
 import Cookbook from "./components/pages/myCookbook";
 
 class App extends Component {
@@ -35,7 +35,7 @@ class App extends Component {
             <Route exact path='/Search' component={Search} />
             <Route exact path='/Cookbook' component={Cookbook} />
             <Route exact path='/Kitchen' component={Kitchen} />
-            <Route exact path='/Planner' component={Planner} />
+            <Route exact path='/Planner' component={PlannerPage} />
           <Footer />
         </div>
         </Router>
