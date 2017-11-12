@@ -19,27 +19,52 @@ const Title = ({todoCount}) => {
     );
 }
 
+// Adding to the list, aka the add bar
 const TodoForm = ({addTodo}) => {
     // Input Tracker
     let input;
-    // Return JSX
+
     return (
+
+        // Add to the form
         <form onSubmit={(e) => {
             e.preventDefault();
-            addTodo(input.value);
-            input.value = '';
+
+            // Preventing empty answers
+            if( input.value != '') {
+                addTodo(input.value);
+
+                // Clearing
+                input.value = '';
+            }
         }}>
-            <input className="form-control col-md-12" ref={node => {
-                input = node;
-            }} />
-            <br />
+
+            <div class="input-group">
+                <input className="form-control col-md-12" ref={node => {
+                    input = node;
+                }} />
+                    <button class="add" type="submit">
+                        Add
+                        <span></span>
+                    </button>
+            </div>
         </form>
+
     );
 };
 
 const Todo = ({todo, remove}) => {
     // Each Todo
-    return (<a href="#" className="list-group-item" onClick={() => {remove(todo.id)}}>{todo.text}</a>);
+    return (
+
+        <div className="form-control col-md-12">
+
+        {todo.text}
+        <button id="remove" type="submit" onClick={()=> remove(todo.id)}>
+            X
+        </button>
+        </div>
+    );
 }
 
 const TodoList = ({todos, remove}) => {
