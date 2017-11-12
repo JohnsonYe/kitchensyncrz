@@ -32,8 +32,8 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var directions = this.state.data.Ingredients.L.map((ingredient) => <li>{ingredient.S}</li>)
-        var ingredients = this.state.data.Directions.L.map((step) => <li>{step.S}</li>)
+        var ingredients = this.state.data.Ingredients.L.map((ingredient) => <li>{ingredient.S}</li>)
+        var directions = this.state.data.Directions.L.map((step) => <li>{step.S}</li>)
         return (
             <div>
                 <h1>{this.state.data.Name.S}</h1>
