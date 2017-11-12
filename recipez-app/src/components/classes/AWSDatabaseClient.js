@@ -6,6 +6,11 @@
  */
  import AWS from 'aws-sdk';
 
+ /**
+  * THIS IS A SINGLETON CLASS.
+  * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
+  */
+
 var creds = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
 });
@@ -66,9 +71,13 @@ var db = new AWS.DynamoDB();
     }
 
     unpackFormatting(aws_response) {
-        
+
     }
 
  }
+
+ var static_client = new DBClient();
+
+ DBClient.getClient = () => static_client;
 
  export default DBClient;

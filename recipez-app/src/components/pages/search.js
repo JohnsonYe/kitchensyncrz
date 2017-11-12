@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import DBClient from '../classes/AWSDatabaseClient';
 import SearchHelper from '../classes/SearchHelper';
 
-var client = new SearchHelper(new DBClient());
+var client = new SearchHelper(DBClient.getClient());
 
 
 class Search extends Component {

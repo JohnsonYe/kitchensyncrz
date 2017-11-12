@@ -7,7 +7,6 @@
 import React,{ Component } from 'react';
 import DBClient from '../classes/AWSDatabaseClient';
 
-var client = new DBClient();
 class Recipe extends Component {
     constructor(props){
         super(props)
@@ -16,7 +15,8 @@ class Recipe extends Component {
             data:'Loading . . . '
         }
         this.setData = this.setData.bind(this);
-        client.getDBItems('Recipes',[this.props.match.params.recipe],this.setData)
+        this.client = DBClient.getClient();
+        this.client.getDBItems('Recipes',[this.props.match.params.recipe],this.setData)
     }
 
     setData(response){
