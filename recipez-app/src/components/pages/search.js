@@ -5,7 +5,7 @@
  * Description: This file will serve as the browse/search recipe page
  */
 import React, { Component } from 'react';
-import AWS from 'aws-sdk';
+import { Link } from 'react-router-dom';
 import DBClient from '../classes/AWSDatabaseClient';
 import SearchHelper from '../classes/SearchHelper';
 
@@ -67,7 +67,7 @@ class Search extends Component {
         var records;
         if(this.state.data_pulled){
         	const results = this.state.test_output
-        	records = results.map((results) => <li onClick={e => alert("Not Implemented !!")}>{results}</li>);
+        	records = results.map((result) => <li><Link to={'/Recipes/'+result}>{result}</Link></li>);
         } else {
             records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
         }

@@ -65,6 +65,10 @@ var db = new AWS.DynamoDB();
         return this.authenticated
     }
 
+    unpackFormatting(aws_response) {
+        
+    }
+
  }
 
  export default DBClient;
