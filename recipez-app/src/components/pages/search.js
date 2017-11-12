@@ -9,13 +9,6 @@ import AWS from 'aws-sdk';
 import DBClient from '../classes/AWSDatabaseClient';
 import SearchHelper from '../classes/SearchHelper';
 
-//these need to go somewhere else eventaully
-// var creds = new AWS.CognitoIdentityCredentials({
-//   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
-// });
-// AWS.config.update({region:'us-east-2',credentials:creds});
-// var db = new AWS.DynamoDB();
-
 var client = new SearchHelper(new DBClient());
 
 
@@ -40,8 +33,6 @@ class Search extends Component {
 	dataPullTest(e){
 		e.preventDefault();
         client.relevanceSearch(this.state.field,this.dataReciever,this.state.test_output)
-
-		// alert(this.state.field.split(' '));
 	}
     changeIngredientFocus(ingredient){
         this.setState({selected:ingredient})
@@ -53,8 +44,6 @@ class Search extends Component {
             this.state.recipeMap = client.relevanceSearch([this.state.field],this.dataReciever)
             this.setState({field:'',selected:this.state.field})
         }
-
-        // alert(this.state.field.split(' '));
     }
     removeIngredient(e){
         // e.preventDefault();
@@ -78,7 +67,7 @@ class Search extends Component {
         var records;
         if(this.state.data_pulled){
         	const results = this.state.test_output
-        	records = results.map((results) => <li>{results}</li>);
+        	records = results.map((results) => <li onClick={e => alert("Not Implemented !!")}>{results}</li>);
         } else {
             records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
         }
@@ -90,7 +79,9 @@ class Search extends Component {
                     <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
                 </label>
             )
-        const ingredient_editor = this.state.selected ? (<div>Selected: {this.state.selected} <button onClick={e => this.removeIngredient(this.state.selected)}>Remove</button></div> ) : <div>Selected: None</div>;
+        const ingredient_editor = this.state.selected 
+        ? (<div>Selected: {this.state.selected} <button onClick={e => this.removeIngredient(this.state.selected)}>Remove</button></div> ) 
+        : (<div>Selected: None</div>);
         return (
             <div className="container-fluid">
                 <div>Search Team has arrived!</div>
