@@ -1,5 +1,5 @@
 /**
- * Title: Items.js
+ * Title: Kitchen.js
  * Authors: Andrew Sanchez, Vivian Lam
  * Date Created: 11/2/2017
  * Description: This file will serve as the Kitchen page
@@ -13,7 +13,7 @@ import FoodItems from '../kitchenComponents/pantry'
 import CookwareItems from '../kitchenComponents/cookware'
 import Excluded from '../kitchenComponents/exclude'
 
-class Kitchen extends Component {
+class kitchen extends Component {
     render() {
         return (
 
@@ -45,4 +45,4 @@ class Kitchen extends Component {
     }
 }
 
-export default Kitchen;
+export default kitchen;
