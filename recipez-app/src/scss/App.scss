@@ -51,14 +51,21 @@ body {
     background: powderblue;
     width: 100%;
 
-    #foodItems{
+    #pantry{
       display: inline-block;
       margin: 10px;
       color: dimgray;
       cursor: pointer;
     }
 
-    #cookwareItems{
+    #cookware{
+      display: inline-block;
+      margin: 10px;
+      color: dimgray;
+      cursor: pointer;
+    }
+
+    #exclude{
       display: inline-block;
       margin: 10px;
       color: dimgray;
@@ -76,6 +83,12 @@ body {
     margin-right: auto;
     position: relative;
 
+    #add{
+      cursor: pointer;
+      background: powderblue;
+      color: dimgray;
+    }
+
     #remove{
       position: absolute;
       right: 0px;
@@ -83,6 +96,8 @@ body {
       top:0px;
       cursor: pointer;
       color: red;
+      background: powderblue;
+      font-weight: bold;
     }
   }
 

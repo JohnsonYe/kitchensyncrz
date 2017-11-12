@@ -1,8 +1,8 @@
 /**
- * Title: cookwareItems.js
- * Author: Vivian Lam, Osama Qarni
+ * Title: pantry.js
+ * Author: Vivian Lam
  * Date Created: 11/3/2017
- * Description: This file will serve as the tools page.
+ * Description: This file will serve as the food items page.
  */
 import React, { Component } from 'react';
 import axios from 'axios';
@@ -13,33 +13,58 @@ const Title = ({todoCount}) => {
     return (
         <div>
             <div>
-                <h3>Cookware Items: ({todoCount})</h3>
+                <h3>Food Items: ({todoCount})</h3>
             </div>
         </div>
     );
 }
 
+// Adding to the list, aka the add bar
 const TodoForm = ({addTodo}) => {
     // Input Tracker
     let input;
-    // Return JSX
+
     return (
+
+        // Add to the form
         <form onSubmit={(e) => {
             e.preventDefault();
-            addTodo(input.value);
-            input.value = '';
+
+            // Preventing empty answers
+            if( input.value != '') {
+                addTodo(input.value);
+
+                // Clearing
+                input.value = '';
+            }
         }}>
-            <input className="form-control col-md-12" ref={node => {
-                input = node;
-            }} />
-            <br />
+
+            <div class="input-group">
+                <input className="form-control col-md-12" ref={node => {
+                    input = node;
+                }} />
+                    <button class="add" type="submit" id="add">
+                        Add
+                        <span></span>
+                    </button>
+            </div>
         </form>
+
     );
 };
 
 const Todo = ({todo, remove}) => {
     // Each Todo
-    return (<a href="#" className="list-group-item" onClick={() => {remove(todo.id)}}>{todo.text}</a>);
+    return (
+
+        <div className="form-control col-md-12">
+
+        {todo.text}
+        <button id="remove" type="submit" onClick={()=> remove(todo.id)}>
+            X
+        </button>
+        </div>
+    );
 }
 
 const TodoList = ({todos, remove}) => {
@@ -53,7 +78,7 @@ const TodoList = ({todos, remove}) => {
 // Contaner Component
 // Todo Id
 window.id = 0;
-class cookwareItems extends React.Component{
+class pantry extends React.Component{
     constructor(props){
         // Pass props to parent class
         super(props);
@@ -61,7 +86,7 @@ class cookwareItems extends React.Component{
         this.state = {
             data: []
         }
-        this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/tools'
+        this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/pantry'
     }
     // Lifecycle method
     componentDidMount(){
@@ -110,4 +135,4 @@ class cookwareItems extends React.Component{
         );
     }
 }
-export default cookwareItems;
+export default pantry;

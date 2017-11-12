@@ -9,8 +9,9 @@ import React, { Component } from 'react';
 import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
 
 //Components
-import FoodItems from './foodItems'
-import CookwareItems from './cookwareItems'
+import FoodItems from '../kitchenComponents/pantry'
+import CookwareItems from '../kitchenComponents/cookware'
+import Excluded from '../kitchenComponents/exclude'
 
 class Items extends Component {
     render() {
@@ -20,16 +21,20 @@ class Items extends Component {
                 <Tabs defaultTab="foodItems" >
 
                     <div id="Kitchen-Tabs">
-                        <TabLink to="foodItems" id="foodItems"> Food Items </TabLink>
-                        <TabLink to="cookwareItems" id="cookwareItems"> Cookware Items </TabLink>
+                        <TabLink to="pantry" id="pantry"> Food Items </TabLink>
+                        <TabLink to="cookware" id="cookware"> Cookware Items </TabLink>
+                        <TabLink to="exclude" id="exclude"> Excluded </TabLink>
                     </div>
 
                     <div id="Kitchen-Content">
-                    <TabContent for="foodItems">
+                    <TabContent for="pantry">
                         <FoodItems />
                     </TabContent>
-                    <TabContent for="cookwareItems">
+                    <TabContent for="cookware">
                         <CookwareItems />
+                    </TabContent>
+                    <TabContent for="exclude">
+                        <Excluded />
                     </TabContent>
                     </div>
                 </Tabs>

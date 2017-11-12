@@ -1,8 +1,8 @@
 /**
- * Title: foodItems.js
+ * Title: cookware.js
  * Author: Vivian Lam
  * Date Created: 11/3/2017
- * Description: This file will serve as the food items page.
+ * Description: This file will serve as the cookware page.
  */
 import React, { Component } from 'react';
 import axios from 'axios';
@@ -13,17 +13,16 @@ const Title = ({todoCount}) => {
     return (
         <div>
             <div>
-                <h3>Food Items: ({todoCount})</h3>
+                <h3>Cookware Items: ({todoCount})</h3>
             </div>
         </div>
     );
 }
 
-// Adding to the list, aka the add bar
 const TodoForm = ({addTodo}) => {
     // Input Tracker
     let input;
-
+    // Return JSX
     return (
 
         // Add to the form
@@ -43,10 +42,10 @@ const TodoForm = ({addTodo}) => {
                 <input className="form-control col-md-12" ref={node => {
                     input = node;
                 }} />
-                    <button class="add" type="submit">
-                        Add
-                        <span></span>
-                    </button>
+            <button class="add" type="submit" id="add">
+                Add
+                <span></span>
+            </button>
             </div>
         </form>
 
@@ -59,11 +58,12 @@ const Todo = ({todo, remove}) => {
 
         <div className="form-control col-md-12">
 
-        {todo.text}
-        <button id="remove" type="submit" onClick={()=> remove(todo.id)}>
+            {todo.text}
+            <button id="remove" type="submit" onClick={()=> remove(todo.id)}>
             X
-        </button>
+            </button>
         </div>
+
     );
 }
 
@@ -78,7 +78,7 @@ const TodoList = ({todos, remove}) => {
 // Contaner Component
 // Todo Id
 window.id = 0;
-class foodItems extends React.Component{
+class cookware extends React.Component{
     constructor(props){
         // Pass props to parent class
         super(props);
@@ -86,7 +86,7 @@ class foodItems extends React.Component{
         this.state = {
             data: []
         }
-        this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/pantry'
+        this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/tools'
     }
     // Lifecycle method
     componentDidMount(){
@@ -135,4 +135,4 @@ class foodItems extends React.Component{
         );
     }
 }
-export default foodItems;
+export default cookware;

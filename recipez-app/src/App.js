@@ -22,7 +22,7 @@ import Header from './components/headerComponent/header';
 import Footer from './components/footerComponent/footer';
 import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
-import Items from './components/pages/Items';
+import Kitchen from './components/kitchenComponents/Kitchen';
 import Planner from './components/pages/myPlanner';
 import Cookbook from "./components/pages/myCookbook";
 
@@ -36,7 +36,7 @@ class App extends Component {
             <Route exact path='/' component={Homepage} />
             <Route exact path='/Search' component={Search} />
             <Route exact path='/Cookbook' component={Cookbook} />
-            <Route exact path='/Items' component={Items} />
+            <Route exact path='/Kitchen' component={Kitchen} />
             <Route exact path='/Planner' component={Planner} />
             <Footer />
         </div>
