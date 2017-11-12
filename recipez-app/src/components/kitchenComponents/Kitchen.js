@@ -13,7 +13,7 @@ import FoodItems from '../kitchenComponents/pantry'
 import CookwareItems from '../kitchenComponents/cookware'
 import Excluded from '../kitchenComponents/exclude'
 
-class Items extends Component {
+class Kitchen extends Component {
     render() {
         return (
 
@@ -45,4 +45,4 @@ class Items extends Component {
     }
 }
 
-export default Items;
+export default Kitchen;
