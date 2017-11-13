@@ -21,9 +21,9 @@ class kitchen extends Component {
                 <Tabs defaultTab="foodItems" >
 
                     <div id="Kitchen-Tabs">
-                        <TabLink to="pantry" id="pantry"> Food Items </TabLink>
-                        <TabLink to="cookware" id="cookware"> Cookware Items </TabLink>
-                        <TabLink to="exclude" id="exclude"> Excluded </TabLink>
+                        <TabLink to="pantry" id="pantry"> Pantry </TabLink>
+                        <TabLink to="cookware" id="cookware"> Cookware </TabLink>
+                        <TabLink to="exclude" id="exclude"> Exclude </TabLink>
                     </div>
 
                     <div id="Kitchen-Content">
