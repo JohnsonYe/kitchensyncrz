@@ -22,7 +22,7 @@ import Header from './components/headerComponent/header';
 import Footer from './components/footerComponent/footer';
 import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
-import Kitchen from './components/kitchenComponents/kitchen';
+import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/myPlanner';
 import Cookbook from "./components/pages/myCookbook";
 
