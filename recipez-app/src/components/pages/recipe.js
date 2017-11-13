@@ -25,7 +25,7 @@ class Recipe extends Component {
             return;
         }
 
-        this.setState({data:response.payload.Responses.Recipes[0],loaded:true})
+        this.setState({data:response.payload[0],loaded:true})
     }
 
     render() {

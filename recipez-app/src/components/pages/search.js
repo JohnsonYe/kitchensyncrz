@@ -6,10 +6,10 @@
  */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import DBClient from '../classes/AWSDatabaseClient';
 import SearchHelper from '../classes/SearchHelper';
+import PlannerHelper from '../classes/Planner';
 
-var client = new SearchHelper(DBClient.getClient());
+var client = new SearchHelper();
 
 
 class Search extends Component {
@@ -29,6 +29,8 @@ class Search extends Component {
                         selected:null
                     };
         this.fieldChange = this.fieldChange.bind(this);
+
+        this.planner = new PlannerHelper();
 	}
 	dataPullTest(e){
 		e.preventDefault();

@@ -22,6 +22,7 @@ var db = new AWS.DynamoDB();
         this.getDBItems = this.getDBItems.bind(this);
         this.buildBatchRequest = this.buildBatchRequest.bind(this);
         this.login = this.login.bind(this);
+        this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false
     }
@@ -40,9 +41,9 @@ var db = new AWS.DynamoDB();
             if(err){
                 target({status:false, payload: err});
             } else {
-                target({status:true,  payload: data});
+                target({status:true,  payload: data.Responses[tableName]});
             }
-        }.bind(this))
+        })
     }
 
     /*
@@ -59,10 +60,33 @@ var db = new AWS.DynamoDB();
         return { RequestItems:{ [tableName]:{ Keys: keyList }}}
     }
 
+    updateItem(params,target){
+        db.updateItem(params,function(err,data){
+            if(err){
+                target({status:false, payload: err});
+            } else {
+                target({status:true,  payload: data});
+            }
+        })
+
+    }
+
+    buildUpdateRequest(tableName,key,setName,operation,item){
+
+        return {"UpdateExpression": (operation + "#set = :item"),
+                "ExpressionAttributeNames":{"#set":setName},
+                "ExpressionAttributeValues":{":item":{M:{'meal':item}}},
+                "TableName":tableName,
+                "Key":{Name:{S:key}}
+            }
+
+    }
+
     /*
      * log the user in to allow them to upload to DB and view user-specific data
      */
     login(username,password) {
+        this.user = username
         return this.authenticated = true
     }
 
