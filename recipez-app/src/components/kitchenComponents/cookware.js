@@ -4,7 +4,7 @@
  * Date Created: 11/3/2017
  * Description: This file will serve as the cookware page.
  */
-import KitchenLists from './kitchenLists';
+import KitchenLists from './lists';
 
 class cookware extends KitchenLists{
     constructor(props){

@@ -1,5 +1,5 @@
 /**
- * Title: kitchenLists.js
+ * Title: lists.js
  * Author: Vivian Lam
  * Date Created: 11/12/2017
  * Description: This file will serve as an abstract class for all
@@ -80,7 +80,7 @@ const TodoList = ({todos, remove}) => {
 // Container Component
 // Todo Id
 window.id = 0;
-class KitchenLists extends React.Component{
+class lists extends React.Component{
 
     constructor(props){
         // Pass props to parent class
@@ -140,4 +140,4 @@ class KitchenLists extends React.Component{
     }
 }
 
-export default KitchenLists;
+export default lists;

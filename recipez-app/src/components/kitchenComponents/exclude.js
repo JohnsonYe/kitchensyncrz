@@ -6,7 +6,7 @@
  * preference page.
  */
 
-import KitchenLists from './kitchenLists';
+import KitchenLists from './lists';
 
 // Container Component
 // Todo Id

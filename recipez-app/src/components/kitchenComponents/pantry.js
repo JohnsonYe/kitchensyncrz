@@ -5,7 +5,7 @@
  * Description: This file will serve as the cookware page.
  */
 
-import KitchenLists from './kitchenLists';
+import KitchenLists from './lists';
 
 
 class pantry extends KitchenLists{
