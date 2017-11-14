@@ -22,6 +22,7 @@ var db = new AWS.DynamoDB();
         this.getDBItems = this.getDBItems.bind(this);
         this.buildBatchRequest = this.buildBatchRequest.bind(this);
         this.login = this.login.bind(this);
+        this.getUsername = this.getUsername.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false
@@ -61,23 +62,34 @@ var db = new AWS.DynamoDB();
     }
 
     updateItem(params,target){
-        db.updateItem(params,function(err,data){
+        db.updateItem(params,this.pushResponseToHandle(target))
+
+    }
+
+    pushResponseToHandle(target){
+        return (function(err,data){
             if(err){
                 target({status:false, payload: err});
             } else {
                 target({status:true,  payload: data});
             }
         })
-
     }
 
-    buildUpdateRequest(tableName,key,setName,operation,item){
+    buildMapUpdateExpression(mapName,key,value){
+        return {expr: 'SET #map.' + key + ' = :item',
+                names:{"#map":mapName},
+                values:{":item":value}
+            }
+    }
 
-        return {"UpdateExpression": (operation + "#set = :item"),
-                "ExpressionAttributeNames":{"#set":setName},
-                "ExpressionAttributeValues":{":item":{M:{'meal':item}}},
+
+    buildUpdateRequest(tableName,keyField,key,updateExpression){
+        return {"UpdateExpression": updateExpression.expr,
+                "ExpressionAttributeNames":updateExpression.names,
+                "ExpressionAttributeValues":updateExpression.values,
                 "TableName":tableName,
-                "Key":{Name:{S:key}}
+                "Key":{[keyField]:{S:key}}
             }
 
     }
@@ -92,6 +104,10 @@ var db = new AWS.DynamoDB();
 
     isLoggedIn(){
         return this.authenticated
+    }
+
+    getUsername(){
+        return this.user
     }
 
     unpackFormatting(aws_response) {

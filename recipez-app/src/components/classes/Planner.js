@@ -10,26 +10,24 @@ import DBClient from "./AWSDatabaseClient"
     constructor(){
         this.client = DBClient.getClient()
 
-        var req = this.client.buildUpdateRequest('User','user001','planner','SET',{S:'chicken and rice'});
-        // this.client.updateItem(req,(s,r) => alert(JSON.stringify(s)))
+        this.addMeal = this.addMeal.bind(this);
+        this.removeMeal = this.removeMeal.bind(this);
 
-
+        // this.addMeal('Monday.breakfast','chicken noodle soup',(e)=>alert(JSON.stringify(e.payload)));
     }
 
-    addMeal(day,recipe){
+    addMeal(day,recipe,target){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User','username',this.client.getUsername(),
+                this.client.buildMapUpdateExpression('planner',day,{S:recipe})),
+                this.client.pushResponseToHandle(target));
 
     }
 
     removeMeal(day,recipe){
 
     }
-
-    pushRequest(request){
-
-    }
-
-
-
  }
 
  export default PlannerHelper;
