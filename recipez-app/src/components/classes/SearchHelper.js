@@ -21,7 +21,7 @@
 
     relevanceSearch(ingredients,target)
     {
-        this.client.getDBItems('Ingredients',ingredients,(response) => this.sortRecipes(response,target))
+        this.client.getDBItems('Ingredients','Name',ingredients,(response) => this.sortRecipes(response,target))
     }
 
     sortRecipes(response,target){
@@ -56,7 +56,7 @@
      * handle target: function handle to send items to
      */
     ingredientSearch(ingredients,target) {
-        this.client.getDBItems('Ingredients',ingredients,target)
+        this.client.getDBItems('Ingredients','Name',ingredients,target)
     }
 
     /*
@@ -66,7 +66,7 @@
      * handle target: function handle to send items to
      */
     recipeSearch(recipes,target) {
-        this.client.getDBItems('Recipes',recipes,target)
+        this.client.getDBItems('Recipes','Name',recipes,target)
     }
  }
 

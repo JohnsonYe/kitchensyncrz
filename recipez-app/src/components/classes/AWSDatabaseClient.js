@@ -37,8 +37,8 @@ var db = new AWS.DynamoDB();
      * [string] keys: list of ingredient names to use as DB keys
      * handle target: function handle to send items to
      */
-    getDBItems(tableName,keys,target){
-        db.batchGetItem(this.buildBatchRequest(tableName,keys),function(err,data){
+    getDBItems(tableName,keyField,keys,target){
+        db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
             if(err){
                 target({status:false, payload: err});
             } else {
@@ -55,8 +55,8 @@ var db = new AWS.DynamoDB();
      *
      * return: JSON object set up as SQS query
      */
-    buildBatchRequest(tableName,keys) {
-        var keyList = keys.map(key => ({Name:{S: key }}));
+    buildBatchRequest(tableName,keyField,keys) {
+        var keyList = keys.map(key => ({[keyField]:{S: key }}));
         // alert(JSON.stringify(keyList))
         return { RequestItems:{ [tableName]:{ Keys: keyList }}}
     }

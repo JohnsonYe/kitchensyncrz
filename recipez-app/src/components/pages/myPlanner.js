@@ -10,7 +10,14 @@ import Grid from "react-bootstrap/es/Grid";
 import Row from "react-bootstrap/es/Row";
 import Col from "react-bootstrap/es/Col";
 
+import User from '../classes/User'
+
 class PlannerPage extends Component {
+    constructor(props){
+        super(props);
+
+        this.client = new User();
+    }
 
     render() {
         return (

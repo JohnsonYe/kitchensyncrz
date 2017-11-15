@@ -14,12 +14,28 @@
 
         this.getPantry = this.getPantry.bind(this);
 
-        this.userData = null
+        this.loadUserData('user001')
     }
 
+    /**
+     * this.userData:
+     * {
+     *      username: <String> username associated with this object, also the primary key for the User table
+     *      pantry:   <Map<String,Object>> user's ingredient pantry and associated metadata
+     *      cookbook: <Set<String>> user's favorited/saved recipe list
+     *      cookware: <Set<String>> user's available cookware
+     * }
+     */
     loadUserData(username){
-        this.client.getDBItems('User',username,(response) =>
-            this.userData = response.status ? response.payload : null)
+        this.client.getDBItems('User','username',[username],function(response) {
+            (this.userData = (response.status
+            ?
+            {
+                username:response.payload[0].username.S,
+                cookbook:new Set(response.payload[0].cookbook.SS),
+                cookware:new Set(response.payload[0].cookware.SS)
+            }
+            : null))})
     }
 
     getPantry(){
@@ -33,8 +49,8 @@
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return ["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
-                    "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]
+         return new Set(["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
+                    "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
     }
 
     getCookware(){

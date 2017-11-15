@@ -41,7 +41,7 @@ import DBClient from '../classes/AWSDatabaseClient';
     }
 
     loadRecipe(recipeName,callback){
-        this.client.getDBItems('Recipes',recipeName,e => this.receiveRecipe(e,callback))
+        this.client.getDBItems('Recipes','Name',recipeName,e => this.receiveRecipe(e,callback))
     }
 
     receiveRecipe(response,callback) {
