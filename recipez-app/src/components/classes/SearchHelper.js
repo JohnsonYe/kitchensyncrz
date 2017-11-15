@@ -4,10 +4,11 @@
  * Date Created: 11/7/2017
  * Description: This file will handle search functionality through the DBClient
  */
+ import DBClient from "./AWSDatabaseClient"
 
  class SearchHelper {
-    constructor(client){
-        this.client = client
+    constructor(){
+        this.client = DBClient.getClient()
         this.relevanceSearch = this.relevanceSearch.bind(this);
         this.unpackRecipeList = this.unpackRecipeList.bind(this);
         this.sortRecipes = this.sortRecipes.bind(this);
@@ -36,7 +37,7 @@
         }
         if(!response.status)
             return this.recipeMap
-        response.payload.Responses.Ingredients.forEach((ingredient) =>
+        response.payload.forEach((ingredient) =>
             ingredient.recipes.L.forEach(function(recipe) {
                 if(this.recipeMap[ recipe.M.Name.S] ){
                     this.recipeMap[ recipe.M.Name.S ] += +recipe.M.Importance.N;
