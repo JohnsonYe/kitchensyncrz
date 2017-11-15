@@ -45,6 +45,16 @@
             : null))/*; alert(JSON.stringify(this.userData))*/}.bind(this))
     }
 
+    /**
+     * get a Pantry Object:
+     * {
+     *      [Ingredient]:
+     *      {
+     *          amount: amout of this ingredient
+     *          unit: unit of ingredient amount
+     *      }
+     * }
+     */
     getPantry(){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
