@@ -54,21 +54,21 @@ body {
     #pantry{
       display: inline-block;
       margin: 10px;
-      color: dimgray;
+      color: dimgrey;
       cursor: pointer;
     }
 
     #cookware{
       display: inline-block;
       margin: 10px;
-      color: dimgray;
+      color: dimgrey;
       cursor: pointer;
     }
 
     #exclude{
       display: inline-block;
       margin: 10px;
-      color: dimgray;
+      color: dimgrey;
       cursor: pointer;
     }
   }
@@ -83,10 +83,15 @@ body {
     margin-right: auto;
     position: relative;
 
+    #gap{
+      margin-top:30px;
+    }
+
     #add{
       cursor: pointer;
       background: powderblue;
-      color: dimgray;
+      color: green;
+      font-weight: bold;
     }
 
     #remove{
@@ -99,6 +104,7 @@ body {
       background: powderblue;
       font-weight: bold;
     }
+
   }
 
 }

@@ -5,11 +5,14 @@
  * Description: This file will serve as the cookware page.
  */
 
-import KitchenLists from './lists';
+import KitchenLists from './kitchenLists';
+import addBar from './addBar'
 
+// Mixin, use for multiple extensions
+class pantry extends addBar(KitchenLists){
 
-class pantry extends KitchenLists{
     constructor(props){
+
         // Pass props to parent class
         super(props);
 
@@ -17,8 +20,11 @@ class pantry extends KitchenLists{
         this.state = {
             data: []
         }
+
+        //Will change once database is ready
         this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/pantry'
     }
+
 }
 
 export default pantry;

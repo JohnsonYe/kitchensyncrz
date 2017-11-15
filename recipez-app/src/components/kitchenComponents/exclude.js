@@ -6,21 +6,26 @@
  * preference page.
  */
 
-import KitchenLists from './lists';
+import KitchenLists from './kitchenLists';
+import addBar from './addBar'
 
-// Container Component
-// Todo Id
-window.id = 0;
-class Exclude extends KitchenLists{
+// Mixin, use for multiple extensions
+class exclude extends addBar(KitchenLists){
+
     constructor(props){
+
         // Pass props to parent class
         super(props);
+
         // Set initial state
         this.state = {
             data: []
         }
+
+        // Will change once database is ready
         this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/exclude'
     }
+
 }
 
-export default Exclude;
+export default exclude;
