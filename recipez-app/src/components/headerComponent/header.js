@@ -13,7 +13,7 @@ import {
 class Header extends Component {
     render() {
         return (
-            <header>
+            <div className="header">
                 <div className="Logo">
                     <img src="https://68.media.tumblr.com/avatar_acbfaaa90b06_128.png" alt="Logo" />
                 </div>
@@ -41,7 +41,7 @@ class Header extends Component {
                         </li>
                     </ul>
                 </nav>
-            </header>
+            </div>
         );
     }
 }
