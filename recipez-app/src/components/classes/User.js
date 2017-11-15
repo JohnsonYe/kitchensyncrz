@@ -38,7 +38,7 @@
                 cookware:new Set(response.payload[0].cookware.SS),
                 pantry:this.client.unpackMap(response.payload[0].pantry.M)
             }
-            : null)); alert(JSON.stringify(this.userData))}.bind(this))
+            : null))/*; alert(JSON.stringify(this.userData))*/}.bind(this))
     }
 
     getPantry(){
