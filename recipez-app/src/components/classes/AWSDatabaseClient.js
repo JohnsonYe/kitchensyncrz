@@ -83,6 +83,19 @@ var db = new AWS.DynamoDB();
             }
     }
 
+    buildSetUpdateExpression(attrName,value){
+        return {expr: 'SET #attr = :item',
+                names:{"#attr":attrName},
+                values:{":item":value}
+            }
+    }
+
+    buildListAppendUpdateExpression(attrName,value){
+        return {expr: 'SET #attr = list_append(#attr,:item)',
+                names:{"#attr":attrName},
+                values:{":item":value}
+            }
+    }
 
     buildUpdateRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,

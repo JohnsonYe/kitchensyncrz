@@ -6,6 +6,7 @@
  */
 import React,{ Component } from 'react';
 import DBClient from '../classes/AWSDatabaseClient';
+import RecipeHelper from '../classes/RecipeHelper';
 
 class Recipe extends Component {
     constructor(props){
@@ -15,28 +16,25 @@ class Recipe extends Component {
             data:'Loading . . . '
         }
         this.setData = this.setData.bind(this);
-        this.client = DBClient.getClient();
-        this.client.getDBItems('Recipes',[this.props.match.params.recipe],this.setData)
+        this.client = new RecipeHelper();
+        this.client.loadRecipe([this.props.match.params.recipe],this.setData)
     }
 
-    setData(response){
-        if(!response.status){
-            //do nothing? or try again
-            return;
-        }
-
-        this.setState({data:response.payload[0],loaded:true})
+    setData(recipeObject){
+        this.setState({data:recipeObject,loaded:true})
     }
 
     render() {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var ingredients = this.state.data.Ingredients.L.map((ingredient) => <li>{ingredient.S}</li>)
-        var directions = this.state.data.Directions.L.map((step) => <li>{step.S}</li>)
+        var ingredients = this.state.data.Ingredients.map((ingredient) => <li>{ingredient}</li>)
+        var directions = this.state.data.Directions.map((step) => <li>{step}</li>)
+        var dummyReviewObject = {username:'user001',Comment:'hello world',Rating:'5',timestamp:'-1'}
         return (
             <div>
-                <h1>{this.state.data.Name.S}</h1>
+                <h1>{this.state.data.Name}</h1>
+                <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject)}>U P D A T E</button>
                 <h2>Ingredients:</h2>
                 <ul>{ingredients}</ul>
                 <h2>Directions:</h2>
