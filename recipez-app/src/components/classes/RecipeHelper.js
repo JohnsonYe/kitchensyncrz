@@ -20,7 +20,6 @@ import DBClient from '../classes/AWSDatabaseClient';
     /**
      * push a new review object to the review list for the given recipe
      * review object should follow format given below
-     * this method naively pushes new reviews; caller must verify
      */
     updateReview(recipeName,revObj){
         //re-pack the review object

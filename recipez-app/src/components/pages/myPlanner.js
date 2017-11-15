@@ -15,8 +15,6 @@ import User from '../classes/User'
 class PlannerPage extends Component {
     constructor(props){
         super(props);
-
-        this.client = new User();
     }
 
     render() {

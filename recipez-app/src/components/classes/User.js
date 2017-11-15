@@ -13,8 +13,10 @@
         this.getUserData = this.getUserData.bind(this);
 
         this.getPantry = this.getPantry.bind(this);
+        this.addToPantry = this.addToPantry.bind(this);
 
-        this.loadUserData('user001')
+        this.loadUserData(this.client.getUsername())
+        this.addToPantry('zucchini','none',1)
     }
 
     /**
@@ -26,23 +28,34 @@
      *      cookware: <Set<String>> user's available cookware
      * }
      */
-    loadUserData(username){
-        this.client.getDBItems('User','username',[username],function(response) {
+    loadUserData(){
+        this.client.getDBItems('User','username',[this.client.getUsername()],function(response) {
             (this.userData = (response.status
             ?
             {
                 username:response.payload[0].username.S,
                 cookbook:new Set(response.payload[0].cookbook.SS),
-                cookware:new Set(response.payload[0].cookware.SS)
+                cookware:new Set(response.payload[0].cookware.SS),
+                pantry:this.client.unpackMap(response.payload[0].pantry.M)
             }
-            : null))}.bind(this))
+            : null)); alert(JSON.stringify(this.userData))}.bind(this))
     }
 
     getPantry(){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return ['egg','flour','water','bread','sugar']        
+         return this.userData.pantry       
+    }
+
+    addToPantry(ingredient,unit,amount){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',this.client.getUsername(),
+                this.client.buildMapUpdateExpression('pantry',ingredient,{M:{amount:{N:amount.toString()},unit:{S:unit}}})),
+            function(error,response){if(!error) this.userData.pantry[ingredient] = {amount:amount,unit:unit}}.bind(this))
+
     }
 
     getCookbook(){
@@ -85,5 +98,10 @@
         }
     }
  }
+
+
+ var static_user = new User();
+
+ User.getUser = () => static_user;
 
  export default User;

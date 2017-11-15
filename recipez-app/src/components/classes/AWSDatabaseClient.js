@@ -107,6 +107,13 @@ var db = new AWS.DynamoDB();
             }
     }
 
+    buildStringSetAppendUpdateExpression(attrName,value){
+        return {expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+                names:{"#attr":attrName},
+                values:{":item":value,":empty_set":{SS:[]}}
+            }
+    }
+
     buildUpdateRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
                 "ExpressionAttributeNames":updateExpression.names,
@@ -135,6 +142,17 @@ var db = new AWS.DynamoDB();
 
     unpackFormatting(aws_response) {
 
+    }
+
+    unpackMap(aws_style_map){
+        var client_style_map = {};
+        // alert(JSON.stringify(Object.entries(aws_style_map)))
+        Object.entries(aws_style_map).forEach(
+            (kvp) => Object.entries(kvp[1].M).forEach(
+                (ikvp) => client_style_map[kvp[0]] = Object.assign({[ikvp[0]]:Object.entries(ikvp[1])[0][1]},client_style_map[kvp[0]])))
+        // alert(JSON.stringify(client_style_map))
+
+        return client_style_map
     }
 
  }
