@@ -17,22 +17,27 @@ import DBClient from '../classes/AWSDatabaseClient';
         this.updateReview = this.updateReview.bind(this);
     }
 
+    /**
+     * push a new review object to the review list for the given recipe
+     * review object should follow format given below
+     * this method naively pushes new reviews; caller must verify
+     */
     updateReview(recipeName,revObj){
         //re-pack the review object
-        var packedReviewObject = {L:[{M:{
+        var packedReviewObject = {M:{
                 username:{S:revObj.username},
                 Comment:{S:revObj.Comment},
                 Rating:{N:revObj.Rating},
                 timestamp:{N:revObj.timestamp},
             }
-        }]}
+        }
 
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'Recipes',
                 'Name',recipeName,
-                this.client.buildListAppendUpdateExpression('Reviews',packedReviewObject)),
-            (e,r) => alert(JSON.stringify(e)))
+                this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject)),
+            (e,r)=>alert(JSON.stringify(e)))
     }
 
     loadRecipe(recipeName,callback){
@@ -64,11 +69,12 @@ import DBClient from '../classes/AWSDatabaseClient';
     unpackRecipe(recipeResponse){
         var reviews = []
         if(recipeResponse.Reviews){
-            reviews = recipeResponse.Reviews.L.map((review) => ({
-                username: review.M.username.S,
-                Comment: review.M.Comment.S,
-                Rating: review.M.Rating.N,
-                timestamp: review.M.timestamp.N,
+            // alert(JSON.stringify(Object.entries(recipeResponse.Reviews.M)))
+            reviews = Object.entries(recipeResponse.Reviews.M).map((review) => ({
+                username: review[1].M.username.S,
+                Comment: review[1].M.Comment.S,
+                Rating: review[1].M.Rating.N,
+                timestamp: review[1].M.timestamp.N,
             }))
         }
         return {

@@ -15,12 +15,12 @@ class Recipe extends Component {
             loaded:false,
             data:'Loading . . . '
         }
-        this.setData = this.setData.bind(this);
+        this.setRecipeData = this.setRecipeData.bind(this);
         this.client = new RecipeHelper();
-        this.client.loadRecipe([this.props.match.params.recipe],this.setData)
+        this.client.loadRecipe([this.props.match.params.recipe],this.setRecipeData)
     }
 
-    setData(recipeObject){
+    setRecipeData(recipeObject){
         this.setState({data:recipeObject,loaded:true})
     }
 
@@ -28,9 +28,16 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var ingredients = this.state.data.Ingredients.map((ingredient) => <li>{ingredient}</li>)
+        var ingredients = this.state.data.Ingredients.map((ingredient) => <li><font color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</font></li>)
         var directions = this.state.data.Directions.map((step) => <li>{step}</li>)
-        var dummyReviewObject = {username:'user001',Comment:'hello world',Rating:'5',timestamp:'-1'}
+        var reviews = this.state.data.Reviews.map((review) => 
+            <li>
+                <div>
+                    <h5 style={{float:'left'}}>{review.username}</h5><img src={'/star.jpg'} height='21' width='21'/>
+                </div>
+                <p>{review.Comment}</p>
+            </li>)
+        var dummyReviewObject = {username:'user001',Comment:'new hello world',Rating:'5',timestamp:'-1'}
         return (
             <div>
                 <h1>{this.state.data.Name}</h1>
@@ -39,6 +46,8 @@ class Recipe extends Component {
                 <ul>{ingredients}</ul>
                 <h2>Directions:</h2>
                 <ol>{directions}</ol>
+                <h2>Reviews:</h2>
+                <ul>{reviews}</ul>
             </div>
             )
     }

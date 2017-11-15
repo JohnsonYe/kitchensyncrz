@@ -77,10 +77,20 @@ var db = new AWS.DynamoDB();
     }
 
     buildMapUpdateExpression(mapName,key,value){
-        return {expr: 'SET #map.' + key + ' = :item',
-                names:{"#map":mapName},
-                values:{":item":value}
+        // return {expr: 'SET #'+key+'=if_not_exists(#'+key+',:empty_map) SET #'+key+'.' + key + ' = :'+key+'_value',
+        return {expr: 'SET #'+key+'.' + key + ' = :'+key+'_value',
+                names:{["#"+key]:mapName},
+                // values:{[":"+key+'_value']:value,':empty_map':{M:{}}}
+                values:{[":"+key+'_value']:value}
             }
+    }
+
+    combineUpdateExpressions(exp1,exp2){
+        return {
+            expr:   exp1.expr + ',' + exp2.expr,
+            names:  Object.assign(exp1.names,exp2.names),
+            values: Object.assign(exp1.values,exp2.values)
+        }
     }
 
     buildSetUpdateExpression(attrName,value){
@@ -91,9 +101,9 @@ var db = new AWS.DynamoDB();
     }
 
     buildListAppendUpdateExpression(attrName,value){
-        return {expr: 'SET #attr = list_append(#attr,:item)',
+        return {expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
                 names:{"#attr":attrName},
-                values:{":item":value}
+                values:{":item":value,":empty_list":{L:[]}}
             }
     }
 
