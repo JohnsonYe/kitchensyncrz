@@ -17,19 +17,17 @@ class Recipe extends Component {
         this.setRecipeData = this.setRecipeData.bind(this);
         this.updateReviews = this.updateReviews.bind(this);
         this.client = new RecipeHelper();
-        this.recipeData = 'Loading . . .'
         // alert(JSON.stringify(this))
         // this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
         // alert(this.props.match.params.user)
-        this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user?this.props.match.params.user:null)
+        this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
     }
 
-    setRecipeData(recipeObject){
+    setRecipeData(recipeObject,err){
         if(!recipeObject){
             // alert(JSON.stringify(this))
             const notFound = this.props.match.params.recipe.toString()+' not found :('
-            this.recipeData = notFound
-            this.setState({loaded:false})
+            this.setState({data:err,loaded:false})
             // alert(notFound)
             return
         }
@@ -42,7 +40,7 @@ class Recipe extends Component {
 
     render() {
         if(!this.state.loaded) {
-            return <div><h1>{this.recipeData}</h1></div>
+            return <div><h1>{this.state.data}</h1></div>
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)
         var directions = this.state.data.Directions.map((step) => <li>{step}</li>)
@@ -64,6 +62,8 @@ class Recipe extends Component {
                 <ol>{directions}</ol>
                 <h2>Reviews:</h2>
                 <ul>{reviews}</ul>
+                <h2>JSON:</h2>
+                <p>{JSON.stringify(this.state.data)}</p>
             </div>
             )
     }

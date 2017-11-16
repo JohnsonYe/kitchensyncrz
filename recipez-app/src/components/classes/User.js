@@ -31,6 +31,7 @@
         //         'username',this.client.getUsername(),
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
+        this.loadStream = new Promise(this.loadUserData)
     }
 
     /**
@@ -44,9 +45,9 @@
      * }
      */
     loadUserData(resolve,reject){
-        if(this.userData === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
-            alert('rejected!')
-            reject(false)
+        if(this.userData.username === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
+            // alert('rejected!')
+            reject('User is not logged in!')
             return
         }
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
@@ -58,11 +59,11 @@
                     pantry:     this.client.unpackMap(response.payload[0].pantry.M),
                     planner:{}
                 }
-                resolve(this)
+                resolve(this.userData)
             } else {
                 this.userData = null
-                alert('rejected!')
-                reject(false)
+                // alert('rejected!')
+                reject('Failed to load user data!')
             }
             /*; alert(JSON.stringify(this.userData))*/})
     }
@@ -138,9 +139,9 @@
 
     getUserData(name){
         if(!this.userData || !this.userData[name]){
-            return 'Could not fetch user data';
+            return new Promise().reject('Could not fetch user data');
         } else {
-            return this.userData[name];
+            return this.loadStream.then((data)=>data[name]);
         }
     }
  }
@@ -148,9 +149,6 @@
 
  var static_user = new User();
 
- User.getUser = () => new Promise(function(resolve,reject){
-    var singleton = new User();
-    singleton.loadUserData(resolve)
- });
+ User.getUser = () => static_user;
 
  export default User;

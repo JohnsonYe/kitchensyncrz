@@ -58,17 +58,18 @@ import User from '../classes/User';
         if(custom){ 
             //load recipe from JSON string
             // alert(User.getUser().getCookbook())
-            User.getUser().then((user)=>
+            User.getUser().getUserData('cookbook')
+                .then((cookbook)=>
                 {
-                    var customRecipe = user.getCookbook()[recipeName].S
+                    var customRecipe = cookbook[recipeName] ? cookbook[recipeName].S : null;
+                    // alert(customRecipe)
                     if(customRecipe){
-                        this.receiveRecipe({status:true,payload:[JSON.parse(customRecipe)]},callback)
+                        callback(JSON.parse(customRecipe))
                     } else {
-                        // this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe({status:false,payload:'Item not found!'},callback))
-                        // this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe(e,callback))
                         this.receiveRecipe({status:false,payload:'Item not found!'},callback)
                     }
-            },(user)=>this.receiveRecipe({status:false,payload:'Item not found!'},callback))
+                })
+                .catch((message)=>{this.receiveRecipe({status:false,payload:message},callback)})
         } else {
             this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe(e,callback))
         }
@@ -83,7 +84,7 @@ import User from '../classes/User';
             //the call failed, should we try again?
             // alert(JSON.stringify(response.payload))
             // alert(callback)
-            callback(null)
+            callback(null,response.payload)
             return
         }
         // alert(JSON.stringify(response))
@@ -111,7 +112,7 @@ import User from '../classes/User';
             // alert(JSON.stringify(Object.entries(recipeResponse.Reviews.M)))
             reviews = this.unpackReview(recipeResponse.Reviews)
         }
-        alert(recipeResponse)
+        // alert(recipeResponse)
         return {
             Name:recipeResponse.Name.S,
             Ingredients:recipeResponse.Ingredients.L.map((ingredient) => ingredient.S),
