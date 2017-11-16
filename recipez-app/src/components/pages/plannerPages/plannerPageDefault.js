@@ -57,6 +57,12 @@ class Planner extends Component {
 
     render() {
         return (
+
+            <div>
+                <div className="jumbotron">
+                    <h1>Planner</h1>
+                </div>
+
             <Grid fluid={true} className='container-fluid'>
                 <Row className='content'>
                     <Col xs={6} md={4}>
@@ -96,6 +102,7 @@ class Planner extends Component {
                     <button>View Full Week Planner</button>
                 </Row>
             </Grid>
+            </div>
 
         );
     }

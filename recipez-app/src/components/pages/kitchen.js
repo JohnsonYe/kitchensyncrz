@@ -18,6 +18,9 @@ class kitchen extends Component {
         return (
 
             <div>
+                <div className="jumbotron">
+                    <h1>Kitchen</h1>
+                </div>
                 <Tabs defaultTab="foodItems" >
 
                     <div id="Kitchen-Tabs">
