@@ -29,7 +29,7 @@ class Header extends Component {
                         </li>
 
                         <li>
-                            <Link to="/Cookbook">MyCookbook</Link>
+                            <Link to="/Cookbook">Cookbook</Link>
                         </li>
 
                         <li>
@@ -37,7 +37,7 @@ class Header extends Component {
                         </li>
 
                         <li className="last">
-                            <Link to="/Planner">MyPlanner</Link>
+                            <Link to="/Planner">Planner</Link>
                         </li>
                     </ul>
                 </nav>

@@ -17,14 +17,16 @@ import {
     Route,
 } from 'react-router-dom'
 
-//Components
+//Components Pages
 import Header from './components/headerComponent/header';
 import Footer from './components/footerComponent/footer';
 import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
 import Kitchen from './components/pages/kitchen';
-import Planner from './components/pages/myPlanner';
+import Planner from './components/pages/plannerPages/plannerPageDefault';
+
 import Cookbook from "./components/pages/myCookbook";
+import Recipe from "./components/pages/recipe";
 
 
 class App extends Component {
@@ -38,7 +40,8 @@ class App extends Component {
             <Route exact path='/Cookbook' component={Cookbook} />
             <Route exact path='/Kitchen' component={Kitchen} />
             <Route exact path='/Planner' component={Planner} />
-            <Footer />
+            <Route exact path='/Recipes/:recipe' component={Recipe} />
+          <Footer />
         </div>
         </Router>
     );
