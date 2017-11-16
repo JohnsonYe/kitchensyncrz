@@ -17,9 +17,6 @@ class Recipe extends Component {
         this.setRecipeData = this.setRecipeData.bind(this);
         this.updateReviews = this.updateReviews.bind(this);
         this.client = new RecipeHelper();
-        // alert(JSON.stringify(this))
-        // this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
-        // alert(this.props.match.params.user)
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
     }
 

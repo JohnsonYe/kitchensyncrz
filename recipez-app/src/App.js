@@ -14,6 +14,7 @@ import './css/App.css';
 import {
     BrowserRouter as Router,
     Route,
+    Switch
 } from 'react-router-dom'
 
 //Components Pages
@@ -33,14 +34,16 @@ class App extends Component {
         <Router>
         <div className="App">
             <Header />
-            <Route exact path='/' component={Homepage} />
-            <Route exact path='/Search' component={Search} />
-            <Route exact path='/Cookbook' component={Cookbook} />
-            <Route exact path='/Kitchen' component={Kitchen} />
-            <Route exact path='/Planner' component={PlannerPage} />
-            <Route exact path='/Recipes/:recipe' component={Recipe} />
-            <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
-          <Footer />
+                <Switch>
+                    <Route exact path='/' component={Homepage} />
+                    <Route exact path='/Search' component={Search} />
+                    <Route exact path='/Cookbook' component={Cookbook} />
+                    <Route exact path='/Kitchen' component={Kitchen} />
+                    <Route exact path='/Planner' component={PlannerPage} />
+                    <Route exact path='/Recipes/:recipe' component={Recipe} />
+                    <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
+                </Switch>
+            <Footer />
         </div>
         </Router>
     );

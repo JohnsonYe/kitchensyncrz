@@ -23,12 +23,29 @@ const UNAUTH_NAME = 'GUEST'
  class DBClient {
     constructor(){
         this.getDBItems = this.getDBItems.bind(this);
-        this.buildBatchRequest = this.buildBatchRequest.bind(this);
+        this.registerPrototype = this.registerPrototype.bind(this);
+        this.getPrototype = this.getPrototype.bind(this);
         this.login = this.login.bind(this);
         this.getUsername = this.getUsername.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
-        this.authenticated = false
+        this.authenticated = false;
+
+        this.protoPack = { //pack items in AWS compliant format
+            'S': (s)=>s.S,
+            'L': (l)=>l.L,
+            'M': (m)=>m.M,
+            'SS':(ss)=>ss.SS,
+            'N': (n)=>n.N,
+        }
+
+        this.protoUnpack = { //unpack items into easy-access format
+            'S': (s)=>({'S':s}),
+            'L': (l)=>({'L':l}),
+            'M': (m)=>({'M':m}),
+            'SS':(ss)=>({'SS':ss}),
+            'N': (n)=>({'N':n}),
+        }
     }
 
     /*
@@ -185,7 +202,19 @@ const UNAUTH_NAME = 'GUEST'
         return client_style_map
     }
 
-    packMap(client_style_map){
+    registerPrototype(key,proto){
+
+    }
+
+    getPrototype(key){
+
+    }
+
+    unpackItem(item,prototype){
+
+    }
+
+    packItem(item,prototype){
 
     }
 

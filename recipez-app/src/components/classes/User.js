@@ -14,6 +14,8 @@
     constructor(){
         this.client = DBClient.getClient()
         this.loadUserData = this.loadUserData.bind(this);
+        this.verify = this.verify.bind(this);
+        this.validateUsername = this.validateUsername.bind(this);
         this.getUserData = this.getUserData.bind(this);
 
         this.getPantry = this.getPantry.bind(this);
@@ -144,11 +146,24 @@
             return this.loadStream.then((data)=>data[name]);
         }
     }
+
+    verify(username){
+        this.loadStream = this.loadStream.then((data)=>this.validateUsername(username,data))
+        return this
+    }
+
+    validateUsername(username,userData){
+        if(username === userData.username){
+            return userData
+        } else {
+            throw new Error('You don\'t have permission to view '+username+'\'s personal data.')
+        }
+    }
  }
 
 
  var static_user = new User();
 
- User.getUser = () => static_user;
+ User.getUser = (username) => static_user.verify(username);
 
  export default User;
