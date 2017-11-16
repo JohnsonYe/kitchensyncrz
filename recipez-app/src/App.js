@@ -24,6 +24,7 @@ import Search from './components/pages/search';
 import Kitchen from './components/pages/myKitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
+import Recipe from "./components/pages/recipe";
 
 
 class App extends Component {
@@ -37,6 +38,7 @@ class App extends Component {
             <Route exact path='/Cookbook' component={Cookbook} />
             <Route exact path='/Kitchen' component={Kitchen} />
             <Route exact path='/Planner' component={Planner} />
+            <Route exact path='/Recipes/:recipe' component={Recipe} />
           <Footer />
         </div>
         </Router>

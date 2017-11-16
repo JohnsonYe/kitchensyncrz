@@ -6,6 +6,11 @@
  */
  import AWS from 'aws-sdk';
 
+ /**
+  * THIS IS A SINGLETON CLASS.
+  * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
+  */
+
 var creds = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
 });
@@ -17,6 +22,8 @@ var db = new AWS.DynamoDB();
         this.getDBItems = this.getDBItems.bind(this);
         this.buildBatchRequest = this.buildBatchRequest.bind(this);
         this.login = this.login.bind(this);
+        this.getUsername = this.getUsername.bind(this);
+        this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false
     }
@@ -35,9 +42,9 @@ var db = new AWS.DynamoDB();
             if(err){
                 target({status:false, payload: err});
             } else {
-                target({status:true,  payload: data});
+                target({status:true,  payload: data.Responses[tableName]});
             }
-        }.bind(this))
+        })
     }
 
     /*
@@ -54,10 +61,67 @@ var db = new AWS.DynamoDB();
         return { RequestItems:{ [tableName]:{ Keys: keyList }}}
     }
 
+    updateItem(params,target){
+        db.updateItem(params,this.pushResponseToHandle(target))
+
+    }
+
+    pushResponseToHandle(target){
+        return (function(err,data){
+            if(err){
+                target({status:false, payload: err});
+            } else {
+                target({status:true,  payload: data});
+            }
+        })
+    }
+
+    buildMapUpdateExpression(mapName,key,value){
+        // return {expr: 'SET #'+key+'=if_not_exists(#'+key+',:empty_map) SET #'+key+'.' + key + ' = :'+key+'_value',
+        return {expr: 'SET #'+key+'.' + key + ' = :'+key+'_value',
+                names:{["#"+key]:mapName},
+                // values:{[":"+key+'_value']:value,':empty_map':{M:{}}}
+                values:{[":"+key+'_value']:value}
+            }
+    }
+
+    combineUpdateExpressions(exp1,exp2){
+        return {
+            expr:   exp1.expr + ',' + exp2.expr,
+            names:  Object.assign(exp1.names,exp2.names),
+            values: Object.assign(exp1.values,exp2.values)
+        }
+    }
+
+    buildSetUpdateExpression(attrName,value){
+        return {expr: 'SET #attr = :item',
+                names:{"#attr":attrName},
+                values:{":item":value}
+            }
+    }
+
+    buildListAppendUpdateExpression(attrName,value){
+        return {expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+                names:{"#attr":attrName},
+                values:{":item":value,":empty_list":{L:[]}}
+            }
+    }
+
+    buildUpdateRequest(tableName,keyField,key,updateExpression){
+        return {"UpdateExpression": updateExpression.expr,
+                "ExpressionAttributeNames":updateExpression.names,
+                "ExpressionAttributeValues":updateExpression.values,
+                "TableName":tableName,
+                "Key":{[keyField]:{S:key}}
+            }
+
+    }
+
     /*
      * log the user in to allow them to upload to DB and view user-specific data
      */
     login(username,password) {
+        this.user = username
         return this.authenticated = true
     }
 
@@ -65,6 +129,18 @@ var db = new AWS.DynamoDB();
         return this.authenticated
     }
 
+    getUsername(){
+        return this.user
+    }
+
+    unpackFormatting(aws_response) {
+
+    }
+
  }
+
+ var static_client = new DBClient();
+
+ DBClient.getClient = () => static_client;
 
  export default DBClient;

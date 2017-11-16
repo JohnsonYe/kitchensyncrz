@@ -7,8 +7,8 @@
  import DBClient from './AWSDatabaseClient'
 
  class User {
-    constructor(client){
-        this.client = client //hand this class an existing database client for data access
+    constructor(){
+        this.client = DBClient.getClient()
         this.loadUserData = this.loadUserData.bind(this);
         this.getUserData = this.getUserData.bind(this);
 
