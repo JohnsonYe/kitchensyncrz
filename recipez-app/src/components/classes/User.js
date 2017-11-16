@@ -20,9 +20,17 @@
         this.addToPantry = this.addToPantry.bind(this);
         this.removeFromPantry = this.removeFromPantry.bind(this);
 
-        this.loadUserData(this.client.getUsername())
-        this.addToPantry('zucchini','none',1)
-        this.removeFromPantry('zucchini')
+        // this.addToPantry('zucchini','none',1)
+        // this.removeFromPantry('zucchini')
+
+        this.userData = { username:this.client.getUsername(), cookbook:{},cookware:{},pantry:{},planner:{}}
+
+        // this.client.updateItem(
+        //     this.client.buildUpdateRequest(
+        //         'User',
+        //         'username',this.client.getUsername(),
+        //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
+        //     this.client.alertResponseCallback)
     }
 
     /**
@@ -35,17 +43,28 @@
      *      planner:  <???> TODO work with planner team on data organization
      * }
      */
-    loadUserData(){
-        this.client.getDBItems('User','username',[this.client.getUsername()],function(response) {
-            (this.userData = (response.status
-            ?
-            {
-                username:   response.payload[0].username.S,
-                cookbook:   new Set(response.payload[0].cookbook.SS),
-                cookware:   new Set(response.payload[0].cookware.SS),
-                pantry:     this.client.unpackMap(response.payload[0].pantry.M)
+    loadUserData(resolve,reject){
+        if(this.userData === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
+            alert('rejected!')
+            reject(false)
+            return
+        }
+        this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
+            if(response.status){
+                this.userData = {
+                    username:   response.payload[0].username.S,
+                    cookbook:   response.payload[0].cookbook.M,
+                    cookware:   new Set(response.payload[0].cookware.SS),
+                    pantry:     this.client.unpackMap(response.payload[0].pantry.M),
+                    planner:{}
+                }
+                resolve(this)
+            } else {
+                this.userData = null
+                alert('rejected!')
+                reject(false)
             }
-            : null))/*; alert(JSON.stringify(this.userData))*/}.bind(this))
+            /*; alert(JSON.stringify(this.userData))*/})
     }
 
     /**
@@ -71,7 +90,7 @@
                 'User',
                 'username',this.client.getUsername(),
                 this.client.buildMapUpdateExpression('pantry',ingredient,{M:{amount:{N:amount.toString()},unit:{S:unit}}})),
-            function(error,response){if(!error) this.userData.pantry[ingredient] = {amount:amount,unit:unit}}.bind(this))
+            function(response){if(response.status) this.userData.pantry[ingredient] = {amount:amount,unit:unit}}.bind(this))
 
     }
 
@@ -81,15 +100,16 @@
                 'User',
                 'username',this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('pantry',ingredient)),
-            this.client.alertResponseCallback)
+            function(response){if(response.status&&this.userData.pantry[ingredient]) delete this.userData.pantry[ingredient]}.bind(this))
     }
 
     getCookbook(){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return new Set(["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
-                    "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
+        return this.userData.cookbook
+         // return new Set(["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
+         //            "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
     }
 
     getCookware(){
@@ -128,6 +148,9 @@
 
  var static_user = new User();
 
- User.getUser = () => static_user;
+ User.getUser = () => new Promise(function(resolve,reject){
+    var singleton = new User();
+    singleton.loadUserData(resolve)
+ });
 
  export default User;

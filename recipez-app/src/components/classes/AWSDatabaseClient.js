@@ -17,6 +17,9 @@ var creds = new AWS.CognitoIdentityCredentials({
 AWS.config.update({region:'us-east-2',credentials:creds});
 var db = new AWS.DynamoDB();
 
+const UNAUTH_NAME = 'GUEST'
+
+
  class DBClient {
     constructor(){
         this.getDBItems = this.getDBItems.bind(this);
@@ -41,6 +44,8 @@ var db = new AWS.DynamoDB();
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
             if(err){
                 target({status:false, payload: err});
+            } else if(data.Responses[tableName].length == 0) {
+                target({status:false, payload: 'Item not found!'});
             } else {
                 target({status:true,  payload: data.Responses[tableName]});
             }
@@ -77,10 +82,9 @@ var db = new AWS.DynamoDB();
     }
 
     buildMapUpdateExpression(mapName,key,value){
-        // return {expr: 'SET #'+key+'=if_not_exists(#'+key+',:empty_map) SET #'+key+'.' + key + ' = :'+key+'_value',
-        return {expr: 'SET #'+key+'.' + key + ' = :'+key+'_value',
+        return {
+                expr: 'SET #'+key+'.' + key + ' = :'+key+'_value',
                 names:{["#"+key]:mapName},
-                // values:{[":"+key+'_value']:value,':empty_map':{M:{}}}
                 values:{[":"+key+'_value']:value}
             }
     }
@@ -95,28 +99,31 @@ var db = new AWS.DynamoDB();
 
     combineUpdateExpressions(exp1,exp2){
         return {
-            expr:   exp1.expr + ',' + exp2.expr,
+            expr:   exp1.expr + ', ' + exp2.expr.slice(3),
             names:  Object.assign(exp1.names,exp2.names),
             values: Object.assign(exp1.values,exp2.values)
         }
     }
 
     buildSetUpdateExpression(attrName,value){
-        return {expr: 'SET #attr = :item',
+        return {
+                expr: 'SET #attr = :item',
                 names:{"#attr":attrName},
                 values:{":item":value}
             }
     }
 
     buildListAppendUpdateExpression(attrName,value){
-        return {expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+        return {
+                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
                 names:{"#attr":attrName},
                 values:{":item":value,":empty_list":{L:[]}}
             }
     }
 
     buildStringSetAppendUpdateExpression(attrName,value){
-        return {expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+        return {
+                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
                 names:{"#attr":attrName},
                 values:{":item":value,":empty_set":{SS:[]}}
             }
@@ -178,6 +185,10 @@ var db = new AWS.DynamoDB();
         return client_style_map
     }
 
+    packMap(client_style_map){
+
+    }
+
     /**
      * convenience method for printing output from DBClient calls
      * meant to be handed to a DBClient function as a callback for debugging
@@ -188,6 +199,7 @@ var db = new AWS.DynamoDB();
     }
 
  }
+
 
  var static_client = new DBClient();
 

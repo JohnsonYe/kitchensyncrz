@@ -6,6 +6,9 @@
  */
 import React from 'react';
 import DBClient from '../classes/AWSDatabaseClient';
+import User from '../classes/User';
+
+
 
  class RecipeHelper{
     constructor(){
@@ -21,7 +24,7 @@ import DBClient from '../classes/AWSDatabaseClient';
      * push a new review object to the review list for the given recipe
      * review object should follow format given below
      */
-    updateReview(recipeName,revObj){
+    updateReview(recipeName,revObj,callback){
         //re-pack the review object
         var packedReviewObject = this.packReview(revObj)
 
@@ -34,21 +37,56 @@ import DBClient from '../classes/AWSDatabaseClient';
                         'Recipes',
                         'Name',recipeName,
                         this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject)),
-                    (r)=>{})
+                    callback)
             } else {
                 //field creation failed (!) (?)
+                callback({status:false,payload:e1})
             }
         }.bind(this))
+
+        // this.client.updateItem(
+        //     this.client.buildUpdateRequest(
+        //         'Recipes',
+        //         'Name',recipeName,
+        //         this.client.combineUpdateExpressions(
+        //             this.client.buildFieldCreateExpression('Reviews',{M:{}}),
+        //             this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject))),
+        //     this.client.alertResponseCallback)
     }
 
-    loadRecipe(recipeName,callback){
-        this.client.getDBItems('Recipes','Name',recipeName,e => this.receiveRecipe(e,callback))
+    loadRecipe(recipeName,callback,custom){
+        if(custom){ 
+            //load recipe from JSON string
+            // alert(User.getUser().getCookbook())
+            User.getUser().then((user)=>
+                {
+                    var customRecipe = user.getCookbook()[recipeName].S
+                    if(customRecipe){
+                        this.receiveRecipe({status:true,payload:[JSON.parse(customRecipe)]},callback)
+                    } else {
+                        // this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe({status:false,payload:'Item not found!'},callback))
+                        // this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe(e,callback))
+                        this.receiveRecipe({status:false,payload:'Item not found!'},callback)
+                    }
+            },(user)=>this.receiveRecipe({status:false,payload:'Item not found!'},callback))
+        } else {
+            this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe(e,callback))
+        }
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     receiveRecipe(response,callback) {
         if(!response.status){
             //the call failed, should we try again?
+            // alert(JSON.stringify(response.payload))
+            // alert(callback)
+            callback(null)
+            return
         }
+        // alert(JSON.stringify(response))
         callback(this.unpackRecipe(response.payload[0]))
     }
 
@@ -73,6 +111,7 @@ import DBClient from '../classes/AWSDatabaseClient';
             // alert(JSON.stringify(Object.entries(recipeResponse.Reviews.M)))
             reviews = this.unpackReview(recipeResponse.Reviews)
         }
+        alert(recipeResponse)
         return {
             Name:recipeResponse.Name.S,
             Ingredients:recipeResponse.Ingredients.L.map((ingredient) => ingredient.S),
