@@ -122,6 +122,21 @@ var db = new AWS.DynamoDB();
             }
     }
 
+    buildRemoveElementUpdateExpression(attrName,elemName){
+        return {
+            expr: 'REMOVE '+attrName+'.'+elemName,
+            names:{},
+            values:{/*[':'+elemName]:attrName+'.'+elemName*/}
+        }
+    }
+
+    buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
+        return {"UpdateExpression": updateExpression.expr,
+                "TableName":tableName,
+                "Key":{[keyField]:{S:key}}
+            }
+    }
+
     buildUpdateRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
                 "ExpressionAttributeNames":updateExpression.names,
@@ -161,6 +176,15 @@ var db = new AWS.DynamoDB();
         // alert(JSON.stringify(client_style_map))
 
         return client_style_map
+    }
+
+    /**
+     * convenience method for printing output from DBClient calls
+     * meant to be handed to a DBClient function as a callback for debugging
+     * @param  {response Object} response Object created by pushResponseToHandle()
+     */
+    alertResponseCallback(response){
+        alert(JSON.stringify(response))
     }
 
  }

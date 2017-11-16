@@ -11,10 +11,10 @@ import DBClient from '../classes/AWSDatabaseClient';
     constructor(){
         this.client = DBClient.getClient();
 
-        this.loadRecipe = this.loadRecipe.bind(this);
-        this.receiveRecipe = this.receiveRecipe.bind(this);
-        this.unpackRecipe = this.unpackRecipe.bind(this);
-        this.updateReview = this.updateReview.bind(this);
+        this.loadRecipe     = this.loadRecipe.bind(this);
+        this.receiveRecipe  = this.receiveRecipe.bind(this);
+        this.unpackRecipe   = this.unpackRecipe.bind(this);
+        this.updateReview   = this.updateReview.bind(this);
     }
 
     /**
@@ -34,14 +34,12 @@ import DBClient from '../classes/AWSDatabaseClient';
                         'Recipes',
                         'Name',recipeName,
                         this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject)),
-                    (e,r)=>alert(JSON.stringify(e)))
+                    (r)=>{})
             } else {
                 //field creation failed (!) (?)
             }
         }.bind(this))
     }
-
-    update
 
     loadRecipe(recipeName,callback){
         this.client.getDBItems('Recipes','Name',recipeName,e => this.receiveRecipe(e,callback))

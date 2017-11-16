@@ -18,9 +18,11 @@
 
         this.getPantry = this.getPantry.bind(this);
         this.addToPantry = this.addToPantry.bind(this);
+        this.removeFromPantry = this.removeFromPantry.bind(this);
 
         this.loadUserData(this.client.getUsername())
         this.addToPantry('zucchini','none',1)
+        this.removeFromPantry('zucchini')
     }
 
     /**
@@ -30,6 +32,7 @@
      *      pantry:   <Map<String,Object>> user's ingredient pantry and associated metadata
      *      cookbook: <Set<String>> user's favorited/saved recipe list
      *      cookware: <Set<String>> user's available cookware
+     *      planner:  <???> TODO work with planner team on data organization
      * }
      */
     loadUserData(){
@@ -37,10 +40,10 @@
             (this.userData = (response.status
             ?
             {
-                username:response.payload[0].username.S,
-                cookbook:new Set(response.payload[0].cookbook.SS),
-                cookware:new Set(response.payload[0].cookware.SS),
-                pantry:this.client.unpackMap(response.payload[0].pantry.M)
+                username:   response.payload[0].username.S,
+                cookbook:   new Set(response.payload[0].cookbook.SS),
+                cookware:   new Set(response.payload[0].cookware.SS),
+                pantry:     this.client.unpackMap(response.payload[0].pantry.M)
             }
             : null))/*; alert(JSON.stringify(this.userData))*/}.bind(this))
     }
@@ -70,6 +73,15 @@
                 this.client.buildMapUpdateExpression('pantry',ingredient,{M:{amount:{N:amount.toString()},unit:{S:unit}}})),
             function(error,response){if(!error) this.userData.pantry[ingredient] = {amount:amount,unit:unit}}.bind(this))
 
+    }
+
+    removeFromPantry(ingredient){
+        this.client.updateItem(
+            this.client.buildUpdateDeleteRequest(
+                'User',
+                'username',this.client.getUsername(),
+                this.client.buildRemoveElementUpdateExpression('pantry',ingredient)),
+            this.client.alertResponseCallback)
     }
 
     getCookbook(){
@@ -105,7 +117,7 @@
     }
 
     getUserData(name){
-        if(!this.userData || this.userData[name]){
+        if(!this.userData || !this.userData[name]){
             return 'Could not fetch user data';
         } else {
             return this.userData[name];
