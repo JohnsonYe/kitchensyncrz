@@ -16,10 +16,12 @@ import Tools from './tools'
 class Kitchen extends Component {
     render() {
         return (
-
+            <div>
+            <div className="jumbotron">
+                <h1>My Kitchen</h1>
+            </div>
             <div>
                 <Tabs defaultTab="Pantry" >
-
                     <div id="Kitchen-Tabs">
                         <TabLink to="Pantry" id="pantry"> Pantry </TabLink>
                         <TabLink to="Exclude" id="exclude"> Exclude </TabLink>
@@ -39,6 +41,7 @@ class Kitchen extends Component {
                     </div>
                 </Tabs>
 
+            </div>
             </div>
         );
 

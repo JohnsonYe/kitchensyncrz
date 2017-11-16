@@ -82,6 +82,10 @@ class Search extends Component {
                 </label>
             )
         return (
+            <div>
+            <div className="jumbotron">
+                <h1>Browse</h1>
+            </div>
             <div className="container-fluid">
                 <div>Search Team has arrived!</div>
  				<form onSubmit={this.addIngredient}>
@@ -112,6 +116,7 @@ class Search extends Component {
                         </tr>
               		</tbody>
             	</table>
+            </div>
             </div>
         );
 

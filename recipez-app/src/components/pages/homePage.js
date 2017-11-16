@@ -9,9 +9,15 @@ import React, { Component } from 'react';
 class Homepage extends Component {
     render() {
         return (
+            <div>
+            <div className="jumbotron">
+                <h1>Kitchen Sync</h1>
+            </div>
             <div className="container-fluid">
                 Homepage content goes here ... Our Website is currently under construction
             </div>
+            </div>
+        
         );
 
     }

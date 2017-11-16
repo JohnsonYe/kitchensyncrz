@@ -14,6 +14,10 @@ class PlannerPage extends Component {
 
     render() {
         return (
+            <div>
+            <div className="jumbotron">
+                <h1>My Planner</h1>
+            </div>
             <Grid>
                 <Row className="show-grid">
                     <Col xs={12} md={6}>
@@ -25,7 +29,7 @@ class PlannerPage extends Component {
                     </Col>
                 </Row>
             </Grid>
-
+            </div>
         );
     }
 }
