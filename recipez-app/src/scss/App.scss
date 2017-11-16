@@ -58,14 +58,14 @@ body {
       cursor: pointer;
     }
 
-    #exclude{
+    #cookware{
       display: inline-block;
       margin: 10px;
       color: dimgray;
       cursor: pointer;
     }
 
-    #tools{
+    #exclude{
       display: inline-block;
       margin: 10px;
       color: dimgray;
@@ -78,9 +78,33 @@ body {
     vertical-align: middle;
     align-content: center;
     text-align: center;
-    width: 75%;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
+
+    #gap{
+      margin-top:30px;
+    }
+
+    #add{
+      cursor: pointer;
+      background: powderblue;
+      color: green;
+      font-weight: bold;
+    }
+
+    #remove{
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      top:0px;
+      cursor: pointer;
+      color: red;
+      background: powderblue;
+      font-weight: bold;
+    }
+
   }
 
 }
