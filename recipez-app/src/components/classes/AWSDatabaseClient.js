@@ -85,6 +85,14 @@ var db = new AWS.DynamoDB();
             }
     }
 
+    buildFieldCreateExpression(fieldName,base){
+        return{
+            expr:'SET #'+fieldName+' = if_not_exists(#'+fieldName+',:'+fieldName+'_value)',
+            names:{['#'+fieldName]:fieldName},
+            values:{[':'+fieldName+'_value']:base}
+        }
+    }
+
     combineUpdateExpressions(exp1,exp2){
         return {
             expr:   exp1.expr + ',' + exp2.expr,

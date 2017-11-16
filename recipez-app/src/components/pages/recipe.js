@@ -28,7 +28,7 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var ingredients = this.state.data.Ingredients.map((ingredient) => <li><font color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</font></li>)
+        var ingredients = this.state.data.Ingredients.map((ingredient) => <li><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)
         var directions = this.state.data.Directions.map((step) => <li>{step}</li>)
         var reviews = this.state.data.Reviews.map((review) => 
             <li>

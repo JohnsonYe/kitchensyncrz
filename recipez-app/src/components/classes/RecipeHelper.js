@@ -23,21 +23,25 @@ import DBClient from '../classes/AWSDatabaseClient';
      */
     updateReview(recipeName,revObj){
         //re-pack the review object
-        var packedReviewObject = {M:{
-                username:{S:revObj.username},
-                Comment:{S:revObj.Comment},
-                Rating:{N:revObj.Rating},
-                timestamp:{N:revObj.timestamp},
-            }
-        }
+        var packedReviewObject = this.packReview(revObj)
 
-        this.client.updateItem(
-            this.client.buildUpdateRequest(
-                'Recipes',
-                'Name',recipeName,
-                this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject)),
-            (e,r)=>alert(JSON.stringify(e)))
+        this.client.updateItem(//create the reviews field if it doesnt exist
+            this.client.buildUpdateRequest('Recipes','Name',recipeName,this.client.buildFieldCreateExpression('Reviews',{M:{}})),
+            function (e1,r1){ //chain update calls to keep them synced up
+            if(e1){
+                this.client.updateItem( //add the review to the reviews field once the create call resolves
+                    this.client.buildUpdateRequest(
+                        'Recipes',
+                        'Name',recipeName,
+                        this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject)),
+                    (e,r)=>alert(JSON.stringify(e)))
+            } else {
+                //field creation failed (!) (?)
+            }
+        }.bind(this))
     }
+
+    update
 
     loadRecipe(recipeName,callback){
         this.client.getDBItems('Recipes','Name',recipeName,e => this.receiveRecipe(e,callback))
@@ -54,9 +58,9 @@ import DBClient from '../classes/AWSDatabaseClient';
      * Recipe Object Format:
      * {
      *      Name: Recipe Name
-     *      Ingredients: <list> of <String> containing one ingredient specification each
-     *      Directions:  <list> of <String> containing one step each
-     *      Reviews: <list> of Review <Objects>:
+     *      Ingredients: <List> of <String> containing one ingredient specification each
+     *      Directions:  <List> of <String> containing one step each
+     *      Reviews:     <List> of Review <Objects>:
      *      {
      *          username: <String> username of commenter
      *          Comment:  <String> comment assosciated with review, may be empty
@@ -69,18 +73,32 @@ import DBClient from '../classes/AWSDatabaseClient';
         var reviews = []
         if(recipeResponse.Reviews){
             // alert(JSON.stringify(Object.entries(recipeResponse.Reviews.M)))
-            reviews = Object.entries(recipeResponse.Reviews.M).map((review) => ({
-                username: review[1].M.username.S,
-                Comment: review[1].M.Comment.S,
-                Rating: review[1].M.Rating.N,
-                timestamp: review[1].M.timestamp.N,
-            }))
+            reviews = this.unpackReview(recipeResponse.Reviews)
         }
         return {
             Name:recipeResponse.Name.S,
             Ingredients:recipeResponse.Ingredients.L.map((ingredient) => ingredient.S),
             Directions:recipeResponse.Directions.L.map((step) => step.S),
             Reviews:reviews
+        }
+    }
+
+    unpackReview(packedReview){
+        return Object.entries(packedReview.M).map((review) => ({
+                        username:   review[1].M.username.S,
+                        Comment:    review[1].M.Comment.S,
+                        Rating:     review[1].M.Rating.N,
+                        timestamp:  review[1].M.timestamp.N,
+                    }))
+    }
+
+    packReview(revObj){
+        return {M:{
+                username:   {S:revObj.username},
+                Comment:    {S:revObj.Comment},
+                Rating:     {N:revObj.Rating},
+                timestamp:  {N:revObj.timestamp},
+            }
         }
     }
  }
