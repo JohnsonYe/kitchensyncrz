@@ -85,6 +85,10 @@ class Search extends Component {
         ? (<div>Selected: {this.state.selected} <button onClick={e => this.removeIngredient(this.state.selected)}>Remove</button></div> ) 
         : (<div>Selected: None</div>);
         return (
+            <div>
+            <div className="jumbotron">
+                <h1>Browse</h1>
+            </div>
             <div className="container-fluid">
                 <div>Search Team has arrived!</div>
  				<form onSubmit={this.addIngredient}>
@@ -117,6 +121,7 @@ class Search extends Component {
                         </tr>
               		</tbody>
             	</table>
+            </div>
             </div>
         );
 
