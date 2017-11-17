@@ -25,21 +25,24 @@ const UNAUTH_NAME = 'GUEST'
         this.getDBItems = this.getDBItems.bind(this);
         this.registerPrototype = this.registerPrototype.bind(this);
         this.getPrototype = this.getPrototype.bind(this);
+        this.unpackItem = this.unpackItem.bind(this);
         this.login = this.login.bind(this);
         this.getUsername = this.getUsername.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false;
 
-        this.protoPack = { //pack items in AWS compliant format
-            'S': (s)=>s.S,
-            'L': (l)=>l.L,
-            'M': (m)=>m.M,
-            'SS':(ss)=>ss.SS,
-            'N': (n)=>n.N,
+        this.protoUnpack = { //pack items in AWS compliant format
+            'S': (s,p)=>s.S,
+            'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
+            // 'M': (m,p)=>Object.entries(m.M).map((item)=>this.protoUnpack[p.type](item[1],p.inner)),
+            'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>{var step = Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev); /*alert(JSON.stringify(step));*/ return step},{}),
+            'SS':(ss,p)=>ss.SS,
+            'N': (n,p)=>n.N,
+            'SET':(s,p)=>new Set(s)
         }
 
-        this.protoUnpack = { //unpack items into easy-access format
+        this.protoPack = { //unpack items into easy-access format
             'S': (s)=>({'S':s}),
             'L': (l)=>({'L':l}),
             'M': (m)=>({'M':m}),
@@ -203,6 +206,7 @@ const UNAUTH_NAME = 'GUEST'
     }
 
     registerPrototype(key,proto){
+        this.protoUnpack[key] = (o,p)=>this.unpackItem(o.M,proto)
 
     }
 
@@ -211,6 +215,18 @@ const UNAUTH_NAME = 'GUEST'
     }
 
     unpackItem(item,prototype){
+        if(!prototype){
+            throw new Error('No prototype specified for: ' + JSON.stringify(item))
+        }
+        //unpack an item from AWS
+        // alert(JSON.stringify(item)+'\n'+JSON.stringify(prototype))
+        var unpacked = {}
+        Object.keys(item).forEach((key)=>{
+            unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
+        })
+        
+        // alert(JSON.stringify(unpacked))
+        return unpacked
 
     }
 

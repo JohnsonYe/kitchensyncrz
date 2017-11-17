@@ -13,6 +13,7 @@
  class User {
     constructor(){
         this.client = DBClient.getClient()
+        this.client.registerPrototype('PANTRYITEM',User.PantryItemPrototype)
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -61,7 +62,9 @@
                     pantry:     this.client.unpackMap(response.payload[0].pantry.M),
                     planner:{}
                 }
-                resolve(this.userData)
+                // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
+                resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))
+                // resolve(this.userData)
             } else {
                 this.userData = null
                 // alert('rejected!')
@@ -161,6 +164,26 @@
     }
  }
 
+                //  this.userData = {
+                //     username:   response.payload[0].username.S,
+                //     cookbook:   response.payload[0].cookbook.M,
+                //     cookware:   new Set(response.payload[0].cookware.SS),
+                //     pantry:     this.client.unpackMap(response.payload[0].pantry.M),
+                //     planner:{}
+                // }
+
+ User.UserDataPrototype = {
+    username:{type:'S'},
+    cookbook:{type:'M',inner:{type:'S'}},
+    cookware:{type:'SS',inner:{type:'SET'}},
+    pantry:{type:'M',inner:{type:'PANTRYITEM'}},
+    planner:{}
+ }
+
+ User.PantryItemPrototype = {
+    amount:{type:'N'},
+    unit:{type:'S'}
+ }
 
  var static_user = new User();
 

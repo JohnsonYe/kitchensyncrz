@@ -41,12 +41,13 @@ class Recipe extends Component {
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)
         var directions = this.state.data.Directions.map((step) => <li>{step}</li>)
-        var reviews = this.state.data.Reviews.map((review) => 
+        // alert(JSON.stringify(this.state.data))
+        var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) => 
             <li>
                 <div>
-                    <h5 style={{float:'left'}}>{review.username}</h5><img src={'/star.jpg'} height='21' width='21'/>
+                    <h5 style={{float:'left'}}>{review[1].username}</h5><img src={'/star.jpg'} height='21' width='21'/>
                 </div>
-                <p>{review.Comment}</p>
+                <p>{review[1].Comment}</p>
             </li>)
         var dummyReviewObject = {username:'user001',Comment:'new hello world',Rating:'5',timestamp:'-1'}
         return (
