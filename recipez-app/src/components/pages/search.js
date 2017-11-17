@@ -8,7 +8,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
-import Autocomplete from '../classes/Autocomplete';
 
 var client = new SearchHelper();
 
@@ -27,11 +26,15 @@ class Search extends Component {
                         data_pulled:false,
                         entries:[{value:'',index:0}],
                         ingredients:new Set(),
-                        selected:null
+                        selected:null,
+                        completions:[]
                     };
         this.fieldChange = this.fieldChange.bind(this);
 
         this.planner = new PlannerHelper();
+        this.textEntry = this.textEntry.bind(this);
+        this.autocomplete = this.autocomplete.bind(this);
+
 	}
 	dataPullTest(e){
 		e.preventDefault();
@@ -65,6 +68,13 @@ class Search extends Component {
 
         }
     }
+    textEntry(base){
+        // alert(base)
+        client.autocomplete(base,(list)=>this.autocomplete(base,list))
+    }
+    autocomplete(base,completions){
+        this.setState({field:base,completions:completions})
+    }
     render() {
     	// alert(JSON.stringify(this.state.test_output))
         var records;
@@ -77,6 +87,7 @@ class Search extends Component {
         var ingredient_list = []
         this.state.ingredients.forEach((ingredient) => ingredient_list.push(<li onClick={e => this.changeIngredientFocus(ingredient)}>{ingredient}</li>))
 		// const records = <tr><td>{JSON.stringify(this.state.test_output)}</td></tr>;
+        var completion_list = this.state.completions.map((completion)=><li>{completion}</li>) 
         const entry_list = this.state.entries.map( (entry) => 
                 <label>
                     <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
@@ -94,10 +105,13 @@ class Search extends Component {
                 <div>Search Team has arrived!</div>
  				<form onSubmit={this.addIngredient}>
                       <label>
-                          <input type="text" value={this.state.field} onChange={e => this.setState({field:e.target.value})}/>
+                          <input type="text" value={this.state.field} onChange={(e)=>this.textEntry(e.target.value)}/>
                       </label>
                       <button>Add!</button>
-            	</form>  
+            	</form>
+                <ol>
+                    {completion_list}
+                </ol>
                 {/* "modify ingredient" UI element  */}    
                 {ingredient_editor}         
             	<table style={{border:'1px solid black'}}>

@@ -4,18 +4,43 @@
  * Date Created: 11/7/2017
  * Description: This file will serve as the autocomplete engine for finding valid database keys
  */
+import JSZip from 'jszip'
 
 class Autocomplete{
-    constructor(dictionary){
+    constructor(binary){
         this.insert = this.insert.bind(this)
         this.chainBuild = this.chainBuild.bind(this);
         this.getNode = this.getNode.bind(this);
         this.search = this.search.bind(this);
         this.dfs = this.dfs.bind(this);
 
-        this.root = this.getNode('m');
-        dictionary.forEach((word)=>this.insert(this.root,word,0));
+        this.loadTree = this.loadTree.bind(this);
+        this.getCompletions = this.getCompletions.bind(this);
 
+        this.zip = new JSZip()
+        this.baseStream = this.zip.loadAsync(binary,{base64:true})
+            .then((file)=>this.zip.file('Ingredient.tst').async('string'))
+            .then(this.loadTree)
+            .catch((err)=>alert(err))
+        // if(!encoded){
+        //     this.root = this.getNode('m');
+        //     dictionary.forEach((word)=>this.insert(this.root,word,0));
+        // } else {
+        //     this.root = JSON.parse(encoded)
+        // }
+
+    }
+
+    loadTree(unzipped){
+        // alert(JSON.stringify(Object.keys(unzipped.files['Ingredient.tst'])))
+        // this.zip.file('Ingredient.tst').async('string').then((data)=>alert(data))
+        // alert(unzipped.files['Ingredient.tst']['name'])
+        this.root = JSON.parse(unzipped)
+        return this
+    }
+
+    getCompletions(base,callback){
+        return this.baseStream.then((auto)=>callback(auto.getCompletion(base)))
     }
 
     getCompletion(base){
@@ -23,7 +48,7 @@ class Autocomplete{
     }
 
     getNode(value,left,center,right){
-        return {value:value,left:left,center:center,right:right}
+        return {v:value,l:left,c:center,r:right}
     }
 
     insert(node,str,idx){
@@ -31,23 +56,23 @@ class Autocomplete{
             return
         }
         let curr = str.charAt(idx);
-        if(curr > node.value){
-            if(node.right){
-                this.insert(node.right,str,idx)
+        if(curr > node.v){
+            if(node.r){
+                this.insert(node.r,str,idx)
             } else { //no node to the right, create one
-                node.right = this.chainBuild(str,idx)
+                node.r = this.chainBuild(str,idx)
             }
-        } else if(curr < node.value){ //no node to the left, create one
-            if(node.left){
-                this.insert(node.left,str,idx)
+        } else if(curr < node.v){ //no node to the left, create one
+            if(node.l){
+                this.insert(node.l,str,idx)
             } else { //no node to the right, create one
-                node.left = this.chainBuild(str,idx)
+                node.l = this.chainBuild(str,idx)
             }
         } else {
-            if(node.center){
-                this.insert(node.center,str,idx+1)
+            if(node.c){
+                this.insert(node.c,str,idx+1)
             } else {
-                node.center = this.chainBuild(str,idx+1)
+                node.c = this.chainBuild(str,idx+1)
             }
         }
         return node
@@ -58,21 +83,21 @@ class Autocomplete{
             return this.dfs(node,str.split(''))
         }
         let curr = str.charAt(idx);
-        if(curr > node.value){ //search to the right of this node
-            if(node.right){
-                return this.search(node.right,str,idx)
+        if(curr > node.v){ //search to the right of this node
+            if(node.r){
+                return this.search(node.r,str,idx)
             } else { //no node to the right, didnt find anything
                 return []
             }
-        } else if(curr < node.value){ //search to the left of this node
-            if(node.left){
-                return this.search(node.left,str,idx)
+        } else if(curr < node.v){ //search to the left of this node
+            if(node.l){
+                return this.search(node.l,str,idx)
             } else { //no node to the right, didnt find anything
                 return []
             }
         } else {
-            if(node.center){
-                return this.search(node.center,str,idx+1)
+            if(node.c){
+                return this.search(node.c,str,idx+1)
             } else {
                 return []
             }
@@ -81,16 +106,16 @@ class Autocomplete{
 
     dfs(node,base){
         var result = []
-        if(node.right){
-            result = result.concat(this.dfs(node.right,base))
+        if(node.r){
+            result = result.concat(this.dfs(node.r,base))
         }
-        if(node.left){
-            result = result.concat(this.dfs(node.left,base))
+        if(node.l){
+            result = result.concat(this.dfs(node.l,base))
         }
-        base.push(node.value)
-        if(node.center){
+        base.push(node.v)
+        if(node.c){
             // console.log(JSON.stringify(base))
-            result = result.concat(this.dfs(node.center,base))
+            result = result.concat(this.dfs(node.c,base))
         } else {
             // console.log(base.join(''))
             result = result.concat(base.join(''))
@@ -108,20 +133,34 @@ class Autocomplete{
     chainBuild(str,idx){
         // alert(str.substring(idx+1).split('').reduce((prev,next)=>{return prev.center=this.getNode(next)},this.getNode(str.charAt(idx))))
         var buildRoot = this.getNode(str.charAt(idx))
-        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.center=this.getNode(next)},buildRoot)
+        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot)
         return buildRoot
     }
 }
 
-fs = require('fs');
-fs.readFile('../../scripts/ingredient.csv','utf8',(err,data)=>{
-    if(err){
-        console.log(err)
-        return
-    }
-    // console.log(JSON.stringify(data))
-    // var auto = new Autocomplete(['cat','cast','category','cart','cats'])
-    var auto = new Autocomplete(data.split(','))
-    // console.log(JSON.stringify(auto))
-    console.log(auto.getCompletion('ca'))
-})
+// fs = require('fs');
+// csvPath = '../../scripts/ingredient.csv';
+// jsonPath = 'Ingredient.tst'
+// fs.readFile(csvPath,'utf8',(err,data)=>{
+//     if(err){
+//         console.log(err)
+//         return
+//     }
+//     // console.log(JSON.stringify(data))
+//     // var auto = new Autocomplete(['cat','cast','category','cart','cats'])
+//     var auto = new Autocomplete(data.split(','),null)
+//     // var auto = new Autocomplete(null,data)
+//     console.log(JSON.stringify(auto))
+//     console.log(auto.getCompletion('ca'))
+//     fs.writeFile('Ingredient.tst',JSON.stringify(auto.root),(err)=>{
+//         if(err){
+//             console.log(err)
+//             return
+//         }
+//         console.log('saved successfully!')
+//     })
+// })
+
+
+
+export default Autocomplete;

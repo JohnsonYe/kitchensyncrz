@@ -6,6 +6,7 @@
   "dependencies": {
     "aws-sdk": "^2.146.0",
     "axios": "^0.17.0",
+    "extract-zip": "^1.6.6",
     "gh-pages": "^1.0.0",
     "node-sass-chokidar": "0.0.3",
     "react": "^16.0.0",

@@ -5,6 +5,7 @@
  * Description: This file will handle search functionality through the DBClient
  */
  import DBClient from "./AWSDatabaseClient"
+import Autocomplete from '../classes/Autocomplete';
 
  class SearchHelper {
     constructor(){
@@ -17,6 +18,12 @@
         this.shouldReset = false
         this.recipeMap = null
 
+        this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],(response)=>this.auto = new Autocomplete(response.payload[0].Data.B));
+
+    }
+
+    autocomplete(base,callback){
+        this.auto.getCompletions(base,callback)
     }
 
     relevanceSearch(ingredients,target)
