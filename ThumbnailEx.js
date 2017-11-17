@@ -38,20 +38,19 @@ class ThumbnailEx extends Component {
             <div>
                 <img src="chicken.jpg" onclick= {() => this.setState({isOpen: true})}>
 
-        {
-            isOpen &&
-            < Lightbox
-            mainSrc = {images[photoIndex]}
-            onCloseRequest = {() =
-        >
-            this.setState({isOpen: false})
-        }
-            clickOutsideToClose = true
-            imageTitle = React.createElement("h1", null, "Best Chicken NA")
-            imageCaption = React.createElement("p", null, "Average rating: 3.2")
-                / >
-        }
-        </div>
-    );
+        	{
+        	    isOpen &&
+            	<Lightbox
+            		mainSrc = {images[photoIndex]}
+            		onCloseRequest = {()=>this.setState({isOpen: false})}	
+            		clickOutsideToClose = true
+            		imageTitle = React.createElement("h1", null, "Best Chicken NA")
+            		imageCaption = React.createElement("p", null, "Average rating: 3.2")
+                />
+       		}
+      	    </div>
+  	  );
     }
 }
+
+export default ThumbnailEx;
