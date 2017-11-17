@@ -8,6 +8,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
+import Autocomplete from '../classes/Autocomplete';
 
 var client = new SearchHelper();
 
