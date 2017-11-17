@@ -12,52 +12,39 @@
  */
 import React, { Component } from 'react';
 import { Grid , Row, Col, Table } from 'react-bootstrap';
+import {Link} from "react-router-dom";
 
 class Planner extends Component {
 
     constructor(props) {
         super(props);
-        var now = new Date(),
+        var
+            now = new Date(),
+            //Days of the Week String References
             days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
             today = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            mealTable = (
-                <Table striped bordered condensed hover>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Today's Meals</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>[Time Block]</td>
-                        <td>Meal 1</td>
-                    </tr>
-                    <tr>
-                        <td>[Time Block]</td>
-                        <td>Meal 2</td>
-                    </tr>
-                    <tr>
-                        <td>[Time Block</td>
-                        <td>Meal 3</td>
-                    </tr>
-                    </tbody>
-                </Table>
-            );
-
+            mealData = this.getMealData();
 
         this.state = {
             date: today,
             numMeals: 0,
             numShopItems: 0,
             numMealsPrepared: 0,
-            mealTable: mealTable
+            mealData: mealData
         };
     }
 
-    render() {
-        return (
+    /**
+     * This function will retrieve the users mealData array that is currently in the DataBase
+     * @returns [] Array of meal
+     */
+    getMealData() {
+        return [];
+    }
 
+    render() {
+
+        return (
             <div>
                 <div className="jumbotron">
                     <h1>Planner</h1>
@@ -92,7 +79,11 @@ class Planner extends Component {
 
                 <Row>
                     <Col className="meal-list-container" xs={12} md={6}>
-                        {this.state.mealTable}
+                        <ul>
+                            <li>
+                                <Link to="/Planner/MealEditor">Edit Meal</Link>
+                            </li>
+                        </ul>
                     </Col>
                     <Col className="shopping-list" xs={12} md={6}>
                     </Col>
