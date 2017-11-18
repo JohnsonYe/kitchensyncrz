@@ -11,46 +11,66 @@ import react from 'react';
 import {render} from 'react-dom';
 import {Component} from 'react';
 import Modal from 'react-modal';
-import Lightbox from 'react-image-lightbox';
-
-const images=[
-    'chicken.jpg'
-];
-
-class ThumbnailEx extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            photoIndex: 0;
-        isOpen: false;
-        };
-    }
 
 
-    render() {
-        return(
-            //My idea is to have a clickable picture that opens a modal, which contains
-            //the average rating, an enlarged picture
-            //NOTE: Can't seem to find a way to add a hyperlink to the lightbox component
-            //The lightbox only shows the recipe name and the average rating.
-
-            <div>
-                <img src="chicken.jpg" onclick= {() => this.setState({isOpen: true})}>
-
-        	{
-        	    isOpen &&
-            	<Lightbox
-            		mainSrc = {images[photoIndex]}
-            		onCloseRequest = {()=>this.setState({isOpen: false})}	
-            		clickOutsideToClose = true
-            		imageTitle = React.createElement("h1", null, "Best Chicken NA")
-            		imageCaption = React.createElement("p", null, "Average rating: 3.2")
-                />
-       		}
-      	    </div>
-  	  );
+//This will modify the CSS properties of the modal
+const modalStyle={
+    mStyle: {
+        top:    '25%',
+        left:   '25%',
+        right:  '25%',
+        bottom: '25%',
+        width:  '50%',
+        height: '50%'
     }
 }
 
+class ThumbnailEx extends Component {
+    constructor() {
+        super();
+
+        //set modal to be initially off
+        this.state = {
+            modalIsOn: false;
+    }
+        ;
+
+        this.changeModalStatus = this.changeModalStatus.bind(this);
+
+        //function to change the status of the modal when the recipe thumbnail is clicked
+        changeModalStatus()
+        {
+            this.setState({modalIsOn: !this.state.modalIsOn});
+        }
+    }
+
+        render(){
+            return(
+                //example chicken recipe thumbnail
+                <figure>
+                    <img onclick={this.changeModalStatus}
+                     src="chicken.jpg" alt="Chicken recipe" height="100px" width="100px">
+                    <figcaption>Chicken recipe</figcaption>
+                </figure>
+
+                //modal that opens when the user clicks the recipe thumbnail
+                <Modal
+                    isOpen={this.state.modalIsOn}
+                    onRequestClose={this.changeModalStatus}
+                    contentLabel="Recipe Thumbnail"
+                    style={modalStyle}
+                >
+                    <h1>Chicken Recipe</h1>
+                    <img src="chicken.jpg" alt="Chicken recipe big">
+                    <p>Average rating: 3.2 stars</p>
+                    //hyperlinked button that will take user to recipe's page
+                    <form>
+                        <input type="button" value="Go to recipe"/>
+                        //onclick="window.location.href='RECIPE_URL.HTML'"/>
+                    </form>
+                    <button onclick={this.changeModalStatus}>Return</button>
+               </Modal>
+        );
+    }
+}
 export default ThumbnailEx;
