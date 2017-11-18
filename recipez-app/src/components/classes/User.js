@@ -10,6 +10,8 @@
   * SINGLETON CLASS --> USE User.getUser() to get the shared instance
   */
 
+  // Trying to create new branch - Morten
+
  class User {
     constructor(){
         this.client = DBClient.getClient()
