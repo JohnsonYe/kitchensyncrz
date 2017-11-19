@@ -56,6 +56,7 @@ $searchbar-container-border-width:2px;
 }
 .autocomplete-result{
     font-size:large;
+    background-color:lightgray;
 }
 
 .search-overlay{
@@ -74,11 +75,12 @@ $searchbar-container-border-width:2px;
 }
 
 .search-result{
-    position: relative;
-    margin-top:10px;
-    width:100%;
-    min-height: 30px;
-    z-index:-1;
+    // position: absolute;
+    // margin-top:10px;
+    // width:100%;
+    // min-height: 30px;
+    // z-index:1;
+    pointer-events: none;
 }
 
 

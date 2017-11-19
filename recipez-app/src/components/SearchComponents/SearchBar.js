@@ -48,10 +48,10 @@ class SearchBar extends Component{
         return(
             <div className='searchbar-base'>
                 <div className='searchbar-container'>
-                    <form onSubmit={this.addItem}>
+                    <form onSubmit={this.addItem}>{/* we use an <input> element to read text input so we don't have to do keypress handling*/}
                         <input className='search-input' type='text' onChange={(e)=>this.textEntry(e.target.value)} ref={(input)=>this.hiddenForm=input} value={this.state.query}/>
                     </form>
-                    <div className='search-overlay' onClick={this.focusHiddenForm}>
+                    <div className='search-overlay' onClick={this.focusHiddenForm}>{/* display the user's entry and a completion*/}
                         <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
                     </div>
                     <div className='autocomplete-result-container'>

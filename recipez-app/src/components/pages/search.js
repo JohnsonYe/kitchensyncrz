@@ -84,21 +84,20 @@ class Search extends Component {
     	// alert(JSON.stringify(this.state.test_output))
         var records;
         if(this.state.data_pulled){
-        	const results = this.state.test_output
-        	records = results.map((result) => <li><Link to={'/Recipes/'+result}>{result}</Link></li>);
+        	records = this.state.test_output.map((result) => <li><Link to={'/Recipes/'+result}>{result}</Link></li>);
         } else {
             records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
         }
         var ingredient_list = []
         this.state.ingredients.forEach((ingredient) => ingredient_list.push(<li onClick={e => this.changeIngredientFocus(ingredient)}>{ingredient}</li>))
 		// const records = <tr><td>{JSON.stringify(this.state.test_output)}</td></tr>;
-        var completion_list = this.state.completions.map((completion)=><li>{completion}</li>) 
+        // var completion_list = this.state.completions.map((completion)=><li>{completion}</li>) 
         // var completion_list = this.state.completions.map((completion)=><option value={completion}/>) 
-        const entry_list = this.state.entries.map( (entry) => 
-                <label>
-                    <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
-                </label>
-            )
+        // const entry_list = this.state.entries.map( (entry) => 
+        //         <label>
+        //             <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
+        //         </label>
+        //     )
         const ingredient_editor = this.state.selected 
         ? (<div>Selected: {this.state.selected} <button onClick={e => this.removeIngredient(this.state.selected)}>Remove</button></div> ) 
         : (<div>Selected: None</div>);
@@ -110,13 +109,13 @@ class Search extends Component {
             <div className="container-fluid">
                 <div style={{position:'relative'}}>
                     <SearchBar client={client} callback={this.addIngredient}/>
-                    <div className='search-result'>
+                    <div style={{'margin-top':'5px'}}>
                     {/* "modify ingredient" UI element  */}    
-                    {ingredient_editor}         
+                    {/*ingredient_editor*/}         
                     	<table style={{border:'1px solid black'}}>
         	            	<thead>
                                 <tr>
-                                    <th><span style={{color:'purple'}}>Ingr</span><span>edients:</span></th>
+                                    <th><span>Ingredients:</span></th>
             	                	<th>Best Matches:</th>
                                 </tr>
         	            	</thead>
