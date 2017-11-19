@@ -78,12 +78,13 @@ import User from '../classes/User';
     receiveRecipe(response,callback) {
         if(!response.status){
             //the call failed, should we try again?
+            // alert(JSON.stringify(response.payload))
+            // alert(callback)
             callback(null,response.payload)
             return
         }
-
-        callback(this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype))
-        // callback(RecipeHelper.unpackRecipe(response.payload[0]))
+        // alert(JSON.stringify(response))
+        callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
  }
 
@@ -91,10 +92,8 @@ import User from '../classes/User';
     Name:{type:'S'},
     Ingredients:{type:'L',inner:{type:'S'}},
     Directions:{type:'L',inner:{type:'S'}},
-    Reviews:{type:'M',inner:{type:'REVIEW'}},
-    Author:{type:'S'},
-    Difficulty:{type:'N'},
-    TimeCost:{type:'N'}
+    Reviews:{type:'L',inner:{type:'REVIEW'}},
+    Author:{type:'S'}
  }
 
  RecipeHelper.ReviewPrototype = {
