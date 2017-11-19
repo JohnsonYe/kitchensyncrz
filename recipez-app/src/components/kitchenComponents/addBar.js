@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import axios from 'axios'
 
 // Adding to the list, aka the add bar
 export const TodoForm = ({addTodo}) => {
@@ -42,6 +43,23 @@ export const TodoForm = ({addTodo}) => {
 };
 
 // Mixin, use for multiple extensions
-const addBar = (addBar) => class extends addBar{}
+const addBar = (addBar) => class extends addBar{
+
+    // Add todo handler
+    addTodo(val){
+
+        // Assemble data
+        const todo = {value: val}
+
+        // Update data
+        axios.post(this.apiUrl, todo)
+            .then((response) => {
+            this.setState({data: this.state.data.concat(response.data) });
+        })
+            .catch((error)=>{
+            console.log(error);
+        });
+    }
+}
 
 export default addBar;

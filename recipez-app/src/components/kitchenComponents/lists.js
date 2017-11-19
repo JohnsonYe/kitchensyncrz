@@ -74,6 +74,7 @@ class lists extends Component{
                     remove={this.handleRemove.bind(this)}
                 />
             </div>
+
         );
     }
 }

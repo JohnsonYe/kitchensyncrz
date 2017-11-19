@@ -5,11 +5,15 @@
  * Description: This file will serve as the cookware page.
  */
 
-import kitchenLists from './kitchenLists';
+import React from 'react'
+import lists from './lists';
 import addBar from './addBar';
 
+import {TodoForm} from './addBar'
+import {TodoList} from './lists'
+
 // Mixin, use for multiple extension
-class cookware extends addBar(kitchenLists){
+class cookware extends addBar(lists){
 
     constructor(props){
         // Pass props to parent class
@@ -22,6 +26,22 @@ class cookware extends addBar(kitchenLists){
 
         // Will change once the database is set up
         this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/tools'
+    }
+
+        render(){
+
+        // Render JSX
+        return (
+            <div>
+                <h3> Cookware items: ({this.state.data.length})</h3>
+
+                <TodoForm addTodo={this.addTodo.bind(this)}/>
+                <TodoList
+                    todos={this.state.data}
+                    remove={this.removeTodo.bind(this)}
+                />
+             </div>
+        );
     }
 }
 export default cookware;
