@@ -17,18 +17,21 @@ class Autocomplete{
         this.loadTree = this.loadTree.bind(this);
         this.getCompletions = this.getCompletions.bind(this);
 
-        this.zip = new JSZip()
-        this.baseStream = this.zip.loadAsync(binary,{base64:true})
-            .then((file)=>this.zip.file('Ingredient.tst').async('string'))
-            .then(this.loadTree)
-            .catch((err)=>alert(err))
-        // if(!encoded){
-        //     this.root = this.getNode('m');
-        //     dictionary.forEach((word)=>this.insert(this.root,word,0));
-        // } else {
-        //     this.root = JSON.parse(encoded)
-        // }
+        this.loadBinary = this.loadBinary.bind(this);
+        this.loadList = this.loadList.bind(this);
+    }
 
+    loadBinary(binary){
+        var zip = new JSZip()
+        this.baseStream = zip.loadAsync(binary,{base64:true})
+           .then((file)=>zip.file('Ingredient.tst').async('string'))
+           .then(this.loadTree)
+           .catch((err)=>alert(err))       
+    }
+
+    loadList(list){
+        this.root = this.getNode('m');
+        list.forEach((str)=>this.insert(this.root,str,0))
     }
 
     loadTree(unzipped){

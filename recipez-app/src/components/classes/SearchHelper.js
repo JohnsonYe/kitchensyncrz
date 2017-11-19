@@ -4,7 +4,7 @@
  * Date Created: 11/7/2017
  * Description: This file will handle search functionality through the DBClient
  */
- import DBClient from "./AWSDatabaseClient"
+import DBClient from "./AWSDatabaseClient"
 import Autocomplete from '../classes/Autocomplete';
 
  class SearchHelper {
@@ -18,7 +18,11 @@ import Autocomplete from '../classes/Autocomplete';
         this.shouldReset = false
         this.recipeMap = null
 
-        this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],(response)=>this.auto = new Autocomplete(response.payload[0].Data.B));
+        this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
+            (response)=>{
+                this.auto = new Autocomplete();
+                this.auto.loadBinary(response.payload[0].Data.B)
+            });
 
     }
 
