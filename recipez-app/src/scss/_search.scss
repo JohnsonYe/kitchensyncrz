@@ -1,0 +1,71 @@
+/**
+ * Title: _search.scss
+ * Author: Alexander Haggart
+ * Date Created: 11/18/2017
+ * Description: This file will contain styling for search-specific elements
+ */
+
+$search-bar-height: 60px;
+
+.search-result{
+    position: absolute;
+    margin-top:$search-bar-height + 15px;
+    width:100%;
+    min-height: 30px;
+    z-index:-1;
+    background-color: purple;
+}
+
+.search-input{
+    position:absolute;
+    width:100%;
+    border-style: solid;
+    border-color:gray;
+    border-radius:5px;
+
+    background-color:lightgray;
+    height:$search-bar-height;
+}
+
+.searchbar-container{
+    position:absolute;
+    width:100%;
+    border-style: solid;
+    border-color:lightgray;
+    border-radius:5px;
+
+    background-color:lightgray;
+    z-index:2;
+}
+
+.autocomplete-result{
+    position:relative;
+    margin-top: $search-bar-height;
+/*    border-style: solid;
+    border-color:gray;
+    border-radius:5px;*/
+
+    /*background-color:lightgray; */
+    z-index:2;   
+}
+
+.search-overlay{
+    position:relative;
+    z-index:2;
+    padding-left:30px;
+    padding-top:10px;
+    border-style: solid;
+    border-color:gray;
+    border-radius:5px;
+
+    background-color:lightgray;
+    height:$search-bar-height;
+    font-size: $search-bar-height * 0.75;
+
+}
+
+
+
+
+
+

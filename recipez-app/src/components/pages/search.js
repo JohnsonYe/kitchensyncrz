@@ -8,6 +8,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
+import SearchBar from '../SearchComponents/SearchBar'
 
 var client = new SearchHelper();
 
@@ -43,12 +44,11 @@ class Search extends Component {
     changeIngredientFocus(ingredient){
         this.setState({selected:ingredient})
     }
-    addIngredient(e){
-        e.preventDefault();
-        if(this.state.field != ''){
-            this.state.ingredients.add(this.state.field)
-            this.state.recipeMap = client.relevanceSearch([this.state.field],this.dataReciever)
-            this.setState({field:'',selected:this.state.field})
+    addIngredient(ingredient){
+        if(ingredient){
+            this.state.ingredients.add(ingredient)
+            this.state.recipeMap = client.relevanceSearch([ingredient],this.dataReciever)
+            this.setState({field:'',selected:ingredient})
         }
     }
     removeIngredient(e){
@@ -70,10 +70,15 @@ class Search extends Component {
     }
     textEntry(base){
         // alert(base)
-        client.autocomplete(base,(list)=>this.autocomplete(base,list))
+        this.setState({field:base})
+        if(base.length>0){
+            client.autocomplete(base,this.autocomplete)
+        } else {
+            this.setState({completions:[]})
+        }
     }
-    autocomplete(base,completions){
-        this.setState({field:base,completions:completions})
+    autocomplete(completions){
+        this.setState({completions:completions})
     }
     render() {
     	// alert(JSON.stringify(this.state.test_output))
@@ -88,6 +93,7 @@ class Search extends Component {
         this.state.ingredients.forEach((ingredient) => ingredient_list.push(<li onClick={e => this.changeIngredientFocus(ingredient)}>{ingredient}</li>))
 		// const records = <tr><td>{JSON.stringify(this.state.test_output)}</td></tr>;
         var completion_list = this.state.completions.map((completion)=><li>{completion}</li>) 
+        // var completion_list = this.state.completions.map((completion)=><option value={completion}/>) 
         const entry_list = this.state.entries.map( (entry) => 
                 <label>
                     <input type="text" value={entry.value} onChange={e => this.fieldChange(e,entry.index)}/>
@@ -102,40 +108,35 @@ class Search extends Component {
                 <h1>Browse</h1>
             </div>
             <div className="container-fluid">
-                <div>Search Team has arrived!</div>
- 				<form onSubmit={this.addIngredient}>
-                      <label>
-                          <input type="text" value={this.state.field} onChange={(e)=>this.textEntry(e.target.value)}/>
-                      </label>
-                      <button>Add!</button>
-            	</form>
-                <ol>
-                    {completion_list}
-                </ol>
-                {/* "modify ingredient" UI element  */}    
-                {ingredient_editor}         
-            	<table style={{border:'1px solid black'}}>
-	            	<thead>
-                        <tr>
-                            <th>Ingredients:</th>
-    	                	<th>Best Matches:</th>
-                        </tr>
-	            	</thead>
-              		<tbody>
-                        <tr>
-                            <td valign='top'>
-                                <ul>
-                                    {ingredient_list}
-                                </ul>
-                            </td>
-                            <td>
-                                <ol>
-                	               {records ? records : ''}
-                                </ol>
-                            </td>
-                        </tr>
-              		</tbody>
-            	</table>
+                <div style={{position:'relative'}}>
+                    <SearchBar client={client} callback={this.addIngredient}/>
+                    <div className='search-result'>
+                    {/* "modify ingredient" UI element  */}    
+                    {ingredient_editor}         
+                    	<table style={{border:'1px solid black'}}>
+        	            	<thead>
+                                <tr>
+                                    <th><span style={{color:'purple'}}>Ingr</span><span>edients:</span></th>
+            	                	<th>Best Matches:</th>
+                                </tr>
+        	            	</thead>
+                      		<tbody>
+                                <tr>
+                                    <td valign='top'>
+                                        <ul>
+                                            {ingredient_list}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <ol>
+                        	               {records ? records : ''}
+                                        </ol>
+                                    </td>
+                                </tr>
+                      		</tbody>
+                    	</table>
+                    </div>
+                </div>
             </div>
             </div>
         );

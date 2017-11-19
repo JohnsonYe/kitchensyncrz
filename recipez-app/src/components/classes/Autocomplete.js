@@ -99,6 +99,9 @@ class Autocomplete{
             if(node.c){
                 return this.search(node.c,str,idx+1)
             } else {
+                if(idx+1==str.length){
+                    return [str]
+                }
                 return []
             }
         }        
