@@ -12,7 +12,8 @@ class SearchBar extends Component{
 
         this.state = {
             query:'',
-            completions:[]
+            completions:[],
+            listOpen:false
         }
 
         this.autocomplete = this.autocomplete.bind(this);
@@ -54,7 +55,8 @@ class SearchBar extends Component{
                     <div className='search-overlay' onClick={this.focusHiddenForm}>{/* display the user's entry and a completion*/}
                         <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
                     </div>
-                    <div className='autocomplete-result-container'>
+                    <div className='searchbar-contents-expand' open={this.state.listOpen} onClick={(e)=>this.setState({listOpen:true})}></div>
+                    <div className='autocomplete-result-container' open={this.state.completions.length > 0}>
                         {this.state.completions.map((c)=><div className='autocomplete-result'>{c}</div>)}
                     </div>
                 </div>

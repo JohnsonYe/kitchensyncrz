@@ -19,6 +19,8 @@ class Autocomplete{
 
         this.loadBinary = this.loadBinary.bind(this);
         this.loadList = this.loadList.bind(this);
+
+        this.baseStream = new Promise().reject('Tree not loaded');
     }
 
     loadBinary(binary){

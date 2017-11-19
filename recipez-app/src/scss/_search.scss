@@ -6,7 +6,7 @@
  */
 
 $search-bar-height: 60px;
-$left-padding-amt: 30px;
+$left-padding-amt: 100px;
 
 .searchbar-base{
     position:relative;
@@ -23,7 +23,7 @@ $searchbar-container-border-width:2px;
 }
 
 .searchbar-container{
-    @extend .searchbar
+    @extend .searchbar;
     position:absolute;
     width:100%;
     height:$search-bar-height + 2*$searchbar-container-border-width;
@@ -52,6 +52,10 @@ $searchbar-container-border-width:2px;
     background-color:lightgray;
     z-index:2;
     border-radius: 0 0 5px 5px;
+    &[open]{
+        box-shadow:0 2px 2px 2px darkgray;
+        background-color:red;
+    }
 
 }
 .autocomplete-result{
@@ -68,10 +72,33 @@ $searchbar-container-border-width:2px;
     border-color:gray;
     border-radius:5px;
 
-    background-color:lightgray;
+    background-color:white;
     height:$search-bar-height;
     font-size: $search-bar-height * 0.75;
 
+}
+
+$search-grad-start:#6dea19;
+$search-grad-end:#62d615;
+
+.searchbar-contents-expand{
+    position:absolute;
+    z-index:4;
+    height:$search-bar-height;
+    width:$left-padding-amt;
+    border-radius:5px 0 0 5px;
+    border-style: double;
+    border-right-style:none;
+    border-width: medium;
+    border-color: darkgray;
+    background:linear-gradient(top,$search-grad-start,$search-grad-end,$search-grad-start);
+    top:0px;
+
+    cursor:pointer;
+
+    &[open]{
+        background:linear-gradient(bottom,$search-grad-end,$search-grad-start,$search-grad-end);
+    }
 }
 
 .search-result{

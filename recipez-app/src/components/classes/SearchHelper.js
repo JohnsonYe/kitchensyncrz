@@ -21,7 +21,9 @@ import Autocomplete from '../classes/Autocomplete';
         this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
             (response)=>{
                 this.auto = new Autocomplete();
-                this.auto.loadBinary(response.payload[0].Data.B)
+                if(response.status){
+                    this.auto.loadBinary(response.payload[0].Data.B)
+                }
             });
 
     }
