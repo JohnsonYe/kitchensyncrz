@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://tonikhd.github.io/recipez.github.io/recipez-app",
   "dependencies": {
+    "amazon-cognito-identity-js": "^1.26.0",
     "aws-sdk": "^2.146.0",
     "axios": "^0.17.0",
     "gh-pages": "^1.0.0",

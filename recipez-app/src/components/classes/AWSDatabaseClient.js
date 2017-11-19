@@ -10,11 +10,12 @@
   * THIS IS A SINGLETON CLASS.
   * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
   */
-
+ /**
 var creds = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
 });
 AWS.config.update({region:'us-east-2',credentials:creds});
+  */
 var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
@@ -48,6 +49,11 @@ const UNAUTH_NAME = 'GUEST'
             'M': (m)=>({'M':m}),
             'SS':(ss)=>({'SS':ss}),
             'N': (n)=>({'N':n}),
+        }
+
+        this.cognito = {
+            USER_POOL_ID: "us-east-2_SHrX2V3xU",
+            APP_CLIENT_ID: "5ome294mpcicna669ebfieplfi"
         }
     }
 

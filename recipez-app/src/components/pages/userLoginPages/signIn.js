@@ -7,12 +7,21 @@
 import Register from "./register";
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import "../../../scss/App.scss";
+import DBClient from "../../classes/AWSDatabaseClient";
+import {
+    CognitoUserPool,
+    AuthenticationDetails,
+    CognitoUser
+} from "amazon-cognito-identity-js";
+
 import React, { Component } from 'react';
 
 class SignIn extends Component {
 
     constructor(props){
         super(props);
+
+        this.client = DBClient.getClient();
 
         this.state = {
             userName: '',
@@ -22,12 +31,41 @@ class SignIn extends Component {
         }
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault();
-    }
+
+        try {
+            await this.login(this.state.userName, this.state.password);
+            alert("Logged in");
+        } catch (e) {
+            alert(e);
+        }
+    };
 
     validateForm() {
         return this.state.userName.length > 0 && this.state.password.length > 0;
+    }
+
+
+    login(userName, password) {
+
+        const userPool = new CognitoUserPool({
+            UserPoolId: this.client.cognito.USER_POOL_ID,
+            ClientId: this.client.cognito.APP_CLIENT_ID
+        });
+
+        const user = new CognitoUser({ Username: userName, Pool: userPool });
+        const authenticationData = { Username: userName, Password: password };
+        const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+        return new Promise((resolve, reject) =>
+            user.authenticateUser(authenticationDetails, {
+
+                onSuccess: result => resolve(),
+                onFailure: err => reject(err)
+            })
+
+        );
     }
 
 
@@ -39,7 +77,7 @@ class SignIn extends Component {
                     <h1>Sign in to Kitchen Sync</h1>
                 </div>
                 <div className="container-fluid" id="Kitchen-Content">
-                    sign in form goes here ... Our Website is currently under construction
+
                     <form onSubmit={this.handleSubmit}>
                         <label>
                             User Name
@@ -54,6 +92,7 @@ class SignIn extends Component {
                     </form>
                     <form>
                         <button
+                            onClick={this.handleSubmit}
                             disabled={!this.validateForm()}
                             type="submit"
                         >
