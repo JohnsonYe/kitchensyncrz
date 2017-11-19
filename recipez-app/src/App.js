@@ -92,7 +92,7 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
-                    <Route exact path='/Planner/MealEditor' component={MealEditor} />
+                    <Route exact path='/Planner/MealEditor' component={MealEditor}/>
                     <Footer />
                 </div>
             </Router>
