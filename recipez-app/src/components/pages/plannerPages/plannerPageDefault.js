@@ -11,8 +11,13 @@
  * Components: dailyMealPlanner, shoppingList
  */
 import React, { Component } from 'react';
-import { Grid , Row, Col, Table } from 'react-bootstrap';
-import {Link} from "react-router-dom";
+import {
+    Grid ,
+    Row,
+    Col,
+    Button,
+    Jumbotron} from 'react-bootstrap';
+import DailyPlanner from "../../plannerComponents/dailyPlannerList";
 
 class Planner extends Component {
 
@@ -23,9 +28,10 @@ class Planner extends Component {
             //Days of the Week String References
             days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
             today = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            mealData = this.getMealData();
+            mealData = []; /*TODO Change to getMealData after testing*/
 
         this.state = {
+            day: now.getDate(),
             date: today,
             numMeals: 0,
             numShopItems: 0,
@@ -34,63 +40,64 @@ class Planner extends Component {
         };
     }
 
-    /**
-     * This function will retrieve the users mealData array that is currently in the DataBase
-     * @returns [] Array of meal
-     */
-    getMealData() {
-        return [];
-    }
 
     render() {
 
         return (
             <div>
-                <div className="jumbotron">
+                <Jumbotron>
                     <h1>Planner</h1>
-                </div>
+                    <p>
+                        Meal Planner is a feature that allows the you
+                        to schedule
+                        meals from your Cookbook,
+                        for every day of the week.
+                    </p>
+                </Jumbotron>
 
-            <Grid fluid={true} className='container-fluid'>
+            <Grid>
                 <Row className='content'>
-                    <Col xs={6} md={4}>
+                    <Col xs={8} md={8}>
                         <h3>Daily Meal Planner</h3>
                         <h5>{this.state.date}</h5>
                     </Col>
-                    <Col xs={1}></Col>
-                    <Col xs={2} md={1} >
+                    <Col xs={2} md={2} >
                         <h1>{this.state.numMeals}</h1>
                         <h4>Meals</h4>
                     </Col>
-                    <Col xs={1}></Col>
-                    <Col xs={2} md={1} >
+                    <Col xs={2} md={2} >
                         <h1>{this.state.numMealsPrepared}</h1>
                         <h4>Prepared</h4>
                     </Col>
 
+                </Row>
+                &nbsp;
+                <Row>
+                    <Col className="meal-list-container" xs={12} md={6}>
+                        <DailyPlanner />
+                    </Col>
+                </Row>
+                &nbsp;
 
-                    <Col xs={8} md={4}>
+                <Row>
+                    <Col xs={8} md={8}>
                         <h3>Shopping List</h3>
                     </Col>
-                    <Col xs={2} md={2} >
+                    <Col xs={4} md={4} >
                         <h1>{this.state.numShopItems}</h1>
                         <h4>Items</h4>
                     </Col>
                 </Row>
+                &nbsp;
 
                 <Row>
-                    <Col className="meal-list-container" xs={12} md={6}>
-                        <ul>
-                            <li>
-                                <Link to="/Planner/MealEditor">Edit Meal</Link>
-                            </li>
-                        </ul>
-                    </Col>
                     <Col className="shopping-list" xs={12} md={6}>
                     </Col>
                 </Row>
+                &nbsp;
 
                 <Row className="button-section">
-                    <button>View Full Week Planner</button>
+                    <Button bsStyle="info" block>View Full Week Planner</Button>
                 </Row>
             </Grid>
             </div>
