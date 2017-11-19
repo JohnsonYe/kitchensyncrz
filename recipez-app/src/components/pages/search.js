@@ -4,10 +4,13 @@
  * Date Created: 11/2/2017
  * Description: This file will serve as the browse/search recipe page
  */
+// Morten trying to learn how this works...
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
+import User from '../classes/User'
 
 var client = new SearchHelper();
 
@@ -26,11 +29,16 @@ class Search extends Component {
                         data_pulled:false,
                         entries:[{value:'',index:0}],
                         ingredients:new Set(),
-                        selected:null
+                        selected:null,
+                        morten:"Do something cool?"
                     };
         this.fieldChange = this.fieldChange.bind(this);
 
+        this.mortensButton = this.mortensButton.bind(this);
+
         this.planner = new PlannerHelper();
+
+        this.user = new User();
 	}
 	dataPullTest(e){
 		e.preventDefault();
@@ -64,6 +72,13 @@ class Search extends Component {
 
         }
     }
+
+    mortensButton(){
+        this.setState({morten: this.user.client.getUsername()});
+        //this.user.addToPantry('milk','none',1)
+        this.user.removeFromPantry('milk')
+    }
+
     render() {
     	// alert(JSON.stringify(this.state.test_output))
         var records;
@@ -88,6 +103,10 @@ class Search extends Component {
             <div>
             <div className="jumbotron">
                 <h1>Browse</h1>
+            </div>
+            <div>
+                <h3>{this.state.morten}</h3>
+                <button onClick={this.mortensButton}>Mortens Button</button> 
             </div>
             <div className="container-fluid">
                 <div>Search Team has arrived!</div>

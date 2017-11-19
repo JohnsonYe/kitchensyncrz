@@ -25,6 +25,8 @@
         this.addToPantry = this.addToPantry.bind(this);
         this.removeFromPantry = this.removeFromPantry.bind(this);
 
+        this.mort = "Morten Knapp";
+
         // this.addToPantry('zucchini','none',1)
         // this.removeFromPantry('zucchini')
 
@@ -37,6 +39,10 @@
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
         this.loadStream = new Promise(this.loadUserData)
+    }
+
+    getMort(){
+        return this.client.getUsername;
     }
 
     /**
