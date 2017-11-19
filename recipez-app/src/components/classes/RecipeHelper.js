@@ -92,7 +92,9 @@ import User from '../classes/User';
     Ingredients:{type:'L',inner:{type:'S'}},
     Directions:{type:'L',inner:{type:'S'}},
     Reviews:{type:'M',inner:{type:'REVIEW'}},
-    Author:{type:'S'}
+    Author:{type:'S'},
+    Difficulty:{type:'N'},
+    TimeCost:{type:'N'}
  }
 
  RecipeHelper.ReviewPrototype = {
