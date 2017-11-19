@@ -6,6 +6,7 @@
  * preference page.
  */
 import React from 'react'
+import axios from 'axios'
 import {Checkbox, CheckboxGroup} from 'react-checkbox-group'
 
 import lists from './lists';
@@ -14,6 +15,13 @@ import addBar from './addBar'
 import {TodoForm} from './addBar'
 import {TodoList} from './lists'
 
+
+const prefChanged = (newPrefs) =>{
+    this.setState({
+        prefs: newPrefs
+
+    });
+}
 
 // Mixin, use for multiple extensions
 class exclude extends addBar(lists){
@@ -35,32 +43,24 @@ class exclude extends addBar(lists){
 
     componentDidMount(){
 
-        this.setState(() => {
-            this.setState({
-
-                prefs: []
-            });
-        })
-    }
-
-    updatePref = (newPref) => {
-        this.setState({
-            prefs: newPref
+        // Make HTTP request with Axios
+        axios.get(this.apiUrl)
+            .then((response) => {
+            // Set state with result
+            this.setState({data:response.data});
+            this.setState({prefs:response.pref})
         });
-    }
 
+    }
 
     render(){
-
-        // Render JSX
         return (
             <div>
-
                 <h3> Dietary Restrictions </h3>
                 <CheckboxGroup
                     name = "Dietary Restrictions"
                     value = {this.state.prefs}
-                    onChange = {this.updatePrefs} >
+                    onChange = {this.prefsChanged} >
 
                     <label class = "checker"><Checkbox value = "vegan" /> Vegan </label>
                     <label class = "checker"><Checkbox value = "vegetarian" /> Vegetarian </label>
