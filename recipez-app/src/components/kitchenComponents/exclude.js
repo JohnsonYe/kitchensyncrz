@@ -16,13 +16,6 @@ import {TodoForm} from './addBar'
 import {TodoList} from './lists'
 
 
-const prefChanged = (newPrefs) =>{
-    this.setState({
-        prefs: newPrefs
-
-    });
-}
-
 // Mixin, use for multiple extensions
 class exclude extends addBar(lists){
 
@@ -42,16 +35,24 @@ class exclude extends addBar(lists){
     }
 
     componentDidMount(){
-
         // Make HTTP request with Axios
         axios.get(this.apiUrl)
             .then((response) => {
             // Set state with result
-            this.setState({data:response.data});
-            this.setState({prefs:response.pref})
+            this.setState({data: response.data});
+            this.setState({prefs: response.prefs});
         });
 
     }
+/*
+    prefChanged(){
+        axios.get(this.apiUrl)
+            .then((response) => {
+            // Set state with result
+            this.getState({prefs: response.prefs});
+        });
+    }*/
+
 
     render(){
         return (
