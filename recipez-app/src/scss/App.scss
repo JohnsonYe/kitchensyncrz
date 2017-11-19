@@ -105,28 +105,28 @@ body {
     position: relative;
     display: inline-block ;
     list-style-type: none;
-    background: powderblue;
+    background: dimgray;
     width: 100%;
     
 
     #pantry{
       display: inline-block;
       margin: 10px;
-      color: dimgray;
+      color: white;
       cursor: pointer;
     }
 
     #cookware{
       display: inline-block;
       margin: 10px;
-      color: dimgray;
+      color: white;
       cursor: pointer;
     }
 
     #exclude{
       display: inline-block;
       margin: 10px;
-      color: dimgray;
+      color: white;
       cursor: pointer;
     }
   }
@@ -147,9 +147,9 @@ body {
 
     #add{
       cursor: pointer;
-      background: powderblue;
+      background: lightgray;
       color: green;
-      font-weight: bold;
+      font-weight: bolder;
     }
 
     #remove{
@@ -159,7 +159,7 @@ body {
       top:0px;
       cursor: pointer;
       color: red;
-      background: powderblue;
+      background: lightgray;
       font-weight: bold;
     }
 
