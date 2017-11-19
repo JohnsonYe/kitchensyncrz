@@ -6,6 +6,8 @@
  */
 import React from 'react'
 
+import User from '../classes/User'
+
 import lists from './lists';
 import addBar from './addBar'
 
@@ -34,7 +36,7 @@ class pantry extends addBar(lists){
         // Render JSX
         return (
             <div>
-                <h3> Pantry items: ({this.state.data.length})</h3>
+                <h3> Pantry Items: ({this.state.data.length})</h3>
 
                 <TodoForm addTodo={this.addTodo.bind(this)}/>
                 <TodoList

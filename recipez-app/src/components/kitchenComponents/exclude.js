@@ -6,11 +6,14 @@
  * preference page.
  */
 import React from 'react'
+import {Checkbox, CheckboxGroup} from 'react-checkbox-group'
+
 import lists from './lists';
 import addBar from './addBar'
 
 import {TodoForm} from './addBar'
 import {TodoList} from './lists'
+
 
 // Mixin, use for multiple extensions
 class exclude extends addBar(lists){
@@ -22,19 +25,50 @@ class exclude extends addBar(lists){
 
         // Set initial state
         this.state = {
-            data: []
+            data: [],
+            prefs: []
         }
 
         // Will change once database is ready
         this.apiUrl = 'http://59fff8591aebc40012b3c60e.mockapi.io/kitchen/exclude'
     }
 
-        render(){
+    componentDidMount(){
+
+        this.setState(() => {
+            this.setState({
+
+                prefs: []
+            });
+        })
+    }
+
+    updatePref = (newPref) => {
+        this.setState({
+            prefs: newPref
+        });
+    }
+
+
+    render(){
 
         // Render JSX
         return (
             <div>
-                <h3> Excluded items: ({this.state.data.length})</h3>
+
+                <h3> Dietary Restrictions </h3>
+                <CheckboxGroup
+                    name = "Dietary Restrictions"
+                    value = {this.state.prefs}
+                    onChange = {this.updatePrefs} >
+
+                    <label class = "checker"><Checkbox value = "vegan" /> Vegan </label>
+                    <label class = "checker"><Checkbox value = "vegetarian" /> Vegetarian </label>
+                    <label class = "checker"><Checkbox value = "gluten-free" /> Gluten Free </label>
+                </CheckboxGroup>
+
+                <br />
+                <h3> Other Excluded Items: ({this.state.data.length})</h3>
 
                 <TodoForm addTodo={this.addTodo.bind(this)}/>
                 <TodoList

@@ -33,7 +33,7 @@ class cookware extends addBar(lists){
         // Render JSX
         return (
             <div>
-                <h3> Cookware items: ({this.state.data.length})</h3>
+                <h3> Cookware Items: ({this.state.data.length})</h3>
 
                 <TodoForm addTodo={this.addTodo.bind(this)}/>
                 <TodoList
