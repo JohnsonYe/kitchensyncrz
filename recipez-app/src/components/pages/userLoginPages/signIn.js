@@ -107,10 +107,7 @@ class SignIn extends Component {
                             Register
                         </button>
                     </form>
-                    <div>
-                        <h5>user name is: {this.state.userName}</h5>
-                        <h5>password is: {this.state.password}</h5>
-                    </div>
+
                 </div>
             </div>
 

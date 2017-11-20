@@ -28,8 +28,8 @@ class Register extends Component {
                 <div className="jumbotron">
                     <h1>Register for Kitchen Sync</h1>
                 </div>
-                <div className="container-fluid">
-                    Registration form goes here ... Our Website is currently under construction
+                <div className="container-fluid" id="Kitchen-Content">
+
                     <form onSubmit={this.handleSubmit}>
                         <label>
                             User Name
@@ -61,11 +61,7 @@ class Register extends Component {
                             Sign In
                         </button>
                     </form>
-                    <div>
-                        <h5>user name is: {this.state.userName}</h5>
-                        <h5>email is: {this.state.email}</h5>
-                        <h5>password is: {this.state.password}</h5>
-                    </div>
+
                 </div>
             </div>
 
