@@ -50,12 +50,47 @@ function DailyPlannerItem(props) {
     );
 }
 
+function ShoppingListItem(props) {
+
+    const noImg = "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
+
+    return (
+            <Row className="shoppinglist-item">
+                <Col md={3}>
+                    <Image src={noImg} thumbnail responsive/>
+                </Col>
+                <Col md={7}>
+                    <h4>
+                        {props.item}
+                    </h4>
+                    <p>Description......</p>
+                </Col>
+                <Col smPull={2} md={2}>
+                    <Button bsSize="xsmall" bsStyle="success">Add to Pantry</Button>
+                    <Button bsSize="xsmall" bsStyle="danger">Remove</Button>
+                </Col>
+            </Row>
+    );
+}
+
 function MealList(props) {
     return (
         <div className="container">
             {
                 Object.keys(props.meals).map( (key) => {
                     return <DailyPlannerItem meal={props.meals[key]} />
+                })
+            }
+        </div>
+    );
+}
+
+function ShoppingList(props) {
+    return (
+        <div className="container">
+            {
+                Object.keys(props.items).map( (key) => {
+                    return <ShoppingListItem item={props.items[key]} />
                 })
             }
         </div>
@@ -79,10 +114,39 @@ class AddToPlannerButton extends Component {
 
     render() {
         return(
-            <button
+            <Button
+                bsSize="xsmall"
+                bsStyle="secondary"
                 onClick={this.createMeal}>
-                Save
-            </button>
+                Test
+            </Button>
+        );
+    }
+}
+
+class AddToShoppingButton extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            itemNum: 0
+        }
+        this.createItem = this.createItem.bind(this);
+    }
+
+    createItem() {
+        var item = "Item " + this.state.itemNum;
+        this.setState({ itemNum: (++this.state.itemNum) })
+        this.props.addItem(item);
+    }
+
+    render() {
+        return(
+            <Button
+                bsSize="xsmall"
+                bsStyle="secondary"
+                onClick={this.createItem}>
+                Test Item
+            </Button>
         );
     }
 }
@@ -106,10 +170,13 @@ class Planner extends Component {
             numShopItems: 0,
             numMealsPrepared: 0,
             mealData: mealData,
-            meals: {}
+            meals: {},
+            items: {}
         };
 
         this.addMeal = this.addMeal.bind(this);
+        this.addItem = this.addItem.bind(this);
+
     }
 
     /**
@@ -119,8 +186,18 @@ class Planner extends Component {
         var timestamp = (new Date().getTime());
         this.state.meals['meal-'+timestamp] = meal;
         this.setState({ meals : this.state.meals });
+        this.setState({ numMeals: (++this.state.numMeals) });
     }
 
+    /**
+     * Adds a item to the list
+     */
+    addItem(item) {
+        var timestamp = (new Date().getTime());
+        this.state.items['item-'+timestamp] = item;
+        this.setState({ items : this.state.items });
+        this.setState({ numShopItems: (++this.state.numShopItems) });
+    }
 
     render() {
 
@@ -159,6 +236,9 @@ class Planner extends Component {
                             <h1>{this.state.numShopItems}</h1>
                             <h4>Items</h4>
                         </div>
+
+                        <ShoppingListItem item="Item 0" />
+
                     </Col>
                 </Row>&nbsp;
                 <Row>

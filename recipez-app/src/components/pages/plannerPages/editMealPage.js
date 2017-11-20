@@ -87,7 +87,7 @@ class MealEditor extends Component {
                         </FormGroup>
 
                         <FormGroup controlId="formInLineMin">
-                            <ControlLabel>Hour</ControlLabel>
+                            <ControlLabel>Min</ControlLabel>
                             {' '}
                             <FormControl type="text" placeholder=":30"/>
                         </FormGroup>
