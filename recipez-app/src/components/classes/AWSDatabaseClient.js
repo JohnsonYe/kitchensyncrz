@@ -230,8 +230,8 @@ const UNAUTH_NAME = 'GUEST'
         Object.keys(item).forEach((key)=>{
             try{
                 unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
-            } catch(e){ //found an undefined key, skip it for now
-                unpacked[key] = item[key]+'';
+            } catch(e){ //found an undefined key, fail quietly for now
+                unpacked[key] = item[key];
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })
