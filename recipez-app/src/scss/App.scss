@@ -1,7 +1,7 @@
 @import "_config.scss";
 
 .modal-backdrop {
-  z-index: 50;
+  z-index: 90;
 }
 
 .modal{
@@ -10,31 +10,19 @@
 
 .meal-item {
   border-style: solid;
-  .meal-item-row {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-
+  border-width: thin;
+  padding: 12px;
 }
-
 
 /* ruleset for all jumbotrons across website*/
 .jumbotron {
+  //background: #1d1f21;
   text-align: center;
   margin-top: -150px;
   overflow: hidden;
-  //border-style: solid;
-  //border: 10px 10px 10px 10px;
   height: 180px;
-  /*background-image: url(https://i.ytimg.com/vi/mEBFswpYms4/maxresdefault.jpg);*/
-
-  /* text inside jumbotron */
-
-  h1 {
-    //font-size: 60px;
-    //font-family: 'Lobster';
+  h1{
+    //color: #c5c8c6
   }
 }
 
