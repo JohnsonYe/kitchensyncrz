@@ -66,8 +66,8 @@ $searchbar-container-border-width:2px;
 .search-overlay{
     position:relative;
     z-index:2;
-    padding-left:$left-padding-amt;
-    padding-top:10px;
+    // padding-left:$left-padding-amt;
+    // padding-top:10px;
     border-style: solid;
     border-width:2px;
     border-color:gray;
@@ -82,30 +82,44 @@ $searchbar-container-border-width:2px;
 
 }
 
-$search-grad-start:#6dea19;
-$search-grad-end:#62d615;
+.search-text-entry{
+    position:relative;
+    z-index:4;
+    top:0px;
+    padding-top:$search-bar-height*0.125+5px;
+    height:$search-bar-height;
+    pointer-events:none;
+    font-family: Verdana
+    color:lightgray;
+}
+
+$search-grad-start:#69d633;
+$search-grad-end:#4dad1a;
 
 .searchbar-contents-expand{
-    position:absolute;
+    position:relative;
+    float:left;
     z-index:4;
     height:$search-bar-height;
     width:$left-padding-amt;
+    margin-left:-$searchbar-container-border-width;
+    margin-top:-$searchbar-container-border-width;
     border-radius:5px 0 0 5px;
-    border-style: double;
+    border-style: none;
     border-right-style:none;
     border-width: medium;
     border-color: darkgray;
-    // background:linear-gradient(top,$search-grad-start,$search-grad-end,$search-grad-start);
+    background:linear-gradient(top,$search-grad-start,$search-grad-end);
 
-    background-color:$search-grad-start;
-    box-shadow: inset 0 0 10px 5px $search-grad-end;
+    // background-color:$search-grad-start;
+    // box-shadow: inset 0 0 10px 5px $search-grad-end;
     top:0px;
 
     cursor:pointer;
     &:hover{
-        // background:linear-gradient(bottom,$search-grad-end,$search-grad-start,$search-grad-end);
+        background:linear-gradient(bottom,$search-grad-start,$search-grad-start);
         box-shadow: inset 0 0 10px 5px $search-grad-start;        
-        background-color:$search-grad-end;       
+        // background-color:$search-grad-end;       
     }
 }
 

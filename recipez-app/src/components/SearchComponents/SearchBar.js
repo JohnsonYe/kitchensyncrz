@@ -5,6 +5,7 @@
  * Description: modular searchbar component that provides autocomplete in a dropdown menu
  */
 import React, { Component } from 'react';
+import {Typeahead} from 'react-bootstrap-typeahead';
 
 class SearchBar extends Component{
     constructor(props){
@@ -25,7 +26,6 @@ class SearchBar extends Component{
     focusHiddenForm(e){
         this.hiddenForm.focus()
     }
-
     textEntry(value){
         this.setState({query:value})
         if(value.length>0){
@@ -46,18 +46,36 @@ class SearchBar extends Component{
     }
 
     render(){
+        var promptContent = this.state.query.length?
+                        (<div className='search-text-entry'>
+                            <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
+                        </div>)
+                        :
+                        (<div className='search-text-entry'>
+                            <div style={{'font-style':'italic',color:'lightgray'}}>Enter ingredients</div>
+                        </div>)
+        var options = {selectHintOnEnter:true}
         return(
-            <div className='searchbar-base'>
-                <div className='searchbar-container'>
-                    <form onSubmit={this.addItem}>{/* we use an <input> element to read text input so we don't have to do keypress handling*/}
-                        <input className='search-input' type='text' onChange={(e)=>this.textEntry(e.target.value)} ref={(input)=>this.hiddenForm=input} value={this.state.query}/>
-                    </form>
-                    <div className='search-overlay' onClick={this.focusHiddenForm}>{/* display the user's entry and a completion*/}
-                        <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
-                    </div>
-                    <div className='searchbar-contents-expand' open={this.state.listOpen} onClick={(e)=>this.setState({listOpen:true})}></div>
-                    <div className='autocomplete-result-container' open={this.state.completions.length > 0}>
-                        {this.state.completions.map((c)=><div className='autocomplete-result'>{c}</div>)}
+            <div>
+                <div>
+                    <Typeahead {...options} placeholder='Enter ingredients or recipes' options={['a','bunch','of','options']} emptyLabel=''/>
+                </div>
+                <div className='searchbar-base'>
+                    <div className='searchbar-container'>
+                        <form onSubmit={this.addItem}>{/* we use an <input> element to read text input so we don't have to do keypress handling*/}
+                            <input className='search-input' type='text' onChange={(e)=>this.textEntry(e.target.value)} ref={(input)=>this.hiddenForm=input} value={this.state.query}/>
+                        </form>
+                        {/* keep a number on the ingredient list */}
+                        <div className='search-overlay' onClick={this.focusHiddenForm}>{/* display the user's entry and a completion*/}
+                            <div className='searchbar-contents-expand' open={this.state.listOpen} onClick={(e)=>this.setState({listOpen:true})}></div>
+                            {promptContent}
+                            {/*<div className='search-text-entry'>
+                                <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
+                            </div>*/}
+                        </div>
+                        <div className='autocomplete-result-container' open={this.state.completions.length > 0}>
+                            {this.state.completions.map((c)=><div className='autocomplete-result'>{c}</div>)}
+                        </div>
                     </div>
                 </div>
             </div>
