@@ -28,8 +28,6 @@ import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
 import Recipe from "./components/pages/recipe";
-import MealEditor from "./components/pages/plannerPages/editMealPage";
-
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 
@@ -92,7 +90,6 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
-                    <Route exact path='/Planner/MealEditor' component={MealEditor}/>
                     <Footer />
                 </div>
             </Router>
