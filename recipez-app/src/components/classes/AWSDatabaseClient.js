@@ -5,7 +5,7 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
-
+ import Alert from 'react-s-alert';
  /**
   * THIS IS A SINGLETON CLASS.
   * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
@@ -98,6 +98,7 @@ const UNAUTH_NAME = 'GUEST'
             } else {
                 target({status:true,  payload: data});
             }
+            // Alert(JSON.stringify(data.Responses.payload))
         })
     }
 

@@ -160,9 +160,8 @@
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildListAppendUpdateExpression('kitchen', {L:[item]})),
+                this.client.buildStringSetAppendUpdateExpression('cookware', {SS:[item]})),
             function(response){if(response.status) this.userData.kitchen[item] = {item:item}}.bind(this))
-        // Alert.info(JSON.stringify(response.payload))
     }
 
     getPlanner(){
