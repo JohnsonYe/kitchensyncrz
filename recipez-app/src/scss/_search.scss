@@ -19,7 +19,7 @@ $searchbar-container-border-width:2px;
 .searchbar{
     width:100%;
     border-style: solid;
-    background-color:lightgray;
+    background-color:white;
 }
 
 .searchbar-container{
@@ -27,7 +27,7 @@ $searchbar-container-border-width:2px;
     position:absolute;
     width:100%;
     height:$search-bar-height + 2*$searchbar-container-border-width;
-    border-color:lightgray;
+    border-color:white;
     border-width:$searchbar-container-border-width;
     border-radius:5px;
 
@@ -53,7 +53,7 @@ $searchbar-container-border-width:2px;
     z-index:2;
     border-radius: 0 0 5px 5px;
     &[open]{
-        box-shadow:0 2px 2px 2px darkgray;
+        box-shadow:0 0px 3px 3px darkgray;
         background-color:red;
     }
 
@@ -69,8 +69,12 @@ $searchbar-container-border-width:2px;
     padding-left:$left-padding-amt;
     padding-top:10px;
     border-style: solid;
+    border-width:2px;
     border-color:gray;
     border-radius:5px;
+    // &:hover{
+        box-shadow: inset 0 0 5px 3px lightgray;        
+    // }
 
     background-color:white;
     height:$search-bar-height;
@@ -91,13 +95,17 @@ $search-grad-end:#62d615;
     border-right-style:none;
     border-width: medium;
     border-color: darkgray;
-    background:linear-gradient(top,$search-grad-start,$search-grad-end,$search-grad-start);
+    // background:linear-gradient(top,$search-grad-start,$search-grad-end,$search-grad-start);
+
+    background-color:$search-grad-start;
+    box-shadow: inset 0 0 10px 5px $search-grad-end;
     top:0px;
 
     cursor:pointer;
-
-    &[open]{
-        background:linear-gradient(bottom,$search-grad-end,$search-grad-start,$search-grad-end);
+    &:hover{
+        // background:linear-gradient(bottom,$search-grad-end,$search-grad-start,$search-grad-end);
+        box-shadow: inset 0 0 10px 5px $search-grad-start;        
+        background-color:$search-grad-end;       
     }
 }
 
