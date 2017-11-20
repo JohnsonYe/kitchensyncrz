@@ -11,95 +11,158 @@
  * Components: dailyMealPlanner, shoppingList
  */
 import React, { Component } from 'react';
-import { Grid , Row, Col, Table } from 'react-bootstrap';
+import {
+    Grid ,
+    Row,
+    Col,
+    Button,
+    Jumbotron,
+    Image} from 'react-bootstrap';
+
+import MealEditor from "./editMealPage";
+
+function DailyPlannerItem(props) {
+
+    const noImg = "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
+
+    return (
+        <Grid className="meal-item" fluid>
+        <Row>
+            <Col md={1}>
+                <h4>[Time Block]</h4>
+            </Col>
+            <Col md={3}>
+                <Image src={noImg} thumbnail responsive/>
+            </Col>
+            <Col md={6}>
+                <h4>
+                    {props.meal}
+                </h4>
+                <p>Description......</p>
+            </Col>
+            <Col smPull={2} md={2}>
+                <Button bsSize="xsmall" bsStyle="primary">Get Started</Button>
+                <Button bsSize="xsmall" bsStyle="danger">Remove</Button>
+                <MealEditor />
+            </Col>
+        </Row>
+        </Grid>
+    );
+}
+
+function MealList(props) {
+    return (
+        <div className="container">
+            {
+                Object.keys(props.meals).map( (key) => {
+                    return <DailyPlannerItem meal={props.meals[key]} />
+                })
+            }
+        </div>
+    );
+}
+
+class AddToPlannerButton extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            mealNum: 0
+        }
+        this.createMeal = this.createMeal.bind(this);
+    }
+
+    createMeal() {
+        var meal = "Meal " + this.state.mealNum;
+        this.setState({ mealNum: (++this.state.mealNum) })
+        this.props.addMeal(meal);
+    }
+
+    render() {
+        return(
+            <button
+                onClick={this.createMeal}>
+                Save
+            </button>
+        );
+    }
+}
+
 
 class Planner extends Component {
 
     constructor(props) {
         super(props);
-        var now = new Date(),
+        var
+            now = new Date(),
+            //Days of the Week String References
             days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
             today = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            mealTable = (
-                <Table striped bordered condensed hover>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Today's Meals</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>[Time Block]</td>
-                        <td>Meal 1</td>
-                    </tr>
-                    <tr>
-                        <td>[Time Block]</td>
-                        <td>Meal 2</td>
-                    </tr>
-                    <tr>
-                        <td>[Time Block</td>
-                        <td>Meal 3</td>
-                    </tr>
-                    </tbody>
-                </Table>
-            );
-
+            mealData = []; /*TODO Change to getMealData after testing*/
 
         this.state = {
+            day: now.getDate(),
             date: today,
             numMeals: 0,
             numShopItems: 0,
             numMealsPrepared: 0,
-            mealTable: mealTable
+            mealData: mealData,
+            meals: {}
         };
+
+        this.addMeal = this.addMeal.bind(this);
     }
 
+    /**
+     * Adds a meal to the list
+     */
+    addMeal(meal) {
+        var timestamp = (new Date().getTime());
+        this.state.meals['meal-'+timestamp] = meal;
+        this.setState({ meals : this.state.meals });
+    }
+
+
     render() {
+
         return (
-
             <div>
-                <div className="jumbotron">
+                <Jumbotron>
                     <h1>Planner</h1>
-                </div>
+                </Jumbotron>
 
-            <Grid fluid={true} className='container-fluid'>
-                <Row className='content'>
-                    <Col xs={6} md={4}>
+            <Grid>
+                <Row className='planner-header'>
+                    <Col xs={12} md={6}>
                         <h3>Daily Meal Planner</h3>
                         <h5>{this.state.date}</h5>
-                    </Col>
-                    <Col xs={1}></Col>
-                    <Col xs={2} md={1} >
-                        <h1>{this.state.numMeals}</h1>
-                        <h4>Meals</h4>
-                    </Col>
-                    <Col xs={1}></Col>
-                    <Col xs={2} md={1} >
-                        <h1>{this.state.numMealsPrepared}</h1>
-                        <h4>Prepared</h4>
-                    </Col>
 
+                        <div className="counter">
+                            <h1>{this.state.numMeals}</h1>
+                            <h4>Meals</h4>
+                        </div>
 
-                    <Col xs={8} md={4}>
-                        <h3>Shopping List</h3>
-                    </Col>
-                    <Col xs={2} md={2} >
-                        <h1>{this.state.numShopItems}</h1>
-                        <h4>Items</h4>
+                        <div className="counter">
+                            <h1>{this.state.numMealsPrepared}</h1>
+                            <h4>Prepared</h4>
+                        </div>
+
+                        <MealList meals={this.state.meals}/>
+                        <AddToPlannerButton addMeal={this.addMeal} />
+
                     </Col>
                 </Row>
-
+                &nbsp;
                 <Row>
-                    <Col className="meal-list-container" xs={12} md={6}>
-                        {this.state.mealTable}
+                    <Col xs={12} md={6}>
+                        <h3>Shopping List</h3>
+                        <div className="counter">
+                            <h1>{this.state.numShopItems}</h1>
+                            <h4>Items</h4>
+                        </div>
                     </Col>
-                    <Col className="shopping-list" xs={12} md={6}>
-                    </Col>
-                </Row>
-
-                <Row className="button-section">
-                    <button>View Full Week Planner</button>
+                </Row>&nbsp;
+                <Row>
+                    <Button bsStyle="info" block>View Full Week Planner</Button>
                 </Row>
             </Grid>
             </div>

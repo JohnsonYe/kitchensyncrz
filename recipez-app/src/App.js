@@ -28,72 +28,71 @@ import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
 import Recipe from "./components/pages/recipe";
-
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
+
 
 class App extends Component {
 
-  componentWillMount() {
-    this.setState({
-      isMenuOpened: false
-    })
-  }
+    componentWillMount() {
+        this.setState({
+        isMenuOpened: false
+        })
+    }
 
-  handleClick() {
-    this.setState({ isMenuOpened: !this.state.isMenuOpened });
-  }
+    handleClick() {
+        this.setState({ isMenuOpened: !this.state.isMenuOpened });
+    }
 
-  render() {
-    return (
-        <Router>
-        <div className="App">
-          <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
-            <OffCanvasBody className="navbar-icon">
-              <a href="#" onClick={this.handleClick.bind(this)}>
-                <img className="ks-icon" src="http://www.free-icons-download.net/images/a-kitchen-icon-80780.png" />
-              </a>
-            </OffCanvasBody>
-            <OffCanvasMenu className="navbar-menu">
-              <ul>
-                <li className="first">
-                    <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
-                </li>
-                <li>
-                    <Link to="/Search" onClick={this.handleClick.bind(this)}>Browse</Link>
-                </li>
-                <li>
-                    <Link to="/Cookbook" onClick={this.handleClick.bind(this)}>Cookbook</Link>
-                </li>
-                <li>
-                    <Link to="/Kitchen" onClick={this.handleClick.bind(this)}>Kitchen</Link>
-                </li>
-                <li>
-                    <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
-                </li>
-                <li>
-                    <Link to="/" onClick={this.handleClick.bind(this)}>Register</Link>
-                </li>
-                <li>
-                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign in</Link>
-                </li>
-                <li>
-                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
-                </li>
-              </ul>
-            </OffCanvasMenu>
-          </OffCanvas>
+    render() {
+        return (
+            <Router>
+                <div className="App">
+                    <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
+                        <OffCanvasBody className="navbar-icon">
+                            <a href="#" onClick={this.handleClick.bind(this)}>
+                                <img className="ks-icon" src="http://www.free-icons-download.net/images/a-kitchen-icon-80780.png" />
+                            </a>
+                        </OffCanvasBody>
+                        <OffCanvasMenu className="navbar-menu">
+                            <ul>
+                                <li className="first">
+                                    <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
+                                </li>
+                                <li>
+                                    <Link to="/Search" onClick={this.handleClick.bind(this)}>Browse</Link>
+                                </li>
+                                <li>
+                                    <Link to="/Cookbook" onClick={this.handleClick.bind(this)}>Cookbook</Link>
+                                </li>
+                                <li>
+                                    <Link to="/Kitchen" onClick={this.handleClick.bind(this)}>Kitchen</Link>
+                                </li>
+                                <li>
+                                    <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
+                                </li>
+                                <li>
+                                    <Link to="/" onClick={this.handleClick.bind(this)}>Register</Link>
+                                </li>
+                                <li>
+                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                </li>
+                                <li>
+                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
+                                </li>
+                            </ul>
+                        </OffCanvasMenu>
+                    </OffCanvas>
 
-          <Route exact path='/' component={Homepage} />
-          <Route exact path='/Search' component={Search} />
-          <Route exact path='/Cookbook' component={Cookbook} />
-          <Route exact path='/Kitchen' component={Kitchen} />
-          <Route exact path='/Planner' component={Planner} />
-          <Route exact path='/Recipes/:recipe' component={Recipe} />
-          <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
-
-          <Footer />
-        </div>
-        </Router>
+                    <Route exact path='/' component={Homepage} />
+                    <Route exact path='/Search' component={Search} />
+                    <Route exact path='/Cookbook' component={Cookbook} />
+                    <Route exact path='/Kitchen' component={Kitchen} />
+                    <Route exact path='/Planner' component={Planner} />
+                    <Route exact path='/Recipes/:recipe' component={Recipe} />
+                    <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
+                    <Footer />
+                </div>
+            </Router>
     );
   }
 }

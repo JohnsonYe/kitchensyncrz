@@ -1,19 +1,28 @@
 @import "_config.scss";
 
-/* ruleset for all jumbotrons across website */
+.modal-backdrop {
+  z-index: 90;
+}
+
+.modal{
+  display: block;
+}
+
+.meal-item {
+  border-style: solid;
+  border-width: thin;
+  padding: 12px;
+}
+
+/* ruleset for all jumbotrons across website*/
 .jumbotron {
+  //background: #1d1f21;
   text-align: center;
   margin-top: -150px;
   overflow: hidden;
-  border-style: solid;
-  border: 10px 10px 10px 10px;
   height: 180px;
-  /*background-image: url(https://i.ytimg.com/vi/mEBFswpYms4/maxresdefault.jpg);*/
-
-  /* text inside jumbotron */
-  h1 {
-    font-size: 60px;
-    font-family: 'Lobster';
+  h1{
+    //color: #c5c8c6
   }
 }
 
