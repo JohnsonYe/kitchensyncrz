@@ -12,6 +12,7 @@ import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
 import User from '../classes/User'
 
+
 var client = new SearchHelper();
 
 
@@ -75,8 +76,11 @@ class Search extends Component {
 
     mortensButton(){
         this.setState({morten: this.user.client.getUsername()});
-        //this.user.addToPantry('milk','none',1)
-        this.user.removeFromPantry('milk')
+        // this.user.addToPantry('milk','none',1)
+        this.user.addToCookware('fork')
+        // this.user.addToCookbook('pork', 'This is how you do')
+        //this.user.removeFromCookbook('pork')
+
     }
 
     render() {

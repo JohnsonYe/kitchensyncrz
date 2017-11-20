@@ -6,6 +6,7 @@
  */
  import DBClient from './AWSDatabaseClient'
 
+
  /**
   * SINGLETON CLASS --> USE User.getUser() to get the shared instance
   */
@@ -126,11 +127,42 @@
          //            "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
     }
 
+    addToCookbook(recipe, info){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildMapUpdateExpression('cookbook', recipe, {S:info})),
+            function(response){if(response.status) this.userData.cookbook[recipe] = {info:info}}.bind(this))
+    }
+
+    removeFromCookbook(recipe){
+        this.client.updateItem(
+            this.client.buildUpdateDeleteRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildRemoveElementUpdateExpression('cookbook', recipe)),
+            function(response){if(response.status&&this.userData[recipe]) delete this.userData[recipe]}.bind(this))
+    }
+
     getCookware(){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
         return [{Name:'spoon',difficulty:1},{Name:'whisk',difficulty:2},{Name:'food processor',difficulty:8}]
+    }
+
+    addToCookware(item){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildListAppendUpdateExpression('kitchen', {L:[item]})),
+            function(response){if(response.status) this.userData.kitchen[item] = {item:item}}.bind(this))
+        // Alert.info(JSON.stringify(response.payload))
     }
 
     getPlanner(){
