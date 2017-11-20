@@ -175,7 +175,8 @@
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
-    planner:{}
+    planner:{},
+    exclude:{type:'SS'}
  }
 
  var static_user = new User();
