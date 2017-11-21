@@ -206,7 +206,8 @@ const UNAUTH_NAME = 'GUEST'
     }
 
     registerPrototype(key,proto){
-        this.protoUnpack[key] = (o,p)=>this.unpackItem(o.M,proto)
+        this.protoUnpack[key] = (object,outertype)=>this.unpackItem(object.M,proto)
+        this.protoPack[key] = (object)=>this.packItem(object.M,proto)
 
     }
 
@@ -225,7 +226,11 @@ const UNAUTH_NAME = 'GUEST'
             try{
                 unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
             } catch(e){ //found an undefined key, fail quietly for now
-                unpacked[key] = item[key];
+                //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
+                //function's execution in code not being developed for database interaction
+                //for now, developers working with the database must be careful with adding new fields
+                unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                    ' SPECIFICATION IS CORRECT';
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })
@@ -236,7 +241,25 @@ const UNAUTH_NAME = 'GUEST'
     }
 
     packItem(item,prototype){
+        if(!prototype){
+            throw new Error('No prototype specified for: ' + JSON.stringify(item))
+        }
+        alert(JSON.stringify(Object.entries(item)))
 
+        return Object.keys(item).reduce((prev,key)=>{
+                // alert(key)
+                try{
+                    prev[key] = this.protoPack[prototype[key].type](item[key],prototype[key].inner)
+                } catch(e){ //found an undefined key, fail quietly for now
+                    //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
+                    //function's execution in code not being developed for database interaction
+                    //for now, developers working with the database must be careful with adding new fields
+                    prev[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                        ' SPECIFICATION IS CORRECT';
+                    // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
+                }
+                return prev;}
+            ,{})
     }
 
     /**

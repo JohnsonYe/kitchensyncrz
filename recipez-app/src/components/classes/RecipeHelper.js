@@ -14,7 +14,7 @@ import User from '../classes/User';
     constructor(){
         this.client = DBClient.getClient();
         this.client.registerPrototype('RECIPE',RecipeHelper.RecipePrototype)
-        this.client.registerPrototype('REVIEW',RecipeHelper.ReviewPrototype)
+        this.client.registerPrototype(RecipeHelper.ReviewPrototype._NAME,RecipeHelper.ReviewPrototype)
 
         this.loadRecipe     = this.loadRecipe.bind(this);
         this.receiveRecipe  = this.receiveRecipe.bind(this);
@@ -27,7 +27,7 @@ import User from '../classes/User';
      */
     updateReview(recipeName,revObj,callback){ //TODO optimize this so we dont make two DB calls every time
         //re-pack the review object
-        var packedReviewObject = this.packReview(revObj)
+        var packedReviewObject = RecipeHelper.packReview(revObj)
 
         this.client.updateItem(//create the reviews field if it doesnt exist
             this.client.buildUpdateRequest('Recipes','Name',recipeName,this.client.buildFieldCreateExpression('Reviews',{M:{}})),
@@ -83,26 +83,35 @@ import User from '../classes/User';
         }
 
         callback(this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype))
+        var unpacked = this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype)
+        alert(JSON.stringify(unpacked))
+        alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
         // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
+ }
+
+ RecipeHelper.ReviewPrototype = {
+    _NAME:'REVIEW',
+    username:{type:'S'},
+    Comment:{type:'S'},
+    Rating:{type:'N'},
+    timestamp:{type:'N'}
  }
 
  RecipeHelper.RecipePrototype = {
     Name:{type:'S'},
     Ingredients:{type:'L',inner:{type:'S'}},
     Directions:{type:'L',inner:{type:'S'}},
-    Reviews:{type:'M',inner:{type:'REVIEW'}},
+    Reviews:{type:'M',inner:{type:RecipeHelper.ReviewPrototype._NAME}},
     Author:{type:'S'},
     Difficulty:{type:'N'},
     TimeCost:{type:'N'}
  }
 
- RecipeHelper.ReviewPrototype = {
-    username:{type:'S'},
-    Comment:{type:'S'},
-    Rating:{type:'N'},
-    timestamp:{type:'N'}
- }
+ //============================================================================================
+ /*
+  * this code is no longer in use but is kept (for now) for convenience and testing
+  */
 
  /**
  * Recipe Object Format:
