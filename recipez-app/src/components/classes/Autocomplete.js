@@ -23,25 +23,22 @@ class Autocomplete{
         this.baseStream = new Promise((resolve,reject)=>{reject('Tree not loaded')});
     }
 
-    loadBinary(binary,callback){
+    loadBinary(binary,callback,err){ //get read for some async insantiy
         var zip = new JSZip()
-        this.baseStream = zip.loadAsync(binary,{base64:true})
+        this.baseStream = zip.loadAsync(binary,{base64:true}) //another layer of async -> F U N
            .then((file)=>zip.file('Ingredient.tst').async('string'))
            .then(this.loadTree)
-           .then(callback())
-           .catch((err)=>alert(err))       
+           .then(callback(this)) //return this autocompleter so we can use it asynchronously without holding a reference
+           .catch(err)  // we wont catch    
     }
 
     loadList(list,callback){
         this.root = this.getNode('m');
         list.forEach((str)=>this.insert(this.root,str,0))
-        callback()
+        callback(this)
     }
 
     loadTree(unzipped){
-        // alert(JSON.stringify(Object.keys(unzipped.files['Ingredient.tst'])))
-        // this.zip.file('Ingredient.tst').async('string').then((data)=>alert(data))
-        // alert(unzipped.files['Ingredient.tst']['name'])
         this.root = JSON.parse(unzipped)
         return this
     }
@@ -149,6 +146,9 @@ class Autocomplete{
     }
 }
 
+/**
+ * AUTOCOMPLETE BUILDER -- run this in node to compile trees into JSON offline, then zip them and push to database with scanner.py in scripts
+ */
 // fs = require('fs');
 // csvPath = '../../scripts/ingredient.csv';
 // jsonPath = 'Ingredient.tst'

@@ -22,9 +22,8 @@ import Autocomplete from '../classes/Autocomplete';
         this.asyncCompletions = new Promise((resolve,reject)=>{
             this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
                 (response)=>{
-                    this.auto = new Autocomplete();
                     if(response.status){
-                        this.auto.loadBinary(response.payload[0].Data.B,()=>resolve(this.auto))
+                        new Autocomplete().loadBinary(response.payload[0].Data.B,(auto)=>resolve(auto),reject)
                     } else {
                         reject('Failed to load tree')
                     }})
