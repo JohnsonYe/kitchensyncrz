@@ -68,6 +68,7 @@
                     username:   response.payload[0].username.S,
                     cookbook:   response.payload[0].cookbook.M,
                     cookware:   new Set(response.payload[0].cookware.SS),
+                    exclude:    new Set(response.payload[0].cookware.SS),
                     pantry:     this.client.unpackMap(response.payload[0].pantry.M),
                     planner:{}
                 }
@@ -161,7 +162,27 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildStringSetAppendUpdateExpression('cookware', {SS:[item]})),
-            function(response){if(response.status) this.userData.kitchen[item] = {item:item}}.bind(this))
+            function(response){if(response.status) this.userData.cookware[item] = {item:item}}.bind(this))
+    }
+
+    addToExclusionList(ingredient){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildStringSetAppendUpdateExpression('exclude', {SS:[ingredient]})),
+            function(response){if(response.status) this.userData.exclude[ingredient] = {ingredient:ingredient}}.bind(this))
+    }
+
+    removeFromExclusionList(ingredient){
+        this.client.updateItem(
+            this.client.buildUpdateDeleteRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildRemoveElementUpdateExpression('exclude', ingredient)),
+            function(response){if(response.status&&this.userData.exclude[ingredient]) delete this.userData.exclude[ingredient]}.bind(this))
     }
 
     getPlanner(){
