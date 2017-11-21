@@ -23,17 +23,19 @@ class Autocomplete{
         this.baseStream = new Promise((resolve,reject)=>{reject('Tree not loaded')});
     }
 
-    loadBinary(binary){
+    loadBinary(binary,callback){
         var zip = new JSZip()
         this.baseStream = zip.loadAsync(binary,{base64:true})
            .then((file)=>zip.file('Ingredient.tst').async('string'))
            .then(this.loadTree)
+           .then(callback())
            .catch((err)=>alert(err))       
     }
 
-    loadList(list){
+    loadList(list,callback){
         this.root = this.getNode('m');
         list.forEach((str)=>this.insert(this.root,str,0))
+        callback()
     }
 
     loadTree(unzipped){
@@ -45,6 +47,7 @@ class Autocomplete{
     }
 
     getCompletions(base,callback){
+        // return this.baseStream
         return this.baseStream.then((auto)=>callback(auto.getCompletion(base)))
     }
 

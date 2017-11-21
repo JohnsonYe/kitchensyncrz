@@ -21,6 +21,9 @@ class SearchBar extends Component{
         this.textEntry = this.textEntry.bind(this);
         this.focusHiddenForm = this.focusHiddenForm.bind(this);
         this.addItem = this.addItem.bind(this);
+
+        this.textEntry('')
+
     }
 
     focusHiddenForm(e){
@@ -28,7 +31,7 @@ class SearchBar extends Component{
     }
     textEntry(value){
         this.setState({query:value})
-        if(value.length>0){
+        if(value.length>-1){
             this.props.client.autocomplete(value,this.autocomplete)
         } else {
             this.setState({completions:[]})
@@ -36,6 +39,7 @@ class SearchBar extends Component{
     }
 
     autocomplete(completions){
+    // alert(JSON.stringify(completions))
        this.setState({completions:completions})
     }
 
@@ -58,26 +62,24 @@ class SearchBar extends Component{
         return(
             <div>
                 <div>
-                    <Typeahead {...options} placeholder='Enter ingredients or recipes' options={['a','bunch','of','options']} emptyLabel=''/>
+                    <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
                 </div>
+                {/*}
                 <div className='searchbar-base'>
                     <div className='searchbar-container'>
-                        <form onSubmit={this.addItem}>{/* we use an <input> element to read text input so we don't have to do keypress handling*/}
+                        <form onSubmit={this.addItem}>
                             <input className='search-input' type='text' onChange={(e)=>this.textEntry(e.target.value)} ref={(input)=>this.hiddenForm=input} value={this.state.query}/>
                         </form>
-                        {/* keep a number on the ingredient list */}
-                        <div className='search-overlay' onClick={this.focusHiddenForm}>{/* display the user's entry and a completion*/}
+                        <div className='search-overlay' onClick={this.focusHiddenForm}>
                             <div className='searchbar-contents-expand' open={this.state.listOpen} onClick={(e)=>this.setState({listOpen:true})}></div>
                             {promptContent}
-                            {/*<div className='search-text-entry'>
-                                <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
-                            </div>*/}
                         </div>
                         <div className='autocomplete-result-container' open={this.state.completions.length > 0}>
                             {this.state.completions.map((c)=><div className='autocomplete-result'>{c}</div>)}
                         </div>
                     </div>
                 </div>
+            */}
             </div>
             );
     }

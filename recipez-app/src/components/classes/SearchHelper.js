@@ -14,22 +14,26 @@ import Autocomplete from '../classes/Autocomplete';
         this.unpackRecipeList = this.unpackRecipeList.bind(this);
         this.sortRecipes = this.sortRecipes.bind(this);
         this.ingredientSearch = this.ingredientSearch.bind(this);
+        // this.getCompletions = this.getCompletions.bind(this);
 
         this.shouldReset = false
         this.recipeMap = null
 
-        this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
-            (response)=>{
-                this.auto = new Autocomplete();
-                if(response.status){
-                    this.auto.loadBinary(response.payload[0].Data.B)
-                }
-            });
-
+        this.asyncCompletions = new Promise((resolve,reject)=>{
+            this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
+                (response)=>{
+                    this.auto = new Autocomplete();
+                    if(response.status){
+                        this.auto.loadBinary(response.payload[0].Data.B,()=>resolve(this.auto))
+                    } else {
+                        reject('Failed to load tree')
+                    }})
+                })
     }
 
     autocomplete(base,callback){
-        this.auto.getCompletions(base,callback)
+        this.asyncCompletions.then((auto)=>auto.getCompletions(base,callback))
+        // return this.auto.getCompletions()
     }
 
     relevanceSearch(ingredients,target)
