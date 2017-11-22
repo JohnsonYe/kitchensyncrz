@@ -20,26 +20,30 @@ class kitchen extends Component {
 
         return (
 
-            <div>
+            <div className="container">
 
-            <div col>
-            <h4> Inventory Summary </h4>
-            <div class = "row mx-2">
-                <div class = "card mx-2 bg-light text-center">
-                    <div class = "card-title"> 0 </div>
-                    <div class = "card-body"> Total Items: </div>
+                <div className="row">
+                    <h1> Inventory Summary </h1>
                 </div>
-                <div class = "row card mx-2 bg-light text-center">
-                    <div class = "card-title"> 2 </div>
-                    <div class = "card-body"> Needs restock: </div>
+
+                <div className="row">
+                <div className="col-md-2">
+                    <div className = "card mg-3 bg-light text-center">
+                        <div className = "card-title"><h1>0</h1></div>
+                        <div className = "card-body"> Total Items: </div>
+                    </div>
+                </div>&nbsp;
+
+                <div className="col-md-2">
+                    <div class = "card mg-3 bg-light text-center">
+                        <div class = "card-title"><h1>2</h1></div>
+                        <div class = "card-body"> Needs restock: </div>
+                    </div>
                 </div>
-            </div>
+                </div>
 
-            <div inp>
-
-            </div>
-
-            </div>
+                <div className="row">
+                </div>
             </div>
         );
 
