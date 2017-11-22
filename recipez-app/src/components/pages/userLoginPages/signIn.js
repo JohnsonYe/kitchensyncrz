@@ -8,11 +8,7 @@ import Register from "./register";
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import "../../../scss/App.scss";
 import DBClient from "../../classes/AWSDatabaseClient";
-import {
-    CognitoUserPool,
-    AuthenticationDetails,
-    CognitoUser
-} from "amazon-cognito-identity-js";
+
 
 import React, { Component } from 'react';
 
@@ -35,8 +31,10 @@ class SignIn extends Component {
         event.preventDefault();
 
         try {
-            await this.login(this.state.userName, this.state.password);
-            alert("Logged in");
+            await this.client.login(this.state.userName, this.state.password);
+            this.client.authenticated = true;
+            this.client.user = this.state.userName;
+            alert(this.client.getUsername());
         } catch (e) {
             alert(e);
         }
@@ -47,26 +45,7 @@ class SignIn extends Component {
     }
 
 
-    login(userName, password) {
 
-        const userPool = new CognitoUserPool({
-            UserPoolId: this.client.cognito.USER_POOL_ID,
-            ClientId: this.client.cognito.APP_CLIENT_ID
-        });
-
-        const user = new CognitoUser({ Username: userName, Pool: userPool });
-        const authenticationData = { Username: userName, Password: password };
-        const authenticationDetails = new AuthenticationDetails(authenticationData);
-
-        return new Promise((resolve, reject) =>
-            user.authenticateUser(authenticationDetails, {
-
-                onSuccess: result => resolve(),
-                onFailure: err => reject(err)
-            })
-
-        );
-    }
 
 
 

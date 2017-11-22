@@ -88,6 +88,7 @@ class App extends Component {
                         </OffCanvasMenu>
                     </OffCanvas>
 
+
                     <Route exact path='/' component={Homepage} />
                     <Route exact path='/Search' component={Search} />
                     <Route exact path='/Cookbook' component={Cookbook} />

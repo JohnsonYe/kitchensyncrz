@@ -11,6 +11,17 @@
   * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
   */
 
+import {
+    CognitoUserPool,
+    AuthenticationDetails,
+    CognitoUser
+} from "amazon-cognito-identity-js";
+
+const up = {
+    USER_POOL_ID: "us-east-2_SHrX2V3xU",
+    APP_CLIENT_ID: "5ome294mpcicna669ebfieplfi"
+};
+
 var creds = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
 });
@@ -51,10 +62,7 @@ const UNAUTH_NAME = 'GUEST'
             'N': (n)=>({'N':n}),
         }
 
-        this.cognito = {
-            USER_POOL_ID: "us-east-2_SHrX2V3xU",
-            APP_CLIENT_ID: "5ome294mpcicna669ebfieplfi"
-        }
+
     }
 
     /*
@@ -184,8 +192,25 @@ const UNAUTH_NAME = 'GUEST'
      * log the user in to allow them to upload to DB and view user-specific data
      */
     login(username,password) {
-        this.user = username
-        return this.authenticated = true
+
+
+        const userPool = new CognitoUserPool({
+            UserPoolId: up.USER_POOL_ID,
+            ClientId: up.APP_CLIENT_ID
+        });
+
+        const user = new CognitoUser({ Username: username, Pool: userPool });
+        const authenticationData = { Username: username, Password: password };
+        const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+        return new Promise((resolve, reject) =>
+            user.authenticateUser(authenticationDetails, {
+
+                onSuccess: result => resolve(),
+                onFailure: err => reject(err)
+            })
+
+        );
     }
 
     isLoggedIn(){
