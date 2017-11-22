@@ -5,7 +5,7 @@ class Cookbook extends Component {
         return (
             <div>
             <div className="jumbotron">
-                <h1>My Cookbook</h1>
+                <h1>Cookbook</h1>
             </div>
             <div className="container-fluid">
                 Good luck Team Matthew!
