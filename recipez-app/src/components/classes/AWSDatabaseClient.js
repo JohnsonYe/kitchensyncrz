@@ -5,7 +5,7 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
- import Alert from 'react-s-alert';
+
  /**
   * THIS IS A SINGLETON CLASS.
   * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
@@ -98,7 +98,6 @@ const UNAUTH_NAME = 'GUEST'
             } else {
                 target({status:true,  payload: data});
             }
-            // Alert(JSON.stringify(data.Responses.payload))
         })
     }
 
@@ -144,9 +143,9 @@ const UNAUTH_NAME = 'GUEST'
 
     buildStringSetAppendUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+                expr: 'ADD #attr :item',
                 names:{"#attr":attrName},
-                values:{":item":value,":empty_set":{SS:[]}}
+                values:{":item":value}
             }
     }
 
@@ -157,6 +156,9 @@ const UNAUTH_NAME = 'GUEST'
             values:{/*[':'+elemName]:attrName+'.'+elemName*/}
         }
     }
+
+    
+
 
     buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
@@ -223,7 +225,12 @@ const UNAUTH_NAME = 'GUEST'
         // alert(JSON.stringify(item)+'\n'+JSON.stringify(prototype))
         var unpacked = {}
         Object.keys(item).forEach((key)=>{
-            unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
+            try{
+                unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
+            } catch(e){ //found an undefined key, fail quietly for now
+                unpacked[key] = item[key];
+                // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
+            }
         })
         
         // alert(JSON.stringify(unpacked))

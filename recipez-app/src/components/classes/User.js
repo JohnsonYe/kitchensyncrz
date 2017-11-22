@@ -93,11 +93,14 @@
      *      }
      * }
      */
-    getPantry(){
+    getPantry(callback){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return this.userData.pantry       
+         //return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})    ---  This works as well + gives us a worning.
+
+         return this.getUserData('pantry').then(response=>{callback(response)})
+
     }
 
     addToPantry(ingredient,unit,amount){
@@ -119,11 +122,12 @@
             function(response){if(response.status&&this.userData.pantry[ingredient]) delete this.userData.pantry[ingredient]}.bind(this))
     }
 
-    getCookbook(){
+    getCookbook(callback){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-        return this.userData.cookbook
+        return this.getUserData('cookbook').then(response=>{alert(JSON.stringify(response));callback(response)})
+        //return this.userData.cookbook
          // return new Set(["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
          //            "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
     }
@@ -145,14 +149,17 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('cookbook', recipe)),
-            function(response){if(response.status&&this.userData[recipe]) delete this.userData[recipe]}.bind(this))
+            function(response){if(response.status&&this.userData[recipe]) delete this.userData[recipe]; else(JSON.stringify(response))}.bind(this))
     }
 
-    getCookware(){
+
+
+    getCookware(callback){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-        return [{Name:'spoon',difficulty:1},{Name:'whisk',difficulty:2},{Name:'food processor',difficulty:8}]
+        return this.getUserData('cookware').then(response=>{alert(JSON.stringify(response));callback(response)})
+        //return [{Name:'spoon',difficulty:1},{Name:'whisk',difficulty:2},{Name:'food processor',difficulty:8}]
     }
 
     addToCookware(item){
@@ -162,8 +169,19 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildStringSetAppendUpdateExpression('cookware', {SS:[item]})),
-            function(response){if(response.status) this.userData.cookware[item] = {item:item}}.bind(this))
+            function(response){if(response.status) this.userData.cookware[item] = {item:item}; else alert(JSON.stringify(response))}.bind(this))
     }
+
+    removeFromCookware(item){
+        this.client.updateItem(
+            this.client.buildUpdateDeleteRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildRemoveElementUpdateExpression('cookware', item)),
+            function(response){if(response.status&&this.userData.cookware[item]) delete this.userData.cookware[item]; else alert(JSON.stringify(response))}.bind(this))
+    }
+
 
     addToExclusionList(ingredient){
         this.client.updateItem(
@@ -172,7 +190,7 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildStringSetAppendUpdateExpression('exclude', {SS:[ingredient]})),
-            function(response){if(response.status) this.userData.exclude[ingredient] = {ingredient:ingredient}}.bind(this))
+            function(response){if(response.status) this.userData.exclude[ingredient] = {ingredient:ingredient}; else alert(JSON.stringify(response)) }.bind(this))
     }
 
     removeFromExclusionList(ingredient){
@@ -182,7 +200,7 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('exclude', ingredient)),
-            function(response){if(response.status&&this.userData.exclude[ingredient]) delete this.userData.exclude[ingredient]}.bind(this))
+            function(response){if(response.status&&this.userData[ingredient]) delete this.userData[ingredient]; else alert(JSON.stringify(response)) }.bind(this))
     }
 
     getPlanner(){
