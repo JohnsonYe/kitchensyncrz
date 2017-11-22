@@ -62,6 +62,7 @@ class PlannerHelper{
 
          return data;
      }
+
      /**
       * This function creates a meal object that could be added to one of the entries in mealData.
       * @param recipe - passing a in a recipe object will give us recipe name, duration, img link, and description (or index)
