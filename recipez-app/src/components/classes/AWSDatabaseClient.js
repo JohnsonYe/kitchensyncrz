@@ -38,7 +38,6 @@ const UNAUTH_NAME = 'GUEST'
         this.protoUnpack = { //pack items in AWS compliant format
             'S': (s,p)=>s.S,
             'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
-            // 'M': (m,p)=>Object.entries(m.M).map((item)=>this.protoUnpack[p.type](item[1],p.inner)),
             'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev),{}),
             'SS':(ss,p)=>ss.SS,
             'N': (n,p)=>n.N,
@@ -108,10 +107,11 @@ const UNAUTH_NAME = 'GUEST'
     }
 
     buildMapUpdateExpression(mapName,key,value){
+        let xkey = key.replace(/\s/g, '_')
         return {
-                expr: 'SET #'+key+'.' + key + ' = :'+key+'_value',
-                names:{["#"+key]:mapName},
-                values:{[":"+key+'_value']:value}
+                expr: 'SET #'+xkey+'.#' + xkey + '2 = :'+xkey+'_value',
+                names:{["#"+xkey]:mapName,['#'+xkey+'2']:key},
+                values:{[":"+xkey+'_value']:value}
             }
     }
 
@@ -155,11 +155,12 @@ const UNAUTH_NAME = 'GUEST'
             }
     }
 
-    buildRemoveElementUpdateExpression(attrName,elemName){
+    buildRemoveElementUpdateExpression(attr,key){
+        let xattr = attr.replace(/\s/g, '_')       
         return {
-            expr: 'REMOVE '+attrName+'.'+elemName,
-            names:{},
-            values:{/*[':'+elemName]:attrName+'.'+elemName*/}
+            expr: 'REMOVE #'+xattr+'.#'+xattr+'_value',
+            names:{['#'+xattr]:attr,['#'+xattr+'_value']:key},
+            values:undefined
         }
     }
 
@@ -170,6 +171,15 @@ const UNAUTH_NAME = 'GUEST'
             }
     }
 
+    /**
+     * params object builder for AWS update transactions
+     * 
+     * @param  {[type]} tableName        [description]
+     * @param  {[type]} keyField         [description]
+     * @param  {[type]} key              [description]
+     * @param  {[type]} updateExpression [description]
+     * @return {[type]}                  [description]
+     */
     buildUpdateRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
                 "ExpressionAttributeNames":updateExpression.names,
@@ -211,12 +221,12 @@ const UNAUTH_NAME = 'GUEST'
         return client_style_map
     }
 
-    registerPrototype(key,proto){
-        this.protoUnpack[key] = ((object,outertype)=>this.unpackItem(object.M,proto));
-        this.protoPack[key] = ((object,outertype)=>({M:this.packItem(object,proto),TEST:'test'}));
-        // this.protoPack[key] = (this.testMethod);
-
-        // alert(JSON.stringify(this.protoPack[key]({hello:'world'})))
+    registerPrototype(proto){
+        if(!proto._NAME){
+            throw new TypeError('No _NAME specified for prototype: ' + JSON.stringify(proto))
+        }
+        this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
+        this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
     }
 
     getPrototype(key,object){
@@ -252,11 +262,13 @@ const UNAUTH_NAME = 'GUEST'
         if(!prototype){
             throw new Error('No prototype specified for: ' + JSON.stringify(item))
         }
-        // alert(JSON.stringify(item)+' : '+JSON.stringify(prototype))
 
-        var xpacked = Object.keys(item).reduce((prev,key)=>{
+        return Object.keys(item).reduce((prev,key)=>{
                 try{
-                    prev[key] = this.protoPack[prototype[key].type](item[key],prototype[key].inner)
+                    if(item[key]){
+                        // alert(key+": "+JSON.stringify(prev[key]))
+                        prev[key] = this.protoPack[prototype[key].type](item[key],prototype[key].inner)
+                    }
                 } catch(e){ //found an undefined key, fail quietly for now
                     //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                     //function's execution in code not being developed for database interaction
@@ -268,8 +280,6 @@ const UNAUTH_NAME = 'GUEST'
                 }
                 return prev;}
             ,{})
-        // alert(JSON.stringify(packed))
-        return xpacked
     }
 
     /**
