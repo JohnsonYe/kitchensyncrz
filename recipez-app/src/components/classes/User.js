@@ -87,7 +87,7 @@
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return this.userData.pantry       
+         return this.userData.pantry
     }
 
     addToPantry(ingredient,unit,amount){

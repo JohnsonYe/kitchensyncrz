@@ -32,22 +32,28 @@ const UNAUTH_NAME = 'GUEST'
 
         this.authenticated = false;
 
+        /**
+         * figurative recursion hell
+         */
         this.protoUnpack = { //pack items in AWS compliant format
             'S': (s,p)=>s.S,
             'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
             // 'M': (m,p)=>Object.entries(m.M).map((item)=>this.protoUnpack[p.type](item[1],p.inner)),
-            'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>{var step = Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev); /*alert(JSON.stringify(step));*/ return step},{}),
+            'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev),{}),
             'SS':(ss,p)=>ss.SS,
             'N': (n,p)=>n.N,
             'SET':(s,p)=>new Set(s)
         }
 
+        /**
+         * literal recursion hell
+         */
         this.protoPack = { //unpack items into easy-access format
-            'S': (s)=>({'S':s}),
-            'L': (l)=>({'L':l}),
-            'M': (m)=>({'M':m}),
-            'SS':(ss)=>({'SS':ss}),
-            'N': (n)=>({'N':n}),
+            'S': (s,p)=>({'S':s}),
+            'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
+            'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
+            'SS':(ss,p)=>({'SS':ss}),
+            'N': (n,p)=>({'N':n}),
         }
     }
 
@@ -206,13 +212,15 @@ const UNAUTH_NAME = 'GUEST'
     }
 
     registerPrototype(key,proto){
-        this.protoUnpack[key] = (object,outertype)=>this.unpackItem(object.M,proto)
-        this.protoPack[key] = (object)=>this.packItem(object.M,proto)
+        this.protoUnpack[key] = ((object,outertype)=>this.unpackItem(object.M,proto));
+        this.protoPack[key] = ((object,outertype)=>({M:this.packItem(object,proto),TEST:'test'}));
+        // this.protoPack[key] = (this.testMethod);
 
+        // alert(JSON.stringify(this.protoPack[key]({hello:'world'})))
     }
 
-    getPrototype(key){
-
+    getPrototype(key,object){
+        return this.protoPack[key](object)
     }
 
     unpackItem(item,prototype){
@@ -229,7 +237,7 @@ const UNAUTH_NAME = 'GUEST'
                 //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                 //function's execution in code not being developed for database interaction
                 //for now, developers working with the database must be careful with adding new fields
-                unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
@@ -244,22 +252,24 @@ const UNAUTH_NAME = 'GUEST'
         if(!prototype){
             throw new Error('No prototype specified for: ' + JSON.stringify(item))
         }
-        alert(JSON.stringify(Object.entries(item)))
+        // alert(JSON.stringify(item)+' : '+JSON.stringify(prototype))
 
-        return Object.keys(item).reduce((prev,key)=>{
-                // alert(key)
+        var xpacked = Object.keys(item).reduce((prev,key)=>{
                 try{
                     prev[key] = this.protoPack[prototype[key].type](item[key],prototype[key].inner)
                 } catch(e){ //found an undefined key, fail quietly for now
                     //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                     //function's execution in code not being developed for database interaction
                     //for now, developers working with the database must be careful with adding new fields
-                    prev[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                    alert(e+':'+prototype[key])
+                    prev[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                         ' SPECIFICATION IS CORRECT';
                     // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
                 }
                 return prev;}
             ,{})
+        // alert(JSON.stringify(packed))
+        return xpacked
     }
 
     /**

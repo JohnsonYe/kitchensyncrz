@@ -19,6 +19,11 @@ import User from '../classes/User';
         this.loadRecipe     = this.loadRecipe.bind(this);
         this.receiveRecipe  = this.receiveRecipe.bind(this);
         this.updateReview   = this.updateReview.bind(this);
+        this.testUnpack = this.testUnpack.bind(this);
+    }
+
+    testUnpack(revObj){
+        return this.client.getPrototype('REVIEW',revObj)
     }
 
     /**
@@ -61,7 +66,8 @@ import User from '../classes/User';
             User.getUser(custom).getUserData('cookbook') //queue up the custom display after user data loads
                 .then((cookbook)=>
                 {
-                    var customRecipe = cookbook[recipeName] ? cookbook[recipeName].S : null;
+                    // alert(JSON.stringify(cookbook[recipeName]))
+                    var customRecipe = cookbook[recipeName];
                     if(customRecipe){
                         callback(JSON.parse(customRecipe))
                     } else {
@@ -84,8 +90,8 @@ import User from '../classes/User';
 
         callback(this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype))
         var unpacked = this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype)
-        alert(JSON.stringify(unpacked))
-        alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
+        // alert(JSON.stringify(unpacked))
+        // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
         // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
  }
