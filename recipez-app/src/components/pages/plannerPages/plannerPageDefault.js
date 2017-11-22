@@ -11,13 +11,7 @@
  * Components: dailyMealPlanner, shoppingList
  */
 import React, { Component } from 'react';
-import {
-    Grid ,
-    Row,
-    Col,
-    Button,
-    Jumbotron,
-    Image} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 
 import MealEditor from "./editMealPage";
 
@@ -26,131 +20,46 @@ function DailyPlannerItem(props) {
     const noImg = "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
 
     return (
-        <Grid className="meal-item" fluid>
-        <Row>
-            <Col md={1}>
-                <h4>[Time Block]</h4>
-            </Col>
-            <Col md={3}>
-                <Image src={noImg} thumbnail responsive/>
-            </Col>
-            <Col md={6}>
-                <h4>
-                    {props.meal}
-                </h4>
-                <p>Description......</p>
-            </Col>
-            <Col smPull={2} md={2}>
-                <Button bsSize="xsmall" bsStyle="primary">Get Started</Button>
-                <Button bsSize="xsmall" bsStyle="danger">Remove</Button>
-                <MealEditor />
-            </Col>
-        </Row>
-        </Grid>
+        <div className="card m-3 hoverable">
+            <div className="card bg-light">
+                <div className="card-body">
+                    <MealEditor />
+                    <p>5:15 AM to 7:15 AM - 2hours</p>
+                </div>
+            </div>
+        </div>
     );
 }
 
 function ShoppingListItem(props) {
-
-    const noImg = "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
-
     return (
-            <Row className="shoppinglist-item">
-                <Col md={3}>
-                    <Image src={noImg} thumbnail responsive/>
-                </Col>
-                <Col md={7}>
-                    <h4>
-                        {props.item}
-                    </h4>
-                    <p>Description......</p>
-                </Col>
-                <Col smPull={2} md={2}>
-                    <Button bsSize="xsmall" bsStyle="success">Add to Pantry</Button>
-                    <Button bsSize="xsmall" bsStyle="danger">Remove</Button>
-                </Col>
-            </Row>
+        <a href="#" className="list-group-item list-group-item-action">Item {props.num}</a>
     );
 }
 
-function MealList(props) {
-    return (
-        <div className="container">
-            {
-                Object.keys(props.meals).map( (key) => {
-                    return <DailyPlannerItem meal={props.meals[key]} />
-                })
-            }
-        </div>
-    );
-}
+class DynamicList extends Component{
 
-function ShoppingList(props) {
-    return (
-        <div className="container">
-            {
-                Object.keys(props.items).map( (key) => {
-                    return <ShoppingListItem item={props.items[key]} />
-                })
-            }
-        </div>
-    );
-}
-
-class AddToPlannerButton extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            mealNum: 0
-        }
-        this.createMeal = this.createMeal.bind(this);
     }
-
-    createMeal() {
-        var meal = "Meal " + this.state.mealNum;
-        this.setState({ mealNum: (++this.state.mealNum) })
-        this.props.addMeal(meal);
-    }
-
     render() {
-        return(
-            <Button
-                bsSize="xsmall"
-                bsStyle="secondary"
-                onClick={this.createMeal}>
-                Test
-            </Button>
-        );
+
+        if( this.props.type === "item" ) {
+            return (
+                Object.keys(this.props.list).map((key) => {
+                    return <ShoppingListItem meal={this.props.list[key]}/>
+                })
+            );
+        }
+        else {
+            return (
+                Object.keys(this.props.list).map((key) => {
+                    return <DailyPlannerItem meal={this.props.list[key]}/>
+                })
+            );
+        }
     }
 }
-
-class AddToShoppingButton extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            itemNum: 0
-        }
-        this.createItem = this.createItem.bind(this);
-    }
-
-    createItem() {
-        var item = "Item " + this.state.itemNum;
-        this.setState({ itemNum: (++this.state.itemNum) })
-        this.props.addItem(item);
-    }
-
-    render() {
-        return(
-            <Button
-                bsSize="xsmall"
-                bsStyle="secondary"
-                onClick={this.createItem}>
-                Test Item
-            </Button>
-        );
-    }
-}
-
 
 class Planner extends Component {
 
@@ -161,7 +70,8 @@ class Planner extends Component {
             //Days of the Week String References
             days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
             today = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            mealData = []; /*TODO Change to getMealData after testing*/
+            mealData = [], /*TODO Change to getMealData after testing*/
+            itemData = [];
 
         this.state = {
             day: now.getDate(),
@@ -169,84 +79,113 @@ class Planner extends Component {
             numMeals: 0,
             numShopItems: 0,
             numMealsPrepared: 0,
-            mealData: mealData,
-            meals: {},
-            items: {}
+            meals: mealData,
+            items: itemData
         };
 
         this.addMeal = this.addMeal.bind(this);
+        this.removeMeal = this.removeMeal.bind(this);
         this.addItem = this.addItem.bind(this);
+        this.removeItem = this.removeItem.bind(this);
 
     }
 
     /**
      * Adds a meal to the list
      */
-    addMeal(meal) {
-        var timestamp = (new Date().getTime());
-        this.state.meals['meal-'+timestamp] = meal;
+    addMeal() {
+        this.state.meals[this.state.numMeals] = "Meal-" + this.state.numMeals;
         this.setState({ meals : this.state.meals });
         this.setState({ numMeals: (++this.state.numMeals) });
     }
 
+    /** TODO Removes card from Daily Meal Planner*/
+    removeMeal() {
+        this.state.meals.splice((this.state.numMeals-1),1);
+        this.setState({ meals : this.state.meals });
+        this.setState({ numMeals: (--this.state.numMeals) });
+    }
+
     /**
-     * Adds a item to the list
+     * Adds a meal to the list
      */
-    addItem(item) {
-        var timestamp = (new Date().getTime());
-        this.state.items['item-'+timestamp] = item;
+    addItem() {
+        this.state.items[this.state.numShopItems] = "Item-" + this.state.numShopItems;
         this.setState({ items : this.state.items });
         this.setState({ numShopItems: (++this.state.numShopItems) });
+    }
+
+    /** TODO Removes card from Daily Meal Planner*/
+    removeItem() {
+        this.state.items.splice((this.state.numShopItems-1),1);
+        this.setState({ items : this.state.items });
+        this.setState({ numShopItems: (--this.state.numShopItems) });
     }
 
     render() {
 
         return (
             <div>
-                <Jumbotron>
+                <div className="jumbotron jumbotron-fluid">
                     <h1>Planner</h1>
-                </Jumbotron>
+                </div>
 
-            <Grid>
-                <Row className='planner-header'>
-                    <Col xs={12} md={6}>
-                        <h3>Daily Meal Planner</h3>
-                        <h5>{this.state.date}</h5>
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="row">
+                            <div className="col-4">
+                                <h3>Daily Meal Planner</h3>
+                                <h6>{this.state.date}</h6>
+                                <h3>{this.state.numMeals}</h3>
+                                <h6>Meals</h6>
+                                <h3>{this.state.numMealsPrepared}</h3>
+                                <h6>Prepared</h6>
+                            </div>
+                            <div className="col-8">
+                                <Button
+                                    bsSize="small"
+                                    bsStyle="secondary"
+                                    onClick={this.addMeal}>Test</Button>
+                                <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={this.removeMeal}>Remove Test</button>
+                                <DynamicList list={this.state.meals}/>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="row">
+                            <div className="col-4">
+                                <h3>Shopping List</h3>
+                                <h3>{this.state.numShopItems}</h3>
+                                <h6>Items</h6>
+                            </div>
 
-                        <div className="counter">
-                            <h1>{this.state.numMeals}</h1>
-                            <h4>Meals</h4>
+                            <div className="col-8">
+                                <Button
+                                    bsSize="small"
+                                    bsStyle="secondary"
+                                    onClick={this.addItem}>Test</Button>
+                                <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={this.removeItem}>Remove Test</button>
+
+                                <ul className="list-group">
+                                    <DynamicList type="item" list={this.state.items}/>
+                                </ul>
+
+                            </div>
+                        </div>
                         </div>
 
-                        <div className="counter">
-                            <h1>{this.state.numMealsPrepared}</h1>
-                            <h4>Prepared</h4>
-                        </div>
+                    </div>
 
-                        <MealList meals={this.state.meals}/>
-                        <AddToPlannerButton addMeal={this.addMeal} />
-
-                    </Col>
-                </Row>
-                &nbsp;
-                <Row>
-                    <Col xs={12} md={6}>
-                        <h3>Shopping List</h3>
-                        <div className="counter">
-                            <h1>{this.state.numShopItems}</h1>
-                            <h4>Items</h4>
-                        </div>
-
-                        <ShoppingListItem item="Item 0" />
-
-                    </Col>
-                </Row>&nbsp;
-                <Row>
-                    <Button bsStyle="info" block>View Full Week Planner</Button>
-                </Row>
-            </Grid>
+                    <div className="row">
+                        Button Goes Here
+                    </div>
+                </div>
             </div>
-
         );
     }
 }

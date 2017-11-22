@@ -10,7 +10,7 @@
  */
 import React, { Component } from 'react';
 import {
-    Button, Grid, Row, Col, Modal, Image, ButtonGroup, DropdownButton, MenuItem, Form,
+    Button, Modal, Image, DropdownButton, MenuItem, Form,
     FormControl, FormGroup, ControlLabel
 } from 'react-bootstrap';
 
@@ -39,11 +39,10 @@ class MealEditor extends Component {
 
         return (
             <div>
-            <Button
-                onClick={this.open}
-                bsStyle="info"
-                bsSize="xsmall">Edit Meal
-            </Button>
+                <a
+                    className="card-link"
+                    onClick={this.open}>Recipe Title
+                </a>
 
             <Modal show={this.state.showEditor} onHide={this.close}>
                 <Modal.Header>Recipe Title</Modal.Header>
