@@ -12,6 +12,7 @@
 #production
 /.idea
 /build
+*.css
 
 # misc
 .DS_Store

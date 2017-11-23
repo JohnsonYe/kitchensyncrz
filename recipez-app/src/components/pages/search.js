@@ -6,7 +6,7 @@
  */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {Button,Glyphicon,Form,InputGroup} from 'react-bootstrap';
+import {Button,Glyphicon,Form,InputGroup,FormControl} from 'react-bootstrap';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
 import SearchBar from '../SearchComponents/SearchBar'
@@ -111,8 +111,8 @@ class Search extends Component {
                 <div style={{position:'relative'}}>
                     <Form inline>
                         <InputGroup>
-                            <InputGroup.Button><Button bsStyle='success'>Ingredients</Button></InputGroup.Button>
                             <SearchBar client={client} callback={this.addIngredient}/>
+                            <InputGroup.Button><Button bsStyle='success'>Ingredients</Button></InputGroup.Button>
                         </InputGroup>
                     </Form>
                     <div style={{'margin-top':'5px'}}>
