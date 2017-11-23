@@ -9,55 +9,48 @@ import React from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
 
 function PersonalRecipes(props){
+    const imgSrc="http://www.gourmetsleuth.com/images/default-source/articles/big-white-chicken.jpg?sfvrsn=8";
     return(
         <div>
             <div className="row">
                 <div className="col-md-2">
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
             </div>
 
             <div className="row">
                 <div className="col-md-2">
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
                 <div className="col-md-2">
-
-                    <PreviewCard/>
+                    <PreviewCard src={imgSrc}/>
                 </div>
 
             </div>

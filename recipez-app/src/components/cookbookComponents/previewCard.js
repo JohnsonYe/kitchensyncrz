@@ -11,7 +11,7 @@ function PreviewCard(props){
     return(
 
         <div className="card mg-2">
-            <img className="card-img-top" src="https://timedotcom.files.wordpress.com/2017/02/chicken-bird.jpg?quality=85" alt="Food" />
+            <img className="card-img-top" src={props.src} alt="Food" />
 
             <div className="card-body">
                 <h6 className="card-title">
