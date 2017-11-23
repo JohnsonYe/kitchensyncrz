@@ -12,6 +12,7 @@
 
  class User {
     constructor(){
+        this.setup = this.setup.bind(this);
         this.client = DBClient.getClient()
         this.client.registerPrototype(User.PantryItemPrototype)
         this.loadUserData = this.loadUserData.bind(this);
@@ -34,6 +35,11 @@
         //         'username',this.client.getUsername(),
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
+        this.setup()
+
+    }
+
+    setup(){
         this.loadStream = new Promise(this.loadUserData)
         this.verified = false;
     }
@@ -56,7 +62,7 @@
         }
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
-                this.userData = {
+                this.userData = { //THIS VARIABLE WILL BE REMOVED SOON
                     username:   response.payload[0].username.S,
                     cookbook:   response.payload[0].cookbook.M,
                     cookware:   new Set(response.payload[0].cookware.SS),
@@ -72,6 +78,14 @@
                 reject('Failed to load user data!')
             }
             /*; alert(JSON.stringify(this.userData))*/})
+    }
+
+    /**
+     * attach a callback to the user data chain which will recieve user data once it loads
+     * @param  {Function} callback function to recieve data once it is loaded from the database
+     */
+    getCookbook(callback){
+        this.getUserData('cookbook').then(callback)
     }
 
     deleteRecipe(recipeName){
@@ -172,9 +186,6 @@
             function(response){if(response.status&&this.userData.pantry[ingredient]) delete this.userData.pantry[ingredient]}.bind(this))
     }
 
-    getCookbook(callback){
-        this.getUserData('cookbook').then(callback)
-    }
 
     getCookware(callback){
         this.getUserData('cookware').then(callback)
