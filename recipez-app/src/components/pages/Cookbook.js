@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
 import SavedRecipes from "../cookbookComponents/savedRecipes";
-import PreviewCard from "../cookbookComponents/previewCard";
+import PersonalRecipes from "../cookbookComponents/personalRecipes";
 
 
 
@@ -47,10 +47,10 @@ class Cookbook extends Component {
                                     </Tab>
                                     <Tab eventKey={2} title={"Personal Recipes"}>
                                         Personal Recipes here
+                                        <PersonalRecipes/>
                                     </Tab>
                                 </Tabs>
                             </div>
-
                         </div>
 
                         {/* TODO: Swing-out personal recipe edit/create area */}
