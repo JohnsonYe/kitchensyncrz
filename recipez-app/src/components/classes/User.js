@@ -13,11 +13,7 @@
  class User {
     constructor(){
         this.client = DBClient.getClient()
-<<<<<<< HEAD
-        this.client.registerPrototype(User.PantryItemPrototype._NAME,User.PantryItemPrototype)
-=======
         this.client.registerPrototype(User.PantryItemPrototype)
->>>>>>> master
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
