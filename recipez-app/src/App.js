@@ -26,7 +26,7 @@ import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
 import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
-import Cookbook from "./components/pages/myCookbook";
+import Cookbook from "./components/pages/Cookbook";
 import Recipe from "./components/pages/recipe";
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
