@@ -13,7 +13,11 @@
  class User {
     constructor(){
         this.client = DBClient.getClient()
+<<<<<<< HEAD
         this.client.registerPrototype(User.PantryItemPrototype._NAME,User.PantryItemPrototype)
+=======
+        this.client.registerPrototype(User.PantryItemPrototype)
+>>>>>>> master
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -35,6 +39,7 @@
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
         this.loadStream = new Promise(this.loadUserData)
+        this.verified = false;
     }
 
     /**
@@ -73,6 +78,68 @@
             /*; alert(JSON.stringify(this.userData))*/})
     }
 
+    deleteRecipe(recipeName){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',this.client.getUsername(),
+                this.client.buildRemoveElementUpdateExpression('cookbook',recipeName)),
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        delete data.cookbook[recipeName];
+                        return data
+                    })
+                } else {
+                    //the request failed, what should we do?
+                    alert(response.payload)
+                }
+            })
+    }
+
+
+    saveCustomRecipe(recipeObject){
+        //pack the recipe into JSON format and add it to the user's recipe map
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+            this.client.buildUpdateRequest( //construct the params syntax according to the action we want
+                'User', //table to get item from
+                'username',this.client.getUsername(), //keyfield and specific key
+                //set cookbook[recipeObject.Name] = (data)
+                this.client.buildMapUpdateExpression('cookbook',recipeObject.Name,{S:JSON.stringify(recipeObject)})), 
+            (response)=>{ //if the request succeeds, 'add' to the local use data by transforming it in a then clause
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.cookbook[recipeObject.Name]=JSON.stringify(recipeObject);
+                        return data;
+                    })
+                } else {
+                    //the request failed, what should we do?
+                    alert(response.payload)
+                }
+            })
+    }
+
+    saveExternalRecipe(recipeName){
+        //save just the recipe name to the cookbook so we know to load it froma public recipe page
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+            this.client.buildUpdateRequest( //construct the params syntax according to the action we want
+                'User', //table to get item from
+                'username',this.client.getUsername(), //keyfield and specific key
+                //set cookbook[recipeName] = 'none'
+                this.client.buildMapUpdateExpression('cookbook',recipeName,{S:'none'})), 
+            (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.cookbook[recipeName]='none';
+                        return data;
+                    })
+                } else {
+                    //the request failed, what should we do?
+                    alert(response.payload)
+                }
+            })
+    }
+
     /**
      * get a Pantry Object:
      * {
@@ -83,11 +150,11 @@
      *      }
      * }
      */
-    getPantry(){
+    getPantry(callback){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return this.userData.pantry       
+         this.getUserData('pantry').then(callback)
     }
 
     addToPantry(ingredient,unit,amount){
@@ -109,20 +176,12 @@
             function(response){if(response.status&&this.userData.pantry[ingredient]) delete this.userData.pantry[ingredient]}.bind(this))
     }
 
-    getCookbook(){
-        /*
-         * What should this object look like? We need to decide on formatting/nesting of data
-         */
-        return this.userData.cookbook
-         // return new Set(["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
-         //            "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
+    getCookbook(callback){
+        this.getUserData('cookbook').then(callback)
     }
 
-    getCookware(){
-        /*
-         * What should this object look like? We need to decide on formatting/nesting of data
-         */
-        return [{Name:'spoon',difficulty:1},{Name:'whisk',difficulty:2},{Name:'food processor',difficulty:8}]
+    getCookware(callback){
+        this.getUserData('cookware').then(callback)
     }
 
     getPlanner(){
@@ -142,16 +201,32 @@
 
     }
 
+    /**
+     * return a Promise that will provide the user data chain and automatically index into the specified field
+     * @param  {[type]} name [description]
+     * @return {[type]}      [description]
+     */
     getUserData(name){
-        if(!this.userData || !this.userData[name]){
-            return new Promise().reject('Could not fetch user data');
-        } else {
-            return this.loadStream.then((data)=>data[name]);
-        }
+        return this.loadStream.then((data)=>data[name]).catch((e)=>'Failed to fetch loaded data!');
     }
 
+    /**
+     * apply a function to the user data chain before serving it to future requests
+     */
+    addUserData(transform){
+        this.loadStream = this.loadStream.then(transform);
+    }
+
+    /**
+     * add a verification link to the user data chain, which will fail if validation fails
+     * @param  String username the username associated with the requested data
+     * @return User          the User object we are verifying
+     */
     verify(username){
-        this.loadStream = this.loadStream.then((data)=>this.validateUsername(username,data))
+        if(!this.verified){
+            this.loadStream = this.loadStream.then((data)=>this.validateUsername(username,data));
+            this.verified = true;
+        }
         return this
     }
 
@@ -170,7 +245,9 @@
     unit:{type:'S'}
  }
 
-  User.UserDataPrototype = {
+
+ User.UserDataPrototype = {
+    _NAME:'USERDATA',
     username:{type:'S'},
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
