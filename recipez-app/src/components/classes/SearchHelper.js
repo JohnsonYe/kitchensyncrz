@@ -23,7 +23,7 @@ import Autocomplete from '../classes/Autocomplete';
             this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
                 (response)=>{
                     if(response.status){
-                        new Autocomplete().loadBinary(response.payload[0].Data.B,(auto)=>resolve(auto),reject)
+                        new Autocomplete().loadBinary(response.payload[0].Data.B,resolve,reject)
                     } else {
                         reject('Failed to load tree')
                     }})

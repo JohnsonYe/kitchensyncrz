@@ -4,7 +4,7 @@
  * Date Created: 11/18/2017
  * Description: modular searchbar component that provides autocomplete in a dropdown menu
  */
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
 
 class SearchBar extends Component{
@@ -49,38 +49,37 @@ class SearchBar extends Component{
         this.setState({completions:[],query:''})
     }
 
-    render(){
+    getOldSearchBar(){
         var promptContent = this.state.query.length?
-                        (<div className='search-text-entry'>
-                            <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
-                        </div>)
-                        :
-                        (<div className='search-text-entry'>
-                            <div style={{'font-style':'italic',color:'lightgray'}}>Enter ingredients</div>
-                        </div>)
-        var options = {selectHintOnEnter:true}
-        return(
-            <div>
-                <div>
-                    <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
+                (<div className='search-text-entry'>
+                    <span>{this.state.query}</span><span style={{color:'green'}}>{this.state.completions[0]?this.state.completions[0].substring(this.state.query.length):''}</span>
+                </div>)
+                :
+                (<div className='search-text-entry'>
+                    <div style={{'font-style':'italic',color:'lightgray'}}>Enter ingredients</div>
+                </div>)
+        return
+        <div className='searchbar-base'>
+            <div className='searchbar-container'>
+                <form onSubmit={this.addItem}>
+                    <input className='search-input' type='text' onChange={(e)=>this.textEntry(e.target.value)} ref={(input)=>this.hiddenForm=input} value={this.state.query}/>
+                </form>
+                <div className='search-overlay' onClick={this.focusHiddenForm}>
+                    <div className='searchbar-contents-expand' open={this.state.listOpen} onClick={(e)=>this.setState({listOpen:true})}></div>
+                    {promptContent}
                 </div>
-                {/*}
-                <div className='searchbar-base'>
-                    <div className='searchbar-container'>
-                        <form onSubmit={this.addItem}>
-                            <input className='search-input' type='text' onChange={(e)=>this.textEntry(e.target.value)} ref={(input)=>this.hiddenForm=input} value={this.state.query}/>
-                        </form>
-                        <div className='search-overlay' onClick={this.focusHiddenForm}>
-                            <div className='searchbar-contents-expand' open={this.state.listOpen} onClick={(e)=>this.setState({listOpen:true})}></div>
-                            {promptContent}
-                        </div>
-                        <div className='autocomplete-result-container' open={this.state.completions.length > 0}>
-                            {this.state.completions.map((c)=><div className='autocomplete-result'>{c}</div>)}
-                        </div>
-                    </div>
+                <div className='autocomplete-result-container' open={this.state.completions.length > 0}>
+                    {this.state.completions.map((c)=><div className='autocomplete-result'>{c}</div>)}
                 </div>
-            */}
             </div>
+        </div>
+    }
+
+    render(){
+
+        var options = {selectHintOnEnter:true,minLength:1}
+        return(
+                <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
             );
     }
 

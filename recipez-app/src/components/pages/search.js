@@ -6,6 +6,7 @@
  */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import {Button,Glyphicon,Form,InputGroup} from 'react-bootstrap';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
 import SearchBar from '../SearchComponents/SearchBar'
@@ -108,7 +109,12 @@ class Search extends Component {
             </div>
             <div className="container-fluid">
                 <div style={{position:'relative'}}>
-                    <SearchBar client={client} callback={this.addIngredient}/>
+                    <Form inline>
+                        <InputGroup>
+                            <InputGroup.Button><Button bsStyle='success'>Ingredients</Button></InputGroup.Button>
+                            <SearchBar client={client} callback={this.addIngredient}/>
+                        </InputGroup>
+                    </Form>
                     <div style={{'margin-top':'5px'}}>
                     {/* "modify ingredient" UI element  */}    
                     {/*ingredient_editor*/}         
