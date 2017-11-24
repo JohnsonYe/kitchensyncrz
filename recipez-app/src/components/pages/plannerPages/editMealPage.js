@@ -46,69 +46,50 @@ class MealEditor extends Component {
 
             <Modal show={this.state.showEditor} onHide={this.close}>
                 <Modal.Header>Recipe Title</Modal.Header>
-
                 <Modal.Body>
                     <figure>
-                        <Image src="http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
-                            responsive/>
+                        <img
+                            className="img-fluid"
+                            src="http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
+                            alt="No Image"
+                        />
                         <figcaption>Description</figcaption>
                     </figure>
 
-                    <p>
+                    <div className="inline">
                         <img
                             src="http://clipartwork.com/wp-content/uploads/2017/02/clock-timer-clipart.png"
                             alt="Timer"
                             height={10}
-                            width={10}/>&nbsp;
+                            width={10}/>
                         <h6>Cooking Duration</h6>
-                    </p>
+                    </div>
 
                     <h4>Meal Info</h4>
                     <h6>Day</h6>
-                    <DropdownButton
-                        title="Day"
-                        bsStyle="info"
-                        bsSize="small">
-                        <MenuItem >Sunday</MenuItem>
-                        <MenuItem >Monday</MenuItem>
-                        <MenuItem >Tuesday</MenuItem>
-                        <MenuItem >Wednesday</MenuItem>
-                        <MenuItem >Thursday</MenuItem>
-                        <MenuItem >Friday</MenuItem>
-                        <MenuItem >Saturday</MenuItem>
-                    </DropdownButton>
-                    <h6>Start Time</h6>
-                    <Form inline>
-                        <FormGroup controlId="formInLineHour">
-                            <ControlLabel>Hour</ControlLabel>
-                            {' '}
-                            <FormControl type="text" placeholder="12"/>
-                        </FormGroup>
 
-                        <FormGroup controlId="formInLineMin">
-                            <ControlLabel>Min</ControlLabel>
-                            {' '}
-                            <FormControl type="text" placeholder=":30"/>
-                        </FormGroup>
-                        <DropdownButton
-                            title="am/pm"
-                            bsStyle="info"
-                            bsSize="small">
-                            <MenuItem >am</MenuItem>
-                            <MenuItem >pm</MenuItem>
-                        </DropdownButton>
-                    </Form>
-                    <h6>End Time</h6>
+                    <div className="btn-group">
+                        <button
+                            type="button"
+                            className="btn btn-primary dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                            Day
+                        </button>
+                        <div className="dropdown-menu">
+                            <a className="dropdown-item" href="#" >Sunday</a>
+                            <a className="dropdown-item">Monday</a>
+                            <a className="dropdown-item">Tuesday</a>
+                            <a className="dropdown-item">Wednesday</a>
+                            <a className="dropdown-item">Thursday</a>
+                            <a className="dropdown-item">Friday</a>
+                            <a className="dropdown-item">Saturday</a>
+                        </div>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button
-                        bsStyle="primary"
-                    >Add to Planner</Button>
-                    <Button
-                        bsStyle="danger"
-                    >Remove</Button>
-                    <Button
-                        onClick={this.close}>Close</Button>
+                    <Button onClick={this.close}>Close</Button>
                 </Modal.Footer>
             </Modal>
             </div>

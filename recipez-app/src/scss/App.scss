@@ -1,14 +1,9 @@
 @import "_config.scss";
 
-.modal-backdrop {
-  z-index: 90;
+.upnext {
+    height: 200px;
+    overflow:hidden;
 }
-
-.modal{
-  display: block;
-}
-
-
 
 
 /* ruleset for all jumbotrons across website*/
@@ -20,7 +15,7 @@
   height: 180px;
 }
 
-/* little icon that opens nav bar, will have to be 
+/* little icon that opens nav bar, will have to be
  * adjusted as we change the img */
 .ks-icon {
   overflow: hidden;

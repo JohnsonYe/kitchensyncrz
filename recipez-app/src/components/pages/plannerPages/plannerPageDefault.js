@@ -16,6 +16,25 @@ import {Button} from 'react-bootstrap';
 import DynamicList from "../../dynamicList"
 import MealEditor from "./editMealPage"
 
+/**Lets the user know what recipe is up next to cook*/
+function UpNextCard(props){
+    return (
+        <div className="upnext">
+            <div className="card m-3">
+                <img
+                    className="img-fluid"
+                    src="https://static1.squarespace.com/static/533dbfc0e4b0a3ebd0e44c92/t/552f072de4b0b098cbb115b6/1429145391117/Chris+Sanchez+Food+photo"
+                    alt="Food Porn"
+
+                />
+                <div className="card-img-overlay">
+                    <h3 className="card-title text-white">Up next ...</h3>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function DailyPlannerItem(props) {
 
     return (
@@ -162,6 +181,7 @@ class Planner extends Component {
                                 <button
                                     className="btn btn-danger btn-sm"
                                     onClick={this.removeMeal}>Remove Test</button>
+                                <UpNextCard/>
                                 <DynamicList
                                     renderLI={this.renderMeal(0,"start", "end", "Duration", "Meal")}
                                     list={this.state.meals}
