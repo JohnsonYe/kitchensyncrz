@@ -18,20 +18,25 @@ import MealEditor from "./editMealPage"
 
 /**Lets the user know what recipe is up next to cook*/
 function UpNextCard(props){
-    return (
-        <div className="upnext">
-            <div className="card m-3">
-                <img
-                    className="img-fluid"
-                    src="https://static1.squarespace.com/static/533dbfc0e4b0a3ebd0e44c92/t/552f072de4b0b098cbb115b6/1429145391117/Chris+Sanchez+Food+photo"
-                    alt="Food Porn"
 
-                />
+    const img1 = "http://twolovesstudio.com/wp-content/uploads/sites/5/2017/05/99-Best-Food-Photography-Tips-5-1.jpg";
+    const img2 = "https://static1.squarespace.com/static/533dbfc0e4b0a3ebd0e44c92/t/552f072de4b0b098cbb115b6/1429145391117/Chris+Sanchez+Food+photo";
+    return (
+            <div className="card m-3">
+                <div className="view overlay hm-zoom">
+                    <img
+                        className="img-fluid "
+                        src={img2}
+                        alt="Food Porn"
+                    />
+                    <div className="mask flex-center waves-effect waves-light">
+                        <p className="white-text">Get Started</p>
+                    </div>
+                </div>
                 <div className="card-img-overlay">
                     <h3 className="card-title text-white">Up next ...</h3>
                 </div>
             </div>
-        </div>
     );
 }
 
@@ -39,7 +44,7 @@ function DailyPlannerItem(props) {
 
     return (
         <div className="card m-3 hoverable">
-            <div className="card bg-light">
+            <div className="card transparent">
                 <div className="card-body">
                     <MealEditor />
                     <p>{props.start} to {props.end} - {props.duration}</p>
@@ -161,19 +166,26 @@ class Planner extends Component {
                     <h1>Planner</h1>
                 </div>
 
-                <div className="container">
+                <div className="container-fluid">
                     <div className="row">
                         <div className="col-md-6">
                             <div className="row">
-                            <div className="col-4">
-                                <h3>Daily Meal Planner</h3>
-                                <h6>{this.state.date}</h6>
-                                <h3>{this.state.numMeals}</h3>
-                                <h6>Meals</h6>
-                                <h3>{this.state.numMealsPrepared}</h3>
-                                <h6>Prepared</h6>
+                            <div className="col-3
+                                            border
+                                            border-left-0
+                                            border-top-0
+                                            border-bottom-0
+                                            border-dark">
+                                    <div className="mx-auto">
+                                        <h2>Daily Meal Planner</h2>
+                                        <p>{this.state.date}</p>
+                                        <h3>{this.state.numMeals}</h3>
+                                        <p>Meals</p>
+                                        <h3>{this.state.numMealsPrepared}</h3>
+                                        <p>Prepared</p>
+                                    </div>
                             </div>
-                            <div className="col-8">
+                            <div className="col-9">
                                 <Button
                                     bsSize="small"
                                     bsStyle="secondary"
@@ -191,13 +203,20 @@ class Planner extends Component {
                         </div>
                         <div className="col-md-6">
                             <div className="row">
-                            <div className="col-4">
-                                <h3>Shopping List</h3>
-                                <h3>{this.state.numShopItems}</h3>
-                                <h6>Items</h6>
+                            <div className="col-3
+                                            border
+                                            border-left-0
+                                            border-top-0
+                                            border-bottom-0
+                                            border-dark">
+                                <div className="mx-auto">
+                                    <h2>Shopping List</h2>
+                                    <h2>{this.state.numShopItems}</h2>
+                                    <p>Items</p>
+                                </div>
                             </div>
 
-                            <div className="col-8">
+                            <div className="col-9">
                                 <Button
                                     bsSize="small"
                                     bsStyle="secondary"
