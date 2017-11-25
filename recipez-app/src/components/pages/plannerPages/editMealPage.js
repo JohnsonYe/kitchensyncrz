@@ -56,7 +56,7 @@ function DaySelector(props) {
 function TimeSelector(props) {
     return(
         <div className="mt-3">
-            <p>Select a time starting time</p>
+            <p>Select a starting time</p>
             <ButtonToolbar>
                 <DropdownButton
                     onSelect={props.handleHour}
