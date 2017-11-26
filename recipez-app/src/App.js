@@ -28,6 +28,8 @@ import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
 import Recipe from "./components/pages/recipe";
+import SignIn from "./components/pages/signIn";
+import Register from "./components/pages/register";
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 
@@ -71,10 +73,10 @@ class App extends Component {
                                     <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
                                 </li>
                                 <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Register</Link>
+                                    <Link to="/Register" onClick={this.handleClick.bind(this)}>Register</Link>
                                 </li>
                                 <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                    <Link to="/SignIn" onClick={this.handleClick.bind(this)}>Sign in</Link>
                                 </li>
                                 <li>
                                     <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
@@ -90,6 +92,8 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
+                    <Route exact path='/SignIn' component={SignIn} />
+                    <Route exact path='/Register' component={Register} />
                     <Footer />
                 </div>
             </Router>
