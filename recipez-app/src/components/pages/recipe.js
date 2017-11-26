@@ -7,6 +7,8 @@
 import React,{ Component } from 'react';
 import RecipeHelper from '../classes/RecipeHelper';
 
+import User from '../classes/User'
+
 class Recipe extends Component {
     constructor(props){
         super(props)
@@ -54,6 +56,9 @@ class Recipe extends Component {
             <div>
                 <h1>{this.state.data.Name}</h1>
                 <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)}>U P D A T E</button>
+                <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))}>check</button>
+                <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)}>add to cookbook</button>
+                <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)}>remove from cookbook</button>
                 <h2>Ingredients:</h2>
                 <ul>{ingredients}</ul>
                 <h2>Directions:</h2>

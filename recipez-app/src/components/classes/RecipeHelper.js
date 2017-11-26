@@ -13,12 +13,48 @@ import User from '../classes/User';
  class RecipeHelper{
     constructor(){
         this.client = DBClient.getClient();
-        this.client.registerPrototype('RECIPE',RecipeHelper.RecipePrototype)
-        this.client.registerPrototype('REVIEW',RecipeHelper.ReviewPrototype)
+        this.client.registerPrototype(RecipeHelper.RecipePrototype)
+        this.client.registerPrototype(RecipeHelper.ReviewPrototype)
 
+        this.createRecipe = this.createRecipe.bind(this);
         this.loadRecipe     = this.loadRecipe.bind(this);
         this.receiveRecipe  = this.receiveRecipe.bind(this);
         this.updateReview   = this.updateReview.bind(this);
+        this.testUnpack = this.testUnpack.bind(this);
+    }
+
+     /**
+      * Use this method to build a recipe object
+      * 
+      * Recipe Object Format:
+      * {
+      *      Name: <String> recipe Name
+      *      Author: <String> username of user that created this recipe
+      *      Ingredients: <List> of <String> containing one ingredient specification each
+      *      Directions:  <List> of <String> containing one step each
+      *      Reviews:     <List> of Review <Objects>:
+      *      {
+      *          username: <String> username of commenter
+      *          Comment:  <String> comment assosciated with review, may be empty
+      *          Rating:   <int> rating associated with review, out of 5 (stars)
+      *          timestamp: timestamp of comment
+      *      }
+      * }
+      */
+    createRecipe(name,ingredients,directions){
+        return {
+            Name: name,
+            Author: this.client.getUsername(),
+            Ingredients: ingredients,
+            Directions: directions,
+            Reviews:{},
+            TimeCost:-1,
+            Difficulty:-1
+        }
+    }
+
+    testUnpack(revObj){
+        return this.client.getPrototype('RECIPE',revObj)
     }
 
     /**
@@ -27,8 +63,6 @@ import User from '../classes/User';
      */
     updateReview(recipeName,revObj,callback){ //TODO optimize this so we dont make two DB calls every time
         //re-pack the review object
-        var packedReviewObject = this.packReview(revObj)
-
         this.client.updateItem(//create the reviews field if it doesnt exist
             this.client.buildUpdateRequest('Recipes','Name',recipeName,this.client.buildFieldCreateExpression('Reviews',{M:{}})),
             function (e1,r1){ //chain update calls to keep them synced up
@@ -37,7 +71,7 @@ import User from '../classes/User';
                     this.client.buildUpdateRequest(
                         'Recipes',
                         'Name',recipeName,
-                        this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject)),
+                        this.client.buildMapUpdateExpression('Reviews',revObj.username,RecipeHelper.packReview(revObj))),
                     callback)
             } else {
                 //field creation failed (!) (?)
@@ -61,11 +95,12 @@ import User from '../classes/User';
             User.getUser(custom).getUserData('cookbook') //queue up the custom display after user data loads
                 .then((cookbook)=>
                 {
-                    var customRecipe = cookbook[recipeName] ? cookbook[recipeName].S : null;
+                    // alert(JSON.stringify(cookbook[recipeName]))
+                    var customRecipe = cookbook[recipeName];
                     if(customRecipe){
                         callback(JSON.parse(customRecipe))
                     } else {
-                        this.receiveRecipe({status:false,payload:recipeName+' not found!'},callback)
+                        this.receiveRecipe({status:false,payload:recipeName+' not found in cookbook!'},callback)
                     }
                 })
                 //verification failed, user data failed to load, or invalid recipe name --> pass the error object we get
@@ -83,26 +118,36 @@ import User from '../classes/User';
         }
 
         callback(this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype))
+        // var unpacked = this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype)
+        // alert(JSON.stringify(unpacked))
+        // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
         // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
  }
 
- RecipeHelper.RecipePrototype = {
-    Name:{type:'S'},
-    Ingredients:{type:'L',inner:{type:'S'}},
-    Directions:{type:'L',inner:{type:'S'}},
-    Reviews:{type:'M',inner:{type:'REVIEW'}},
-    Author:{type:'S'},
-    Difficulty:{type:'N'},
-    TimeCost:{type:'N'}
- }
-
  RecipeHelper.ReviewPrototype = {
+    _NAME:'REVIEW',
     username:{type:'S'},
     Comment:{type:'S'},
     Rating:{type:'N'},
     timestamp:{type:'N'}
  }
+
+ RecipeHelper.RecipePrototype = {
+    _NAME:'RECIPE',
+    Name:{type:'S'},
+    Ingredients:{type:'L',inner:{type:'S'}},
+    Directions:{type:'L',inner:{type:'S'}},
+    Reviews:{type:'M',inner:{type:RecipeHelper.ReviewPrototype._NAME}},
+    Author:{type:'S'},
+    Difficulty:{type:'N'},
+    TimeCost:{type:'N'}
+ }
+
+ //============================================================================================
+ /*
+  * this code is no longer in use but is kept (for now) for convenience and testing
+  */
 
  /**
  * Recipe Object Format:
