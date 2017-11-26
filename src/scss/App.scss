@@ -1,0 +1,56 @@
+@import "_config.scss";
+
+.modal-backdrop {
+  z-index: 90;
+}
+
+.modal{
+  display: block;
+}
+
+
+
+
+/* ruleset for all jumbotrons across website*/
+.jumbotron {
+  //background: #1d1f21;
+  text-align: center;
+  margin-top: -150px;
+  overflow: hidden;
+  height: 180px;
+}
+
+/* little icon that opens nav bar, will have to be 
+ * adjusted as we change the img */
+.ks-icon {
+  overflow: hidden;
+  max-height: 200px;
+  max-width: 200px;
+
+  margin-top: -40px;
+  margin-left: -30px;
+  margin-bottom: -10px;
+}
+
+/* actual nav bar menu */
+.navbar-menu {
+  z-index: 100;
+  height: 100%;
+  background: black;
+  color: white;
+
+  ul, li {
+    list-style-type: none;
+    margin-left: 10px;
+    padding: 0px;
+  }
+
+  a {
+    color: white;
+    font-size: 25px;
+  }
+
+  .first {
+    margin-top: 30px;
+  }
+}
