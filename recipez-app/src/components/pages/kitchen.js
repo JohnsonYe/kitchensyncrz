@@ -5,7 +5,7 @@
  * Description: This file will serve as the Kitchen page
  */
 import React, { Component } from 'react';
-import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
+import { Jumbotron, Row, Col, Tab, Nav, NavItem } from 'react-bootstrap';
 
 //Components
 import FoodItems from '../kitchenComponents/pantry'
@@ -18,35 +18,109 @@ class kitchen extends Component {
 
     render() {
 
-        return (
+        return(
 
-            <div className="container">
+            <div>
 
-                <div className="row">
-                    <h1> Inventory Summary </h1>
-                </div>
+                <Jumbotron>
+                    <h1>Kitchen</h1>
+                </Jumbotron>
 
-                <div className="row">
-                <div className="col-md-2">
-                    <div className = "card mg-3 bg-light text-center">
-                        <div className = "card-title"><h1>0</h1></div>
-                        <div className = "card-body"> Total Items: </div>
+                <div className="container">
+
+                    <div className="row">
+                        <h3> Inventory Summary </h3>
                     </div>
-                </div>&nbsp;
 
-                <div className="col-md-2">
-                    <div class = "card mg-3 bg-light text-center">
-                        <div class = "card-title"><h1>2</h1></div>
-                        <div class = "card-body"> Needs restock: </div>
+                    <div className = "row" >
+                        <div className = "col-md-3 col-sm-5" >
+                            <div className = "card mg-3 card-bg-light text-center">
+                                <div className = "card-title"><h1>0</h1></div>
+                                <div className = "card-body"> Total Items: </div>
+                            </div>
+                        </div>&nbsp;
+
+                        <div className = "col-md-3 col-sm-5" >
+                            <div className = "card mg-3 card-bg-light text-center">
+                                <div className = "card-title"><h1>2</h1></div>
+                                <div className = "card-body"> Needs Restock: </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                </div>
 
-                <div className="row">
+                    <br />
+
+                    <div className = "row">
+
+                        <div className = "col-md-8" >
+
+                            <div className="form-group">
+                                <input type="text" className="form-control" id="add"/>
+                            </div>
+
+
+                            <Tab.Container id="left-tabs-example" defaultActiveKey="Protein">
+                                <div className="row">
+                                    <div className="col-sm-3 col-md-2">
+                                        <Nav bsStyle="pills" stacked>
+                                            <NavItem eventKey="Protein">
+                                                Protein
+                                            </NavItem>
+                                            <NavItem eventKey="Dairy">
+                                                Dairy
+                                            </NavItem>
+                                            <NavItem eventKey="Vegetable">
+                                                Vegetables
+                                            </NavItem>
+                                            <NavItem eventKey="Grain">
+                                                Grain
+                                            </NavItem>
+                                            <NavItem eventKey="Fruit">
+                                                Fruit
+                                            </NavItem>
+                                            <NavItem eventKey="Other">
+                                                Other
+                                            </NavItem>
+                                        </Nav>
+                                    </div>
+                                    <div className="col-sm-9 col-md-10">
+                                        <Tab.Content animation>
+                                            <Tab.Pane eventKey="Protein">
+                                                Protein
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="Dairy">
+                                                Dairy
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="Vegetable">
+                                                Vegetable
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="Grain">
+                                                Grain
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="Fruit">
+                                                Fruit
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="Other">
+                                                Other
+                                            </Tab.Pane>
+                                        </Tab.Content>
+                                    </div>
+                                </div>
+                            </Tab.Container>
+
+
+                        </div>
+
+                        <div className = "col-md-4" >
+                            <div className = "container-fluid mg-3">
+
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         );
-
     }
 }
 
