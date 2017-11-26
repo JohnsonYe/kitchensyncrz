@@ -6,7 +6,7 @@
  */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {Button,Glyphicon,Form,InputGroup,FormControl} from 'react-bootstrap';
+import {Button,Glyphicon,Form,InputGroup,FormControl,Dropdown,MenuItem} from 'react-bootstrap';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
 import SearchBar from '../SearchComponents/SearchBar'
@@ -109,12 +109,25 @@ class Search extends Component {
             </div>
             <div className="container-fluid">
                 <div style={{position:'relative'}}>
-                    <Form inline>
+                    <form onSubmit={(e)=>{e.preventDefault();alert(JSON.stringify(Object.keys(e.target[0])))}} inline>
                         <InputGroup>
-                            <SearchBar client={client} callback={this.addIngredient}/>
-                            <InputGroup.Button><Button bsStyle='success'>Ingredients</Button></InputGroup.Button>
+                            <InputGroup.Button>
+                                {/*<Button bsStyle='success'><Glyphicon glyph='list'/></Button>*/}
+                                <Dropdown id='ingredient-dropdown'>
+                                    <Dropdown.Toggle noCaret>
+                                        <Glyphicon glyph='list'/>
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <MenuItem eventkey='1'>test</MenuItem>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </InputGroup.Button>
+                            <SearchBar client={client} callback={this.addIngredient} id='searchbar'/>
+                            <InputGroup.Button><Button bsStyle='info' type='submit'><Glyphicon glyph='plus-sign'/></Button></InputGroup.Button>
+                            <InputGroup.Button><Button bsStyle='danger'><Glyphicon glyph='ban-circle'/></Button></InputGroup.Button>
+
                         </InputGroup>
-                    </Form>
+                    </form>
                     <div style={{'margin-top':'5px'}}>
                     {/* "modify ingredient" UI element  */}    
                     {/*ingredient_editor*/}         

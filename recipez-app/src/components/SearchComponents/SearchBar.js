@@ -6,6 +6,7 @@
  */
 import React, {Component} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
+import Autosuggest from 'react-bootstrap-autosuggest';
 
 class SearchBar extends Component{
     constructor(props){
@@ -77,9 +78,11 @@ class SearchBar extends Component{
 
     render(){
 
-        var options = {selectHintOnEnter:true,minLength:1}
+        var options = {selectHintOnEnter:true,minLength:1,submitFormOnEnter:true,highlightOnlyResult:true}
+        // <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
+        // <Autosuggest datalist={['egg','bacon','crossaint']} placeholder='Enter ingredients . . . '/>        
         return(
-                <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
+            <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
             );
     }
 
