@@ -5,12 +5,15 @@
  * Serves as the basic preview card, either for the saved recipes or for the personal recipes
  */
 
+/**
+ * TODO: Need to make it so you can pass a prop for the type (personal/saved) and dynamically determine which it will be
+ */
 import React from 'react';
 
 function PreviewCard(props){
     return(
 
-        <div className="card mg-2">
+        <div className="card saved-recipes">
             <img className="card-img-top" src={props.src} alt="Food" />
 
             <div className="card-body">

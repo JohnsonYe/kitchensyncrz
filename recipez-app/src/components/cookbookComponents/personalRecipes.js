@@ -5,57 +5,43 @@
  * The component that displays all of the user's saved recipes
  */
 
-import React from 'react';
+import React, {Component} from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
 
-function PersonalRecipes(props){
-    const imgSrc="http://www.gourmetsleuth.com/images/default-source/articles/big-white-chicken.jpg?sfvrsn=8";
-    return(
-        <div>
-            <div className="row">
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
+// TODO: Some sort of function to automatically add and display preview cards
+class PersonalRecipes extends Component{
+
+    constructor(props){
+        super(props);
+        this.state = {
+            imgSrc: "",
+            personalRecipes: [],
+        }
+
+        this.state.personalRecipes = [
+            <div className={"col-md-2"}>
+                <PersonalRecipes imgSrc={this.state.imgSrc}/>
+            </div>,
+
+            <div className={"col-md-2"}>
+                <PersonalRecipes imgSrc={this.state.imgSrc}/>
             </div>
 
-            <div className="row">
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard src={imgSrc}/>
-                </div>
+        ];
+    }
 
+    addRecipe(){
+
+
+    }
+
+    render(){
+        return(
+            <div className={"row"}>
+                {this.state.personalRecipes}
             </div>
-        </div>
-    );
+        );
+    }
 
 }
 
