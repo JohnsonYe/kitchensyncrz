@@ -53,20 +53,31 @@ class Recipe extends Component {
             </li>)
         var dummyReviewObject = {username:'user001',Comment:'new hello world',Rating:'5',timestamp:'-1'}
         return (
-            <div>
-                <h1>{this.state.data.Name}</h1>
-                <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)}>U P D A T E</button>
-                <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))}>check</button>
-                <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)}>add to cookbook</button>
-                <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)}>remove from cookbook</button>
-                <h2>Ingredients:</h2>
-                <ul>{ingredients}</ul>
-                <h2>Directions:</h2>
-                <ol>{directions}</ol>
-                <h2>Reviews:</h2>
-                <ul>{reviews}</ul>
-                <h2>JSON:</h2>
-                <p>{JSON.stringify(this.state.data)}</p>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h1>{this.state.data.Name}</h1>
+                        <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)}>U P D A T E</button>
+                        <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))}>check</button>
+                        <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)}>add to cookbook</button>
+                        <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)}>remove from cookbook</button>
+                        <h2>Ingredients:</h2>
+                        <p class="red-text">
+                            <ul>
+                                {ingredients}
+                            </ul>
+                        </p>
+                        <h2>Directions:</h2>
+                        <ol>{directions}</ol>
+                        <h2>Reviews:</h2>
+                        <ul>{reviews}</ul>
+                        <h2>JSON:</h2>
+                        <p>{JSON.stringify(this.state.data)}</p>
+                    </div>
+                    <div class="col">
+                        <img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" class="img-fluid " alt=""></img>
+                    </div>
+                </div>
             </div>
             )
     }
