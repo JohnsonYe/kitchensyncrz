@@ -5,7 +5,8 @@
  * Description: This file will serve as the Kitchen page
  */
 import React, { Component } from 'react';
-import { Jumbotron, Row, Col, Tab, Nav, NavItem } from 'react-bootstrap';
+import { Jumbotron, Tab, Nav, NavItem } from 'react-bootstrap';
+import DynamicList from "../dynamicList";
 
 //Components
 import FoodItems from '../kitchenComponents/pantry'
@@ -14,7 +15,72 @@ import Excluded from '../kitchenComponents/exclude'
 
 import card from '../pages/kitchenPages/kitchenComponents'
 
+function addItem (props) {
+
+    return (
+        <div className="form-control col-md-12">
+            {props.value}
+            <button id="remove" type="submit">X</button>
+        </div>
+    );
+}
+
 class kitchen extends Component {
+
+    constructor( props ){
+        super( props );
+        var
+            proteinData = [],
+            dairyData = [],
+            veggieData = [],
+            grainData = [],
+            fruitData = [],
+            otherData = [];
+
+        this.state = {
+            pCount: 0,
+            dCount: 0,
+            vCount: 0,
+            gCount: 0,
+            fCount: 0,
+            oCount: 0,
+            numItems: 0,
+            numRestock: 0,
+
+            protein: proteinData,
+            dairy: dairyData,
+            veggie: veggieData,
+            grain: grainData,
+            fruit: fruitData,
+            other: otherData
+        };
+
+        this.addProtein = this.addProtein.bind(this);
+        this.removeProtein = this.removeProtein.bind(this);
+    }
+
+    /* Functionality methods */
+    addProtein(e){
+        this.setState({protein: this.state.protein.concat(e)});
+        this.setState({pCount: (++this.state.pCount)});
+        this.setState({numItems: (++this.state.numItems)});
+    }
+
+    removeProtein(e){
+        if( this.state.pCount > 0 ){
+            this.state.protein.splice( this.state.protein.indexOf(e));
+            this.setState({pCount: (--this.state.pCount)});
+            this.setState({numItems: (--this.state.numItems)});
+        }
+    }
+
+    renderProtein( value ){
+        return(
+            <addItem
+                value = {value}
+            />
+        );
+    }
 
     render() {
 
@@ -54,11 +120,26 @@ class kitchen extends Component {
 
                         <div className = "col-md-8" >
 
-                            <div className="form-group">
-                                <input type="text" className="form-control" id="add"/>
+                            <div className = "container">
+                                <div className="input-group">
+
+                                    <form onSubmit={this.addProtein}>
+                                    <input className="form-control"
+                                           type= "text"
+                                           ref = {(input) => {this.textInput = input;}}
+                                    />
+                                    </form>
+                                    <span className="input-group-btn">
+                                        <button className="btn btn-success" type="submit">
+                                            <i className="glyphicon glyphicon-plus"/>
+                                        </button>
+                                    </span>
+                                </div>
+                                <DynamicList
+                                    renderLI={this.renderProtein()}
+                                    list = {this.state.protein}
+                                />
                             </div>
-
-
                             <Tab.Container id="left-tabs-example" defaultActiveKey="Protein">
                                 <div className="row">
                                     <div className="col-sm-3 col-md-2">
