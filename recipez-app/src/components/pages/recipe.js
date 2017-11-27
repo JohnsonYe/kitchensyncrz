@@ -6,6 +6,7 @@
  */
 import React,{ Component } from 'react';
 import RecipeHelper from '../classes/RecipeHelper';
+import '../../css/recipes.css';
 
 import User from '../classes/User'
 
@@ -43,6 +44,8 @@ class Recipe extends Component {
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)
         var directions = this.state.data.Directions.map((step) => <li>{step}</li>)
+        var timecost
+        var difficulty
         // alert(JSON.stringify(this.state.data))
         var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) => 
             <li>
@@ -52,31 +55,69 @@ class Recipe extends Component {
                 <p>{review[1].Comment}</p>
             </li>)
         var dummyReviewObject = {username:'user001',Comment:'new hello world',Rating:'5',timestamp:'-1'}
+
         return (
-            <div class="container">
-                <div class="row">
-                    <div class="col">
-                        <h1>{this.state.data.Name}</h1>
-                        <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)}>U P D A T E</button>
-                        <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))}>check</button>
-                        <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)}>add to cookbook</button>
-                        <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)}>remove from cookbook</button>
-                        <h2>Ingredients:</h2>
-                        <p class="red-text">
-                            <ul>
-                                {ingredients}
-                            </ul>
-                        </p>
-                        <h2>Directions:</h2>
-                        <ol>{directions}</ol>
-                        <h2>Reviews:</h2>
-                        <ul>{reviews}</ul>
-                        <h2>JSON:</h2>
-                        <p>{JSON.stringify(this.state.data)}</p>
+            <div>
+                <div className="jumbotron">
+                    <h1>{this.state.data.Name}</h1>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div id="myCarousel" class="carousel slide" date-ride="carousel">
+                                {/*<!-- Indicators -->*/}
+                                <ol class="carousel-indicators">
+                                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                                    <li data-target="#myCarousel" data-slide-to="1"></li>
+                                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                                    <li data-target="#myCarousel" data-slide-to="3"></li>
+                                </ol>
+
+                                <div class="carousel-inner">
+                                    <div class="item active">
+                                        <img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg"/>
+                                    </div>
+
+                                    <div class="item">
+                                        <img src="http://images.media-allrecipes.com/userphotos/600x600/4228736.jpg"/>
+                                    </div>
+
+                                    <div class="item">
+                                        <img src="http://images.media-allrecipes.com/userphotos/600x600/2126904.jpg"/>
+                                    </div>
+                                </div>
+
+                                {/*<!-- Left and right controls -->*/}
+                                <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                            {/*<img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" class="img-fluid " alt=""></img>*/}
+
+                            <div class="btn=group btn-group-sm">
+                                <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>
+                                <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">  check  </button>
+                                <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">  add to cookbook  </button>
+                                <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">  remove from cookbook  </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            {/*<h1>{this.state.data.Name}</h1>*/}
+                            <h2>Ingredients:</h2>
+                            <ul>{ingredients}</ul>
+                        </div>
                     </div>
-                    <div class="col">
-                        <img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" class="img-fluid " alt=""></img>
-                    </div>
+                    <h2>Directions:</h2>
+                    <ol>{directions}</ol>
+                    <h2>Reviews:</h2>
+                    <ul>{reviews}</ul>
+                    {/*<h2>JSON:</h2>
+                            <p>{JSON.stringify(this.state.data)}</p>*/}
                 </div>
             </div>
             )
