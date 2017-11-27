@@ -8,31 +8,59 @@
 /**
  * TODO: Need to make it so you can pass a prop for the type (personal/saved) and dynamically determine which it will be
  */
-import React from 'react';
+import React, {Component} from 'react';
 
-function PreviewCard(props){
-    return(
+class PreviewCard extends Component{
 
-        <div className="card saved-recipes">
-            <img className="card-img-top" src={props.src} alt="Food" />
 
-            <div className="card-body">
-                <h6 className="card-title">
+    constructor(props) {
+        super(props);
+        this.state = {
+            removeFunc: this.props.removeFunc,
+            parent: this.props.parent,
+            key: this.props.key,
+        };
 
-                </h6>
-                <p className="card-text">
-                    Description
-                </p>
-                <a href="#" className="btn btn-primary">
-                    Edit
-                </a>
+        this.removeThis = this.removeThis.bind(this);
+
+    }
+
+    removeThis(){
+
+        if(typeof(this.state.removeFunc) === 'function'){
+            this.state.removeFunc(this.props.key,this.state.parent);
+        } else {
+            console.log(typeof(this.state.removeFunc));
+        }
+    }
+
+    render() {
+        return (
+            <div className={"col-md-2"}>
+                <div className="card recipes">
+                    <img className="card-img-top" src={this.props.src} alt="Food"/>
+
+                    <div className="card-body">
+                        <h6 className="card-title">
+
+                        </h6>
+                        <p className="card-text">
+                            Description
+                        </p>
+                        <div className="btn btn-primary">
+                            Edit
+                        </div>
+                        <div className={"btn btn-warning"} onClick={this.removeThis}>
+                            Delete
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-        </div>
 
-
-    );
-
+        );
+    }
 }
 
 export default PreviewCard;

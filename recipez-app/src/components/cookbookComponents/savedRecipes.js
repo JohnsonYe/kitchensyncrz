@@ -19,81 +19,19 @@ class SavedRecipes extends Component{
         }
 
         this.state.recipes = [
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>,
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>,
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>,
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>,
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>,
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>,
-                <div className={"col-md-2"}>
-                    <PreviewCard src={this.state.imgSrc}/>
-                </div>
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
         ];
 
-        /*
-        this.state.recipes = [
-
-                [<div className="row">
-                    <div className="col-md-2">
-                        <PreviewCard src={this.state.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                </div>
-                ],[
-                <div className="row">
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-                    <div className="col-md-2">
-                        <PreviewCard src={this.imgSrc}/>
-                    </div>
-
-                </div>]
-
-        ]
-        */
     }
 
     // Method to add a recipe to this.state.recipes, dynamically adding to the recipe display
-    addRecipe(){
+    removeRecipe(){
 
 
 
@@ -101,8 +39,10 @@ class SavedRecipes extends Component{
 
     render(){
         return(
-            <div className={"row"}>
-                {this.state.recipes}
+            <div>
+                <div className={"row"}>
+                    {this.state.recipes}
+                </div>
             </div>);
     }
 
