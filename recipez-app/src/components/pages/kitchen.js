@@ -52,7 +52,9 @@ class kitchen extends Component {
             veggie: veggieData,
             grain: grainData,
             fruit: fruitData,
-            other: otherData
+            other: otherData,
+
+            inputValue: ''
         };
 
         this.addProtein = this.addProtein.bind(this);
@@ -60,10 +62,17 @@ class kitchen extends Component {
     }
 
     /* Functionality methods */
+    updateInputValue(e){
+        this.setState({inputValue: e.target.value})
+    }
     addProtein(e){
-        this.setState({protein: this.state.protein.concat(e)});
-        this.setState({pCount: (++this.state.pCount)});
-        this.setState({numItems: (++this.state.numItems)});
+        e.preventDefault();
+        if( this.state.inputValue !== '') {
+            this.setState({protein: this.state.protein.concat(this.state.inputValue)});
+            this.setState({pCount: (++this.state.pCount)});
+            this.setState({numItems: (++this.state.numItems)});
+            this.setState({inputValue: ''});
+        }
     }
 
     removeProtein(e){
@@ -120,20 +129,23 @@ class kitchen extends Component {
 
                         <div className = "col-md-8" >
 
-                            <div className = "container">
+                            <div className = "container-fluid">
                                 <div className="input-group">
 
-                                    <form onSubmit={this.addProtein}>
-                                    <input className="form-control"
-                                           type= "text"
-                                           ref = {(input) => {this.textInput = input;}}
-                                    />
+                                    <form onSubmit={this.addProtein.bind(this)}>
+                                        <input className="form-control"
+                                               type= "text"
+                                               value={this.state.inputValue}
+                                               onChange={e=>this.updateInputValue(e)}
+                                        />
                                     </form>
+
                                     <span className="input-group-btn">
                                         <button className="btn btn-success" type="submit">
                                             <i className="glyphicon glyphicon-plus"/>
                                         </button>
                                     </span>
+                                    {this.state.pCount}
                                 </div>
                                 <DynamicList
                                     renderLI={this.renderProtein()}
