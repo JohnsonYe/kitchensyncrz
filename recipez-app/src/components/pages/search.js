@@ -29,13 +29,17 @@ class Search extends Component {
                         entries:[{value:'',index:0}],
                         ingredients:new Set(),
                         selected:null,
-                        completions:[]
+                        completions:[],
+                        dropdown:{ingredients:false}
                     };
         this.fieldChange = this.fieldChange.bind(this);
 
         this.planner = new PlannerHelper();
         this.textEntry = this.textEntry.bind(this);
         this.autocomplete = this.autocomplete.bind(this);
+        this.toggleDropdown = this.toggleDropdown.bind(this);
+        this.dropdownState = this.dropdownState.bind(this);
+
 
 	}
 	dataPullTest(e){
@@ -46,11 +50,12 @@ class Search extends Component {
         this.setState({selected:ingredient})
     }
     addIngredient(ingredient){
-        if(ingredient){
-            this.state.ingredients.add(ingredient)
-            this.state.recipeMap = client.relevanceSearch([ingredient],this.dataReciever)
-            this.setState({field:'',selected:ingredient})
-        }
+        this.ingredient = ingredient;
+        // if(ingredient){
+        //     this.state.ingredients.add(ingredient)
+        //     this.state.recipeMap = client.relevanceSearch([ingredient],this.dataReciever)
+        //     this.setState({field:'',selected:ingredient})
+        // }
     }
     removeIngredient(e){
         // e.preventDefault();
@@ -81,6 +86,12 @@ class Search extends Component {
     autocomplete(completions){
         this.setState({completions:completions})
     }
+    toggleDropdown(id){
+        this.setState({dropdown:Object.assign(this.state.dropdown,{[id]:!this.state.dropdown[id]})})
+    }
+    dropdownState(id,base){
+        return (base + (this.state.dropdown[id]?' open':''))
+    }
     render() {
     	// alert(JSON.stringify(this.state.test_output))
         var records;
@@ -108,57 +119,69 @@ class Search extends Component {
                 <h1>Browse</h1>
             </div>
             <div className="container-fluid">
-                <div style={{position:'relative'}}>
-                    <form onSubmit={(e)=>{e.preventDefault();alert(JSON.stringify(Object.keys(e.target[0])))}} inline>
-                        <InputGroup>
-                            <InputGroup.Button>
-                                {/*<Button bsStyle='success'><Glyphicon glyph='list'/></Button>*/}
-                                <Dropdown id='ingredient-dropdown'>
-                                    <Dropdown.Toggle noCaret>
-                                        <Glyphicon glyph='list'/>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <MenuItem eventkey='1'>test</MenuItem>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </InputGroup.Button>
-                            <SearchBar client={client} callback={this.addIngredient} id='searchbar'/>
-                            <InputGroup.Button><Button bsStyle='info' type='submit'><Glyphicon glyph='plus-sign'/></Button></InputGroup.Button>
-                            <InputGroup.Button><Button bsStyle='danger'><Glyphicon glyph='ban-circle'/></Button></InputGroup.Button>
+                <div>
+                    <form onSubmit={(e)=>{e.preventDefault();this.searchbar.reset();this.setState({ingredients:this.state.ingredients.add(this.ingredient)})}}>
+                        <div className='input-group'>
+                            <div className={this.dropdownState('ingredients','input-group-btn')}>
+                                <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown('ingredients')}>
+                                    <span className="glyphicon glyphicon-list"></span>
+                                </button>
+                                <div class="dropdown-menu">
+                                    {[...this.state.ingredients].map((ingredient)=>(<div className='dropdown-item'>{ingredient}</div>))}
+                                    <div role="separator" class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">Separated link</a>
+                                </div>
+                            </div>
+                            <SearchBar client={client} callback={this.addIngredient} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
+                            <span className='input-group-btn'>
+                                <button className='btn btn-success' type='button'>
+                                    <span className="glyphicon glyphicon-plus-sign"></span>
+                                </button>
+                            </span>
+                            <span className='input-group-btn'>
+                                <button className='btn btn-danger' type='button'>
+                                    <span className="glyphicon glyphicon-ban-circle"></span>
+                                </button>
+                            </span>
+                            <div className={this.dropdownState('filters','input-group-btn')}>
+                                <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown('filters')}>
+                                    <span className="glyphicon glyphicon-filter"></span>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <div role="separator" class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">Separated link</a>
+                                </div>
+                            </div>
+                        </div>
 
-                        </InputGroup>
                     </form>
-                    <div style={{'margin-top':'5px'}}>
-                    {/* "modify ingredient" UI element  */}    
-                    {/*ingredient_editor*/}         
-                    	<table style={{border:'1px solid black'}}>
-        	            	<thead>
-                                <tr>
-                                    <th><span>Ingredients:</span></th>
-            	                	<th>Best Matches:</th>
-                                </tr>
-        	            	</thead>
-                      		<tbody>
-                                <tr>
-                                    <td valign='top'>
-                                        <ul>
-                                            {ingredient_list}
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <ol>
-                        	               {records ? records : ''}
-                                        </ol>
-                                    </td>
-                                </tr>
-                      		</tbody>
-                    	</table>
-                    </div>
                 </div>
             </div>
             </div>
         );
 
+    }
+
+    oldBootstrapStuff(){
+        return (               
+            <InputGroup>
+                <InputGroup.Button>
+                    {/*<Button bsStyle='success'><Glyphicon glyph='list'/></Button>*/}
+                    <Dropdown id='ingredient-dropdown'>
+                        <Dropdown.Toggle noCaret>
+                            <Glyphicon glyph='list'/>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <MenuItem eventkey='1'>test</MenuItem>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </InputGroup.Button>
+                <SearchBar client={client} callback={this.addIngredient} id='searchbar'/>
+                <InputGroup.Button><Button bsStyle='info'><Glyphicon glyph='plus-sign'/></Button></InputGroup.Button>
+                <InputGroup.Button><Button bsStyle='danger'><Glyphicon glyph='ban-circle'/></Button></InputGroup.Button>
+
+            </InputGroup>
+        )
     }
 }
 

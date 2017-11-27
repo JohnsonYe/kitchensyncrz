@@ -5,7 +5,7 @@
  * Description: modular searchbar component that provides autocomplete in a dropdown menu
  */
 import React, {Component} from 'react';
-import {Typeahead} from 'react-bootstrap-typeahead';
+import {Typeahead} from 'react-typeahead';
 import Autosuggest from 'react-bootstrap-autosuggest';
 
 class SearchBar extends Component{
@@ -15,16 +15,17 @@ class SearchBar extends Component{
         this.state = {
             query:'',
             completions:[],
-            listOpen:false
+            listOpen:false,
         }
+
+        this.shouldClear = this.props.clear;
 
         this.autocomplete = this.autocomplete.bind(this);
         this.textEntry = this.textEntry.bind(this);
         this.focusHiddenForm = this.focusHiddenForm.bind(this);
         this.addItem = this.addItem.bind(this);
-
-        this.textEntry('')
-
+        this.handleChange = this.handleChange.bind(this);
+        this.reset = this.reset.bind(this);
     }
 
     focusHiddenForm(e){
@@ -32,7 +33,7 @@ class SearchBar extends Component{
     }
     textEntry(value){
         this.setState({query:value})
-        if(value.length>-1){
+        if(value.length>0){
             this.props.client.autocomplete(value,this.autocomplete)
         } else {
             this.setState({completions:[]})
@@ -48,6 +49,17 @@ class SearchBar extends Component{
         e.preventDefault()
         this.props.callback(this.state.completions[0])
         this.setState({completions:[],query:''})
+    }
+
+    handleChange(e){
+        // alert(e.target.value)
+        this.props.callback(e.target.value)
+        this.setState({value:e.target.value})
+        if(e.target.value.length>0){
+            this.props.client.autocomplete(e.target.value,this.autocomplete)
+        } else {
+            this.setState({completions:[]})
+        }  
     }
 
     getOldSearchBar(){
@@ -76,13 +88,32 @@ class SearchBar extends Component{
         </div>
     }
 
+    reset(){
+        this.setState({value:'',completions:[]})
+    }
+
     render(){
 
         var options = {selectHintOnEnter:true,minLength:1,submitFormOnEnter:true,highlightOnlyResult:true}
         // <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
         // <Autosuggest datalist={['egg','bacon','crossaint']} placeholder='Enter ingredients . . . '/>        
         return(
-            <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
+            <div className={(this.state.completions.length?'open':'closed')}>
+                <input 
+                    id="ingredient" 
+                    type="text" 
+                    data-toggle="dropdown" 
+                    className="form-control search-adjust" 
+                    placeholder="Enter ingredients or recipes . . ." 
+                    onChange={this.handleChange}
+                    autocomplete="off"
+                    autofocus="on"
+                    value={this.state.value}
+                    />
+                <div class="dropdown-menu">
+                    {this.state.completions.map((key)=>(<div className='dropdown-item'>{key}</div>))}
+                </div>
+            </div>
             );
     }
 

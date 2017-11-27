@@ -21,7 +21,8 @@
     "react-side-bar": "^0.3.5",
     "react-sidebar": "^2.3.2",
     "react-sidenav": "^2.1.2",
-    "react-tabs-redux": "^2.0.1"
+    "react-tabs-redux": "^2.0.1",
+    "react-typeahead": "^2.0.0-alpha.6"
   },
   "scripts": {
     "start": "react-scripts start",
