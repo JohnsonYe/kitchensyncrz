@@ -15,11 +15,11 @@ import Excluded from '../kitchenComponents/exclude'
 
 import card from '../pages/kitchenPages/kitchenComponents'
 
-function addItem (props) {
+function AddItem (props) {
 
     return (
-        <div className="form-control col-md-12">
-            {props.value}
+        <div className="form-control">
+            {props.inputValue}
             <button id="remove" type="submit">X</button>
         </div>
     );
@@ -59,6 +59,7 @@ class kitchen extends Component {
 
         this.addProtein = this.addProtein.bind(this);
         this.removeProtein = this.removeProtein.bind(this);
+        this.renderProtein = this.renderProtein.bind(this);
     }
 
     /* Functionality methods */
@@ -83,10 +84,10 @@ class kitchen extends Component {
         }
     }
 
-    renderProtein( value ){
+    renderProtein(){
         return(
-            <addItem
-                value = {value}
+            <AddItem
+                inputValue={this.state.inputValue}
             />
         );
     }
@@ -97,9 +98,9 @@ class kitchen extends Component {
 
             <div>
 
-                <Jumbotron>
+                <div className="jumbotron">
                     <h1>Kitchen</h1>
-                </Jumbotron>
+                </div>
 
                 <div className="container">
 
@@ -110,14 +111,14 @@ class kitchen extends Component {
                     <div className = "row" >
                         <div className = "col-md-3 col-sm-5" >
                             <div className = "card mg-3 card-bg-light text-center">
-                                <div className = "card-title"><h1>0</h1></div>
+                                <div className = "card-title"><h1>{this.state.numItems}</h1></div>
                                 <div className = "card-body"> Total Items: </div>
                             </div>
                         </div>&nbsp;
 
                         <div className = "col-md-3 col-sm-5" >
                             <div className = "card mg-3 card-bg-light text-center">
-                                <div className = "card-title"><h1>2</h1></div>
+                                <div className = "card-title"><h1>{this.state.numRestock}</h1></div>
                                 <div className = "card-body"> Needs Restock: </div>
                             </div>
                         </div>
@@ -132,11 +133,11 @@ class kitchen extends Component {
                             <div className = "container-fluid">
                                 <div className="input-group">
 
-                                    <form onSubmit={this.addProtein.bind(this)}>
+                                    <form onSubmit={this.addProtein}>
                                         <input className="form-control"
                                                type= "text"
                                                value={this.state.inputValue}
-                                               onChange={e=>this.updateInputValue(e)}
+                                               onChange={e => this.updateInputValue(e)}
                                         />
                                     </form>
 
@@ -145,12 +146,13 @@ class kitchen extends Component {
                                             <i className="glyphicon glyphicon-plus"/>
                                         </button>
                                     </span>
-                                    {this.state.pCount}
                                 </div>
+
                                 <DynamicList
                                     renderLI={this.renderProtein()}
                                     list = {this.state.protein}
                                 />
+
                             </div>
                             <Tab.Container id="left-tabs-example" defaultActiveKey="Protein">
                                 <div className="row">
