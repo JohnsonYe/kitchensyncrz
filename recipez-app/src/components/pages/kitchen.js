@@ -19,7 +19,7 @@ function AddItem (props) {
 
     return (
         <div className="form-control">
-            {props.inputValue}
+            {props.item}
             <button id="remove" type="submit">X</button>
         </div>
     );
@@ -57,6 +57,7 @@ class kitchen extends Component {
             inputValue: ''
         };
 
+        this.updateInputValue = this.updateInputValue.bind(this);
         this.addProtein = this.addProtein.bind(this);
         this.removeProtein = this.removeProtein.bind(this);
         this.renderProtein = this.renderProtein.bind(this);
@@ -66,6 +67,7 @@ class kitchen extends Component {
     updateInputValue(e){
         this.setState({inputValue: e.target.value})
     }
+
     addProtein(e){
         e.preventDefault();
         if( this.state.inputValue !== '') {
@@ -87,7 +89,7 @@ class kitchen extends Component {
     renderProtein(){
         return(
             <AddItem
-                inputValue={this.state.inputValue}
+                item={this.state.protein[ (this.state.pCount) - 1]}
             />
         );
     }
