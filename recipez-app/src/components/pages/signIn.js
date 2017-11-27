@@ -107,7 +107,7 @@ render() {
                             type="submit" className="btn btn-primary">Login</button>
                             <br />
                             <br />
-                            <p>Don't have an account? Click <Link to="/Register">here</Link> to Register!</p>
+                            <p>Don’t have an account? Click <Link to="/Register">here</Link> to Register!</p>
                         </div>
                     </div>
                 </div>
