@@ -116,7 +116,7 @@ class SearchBar extends Component{
     }
 
     reset(){
-        this.setState({value:'',completions:[]})
+        this.setState({value:'',completions:[],shiftDown:false})
     }
 
     /**
@@ -126,6 +126,14 @@ class SearchBar extends Component{
      */
     getSearchHighlight(){
         return (this.state.value&&this.state.value.length?(this.state.shiftDown?'has-error':'has-success'):'')
+    }
+
+    getValue(){
+        return this.state.value
+    }
+
+    getStatus(){
+        return this.state.shiftDown?0:1;
     }
 
     render(){

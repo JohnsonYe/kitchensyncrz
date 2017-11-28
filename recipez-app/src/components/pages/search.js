@@ -31,9 +31,11 @@ class Search extends Component {
                         data_pulled:false,
                         entries:[{value:'',index:0}],
                         ingredients:new Set(),
+                        excluded: new Set(),
                         selected:null,
                         completions:[],
-                        dropdown:{ingredients:false}
+                        dropdown:{ingredients:false},
+                        sorted:[],
                     };
         this.fieldChange = this.fieldChange.bind(this);
 
@@ -43,6 +45,8 @@ class Search extends Component {
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
         this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleReject = this.handleReject.bind(this);
 
 
 
@@ -62,16 +66,17 @@ class Search extends Component {
     }
     addIngredient(ingredient){
         this.ingredient = ingredient;
-        // if(ingredient){
-        //     this.state.ingredients.add(ingredient)
-        //     this.state.recipeMap = client.relevanceSearch([ingredient],this.dataReciever)
-        //     this.setState({field:'',selected:ingredient})
-        // }
     }
-    removeIngredient(name){
+    removeIngredient(name,code){
         // e.preventDefault();
-        this.state.ingredients.delete(name)
-        this.setState({ingredients:this.state.ingredients})
+        client.updateIngredient(this.ingredient,code,(sorted)=>{
+            this.state.ingredients.delete(name)
+            this.setState({sorted:sorted,ingredients:this.state.ingredients})
+            if(this.state.ingredients.size == 0){
+                this.closeAllDropdowns()
+            }
+        }) 
+
     }
     dataReciever(result){
         if(!result.status){
@@ -98,32 +103,45 @@ class Search extends Component {
         this.setState({completions:completions})
     }
     toggleDropdown(event,id){
-        // this.blockPropagation(event)
-        // alert(JSON.stringify(Object.keys(event)))
         this.setState({dropdown:Object.assign(this.state.dropdown,{[id]:!this.state.dropdown[id]})})
     }
     blockPropagation(event){
-        // alert('got here')
         event.stopPropagation();
     }
     closeAllDropdowns(){
-        // alert('got here')
         this.setState({dropdown:{}})
     }
     dropdownState(id,base){
         return (base + (this.state.dropdown[id]?' open':''))
     }
-    render() {
-    	// alert(JSON.stringify(this.state.test_output))
-        var records;
-        if(this.state.data_pulled){
-        	records = this.state.test_output.map((result) => <li><Link to={'/Recipes/'+result}>{result}</Link></li>);
+    updateIngredientState(value,status){
+        if(status == 1){
+            return {ingredients:this.state.ingredients.add(value)}
+        } else if(status == 0){
+            // alert('got here')
+            return {excluded:this.state.excluded.add(value)}
         } else {
-            records = this.state.test_output == null ? 'No Data!' : JSON.stringify(this.state.test_output);
+            return {}
         }
-        const ingredient_editor = this.state.selected 
-        ? (<div>Selected: {this.state.selected} <button onClick={e => this.removeIngredient(this.state.selected)}>Remove</button></div> ) 
-        : (<div>Selected: None</div>);
+    }
+    handleSubmit(e){
+        e.preventDefault();
+        let value = this.searchbar.getValue()
+        let status = this.searchbar.getStatus()
+        client.updateIngredient(value,status,(sorted)=>{
+            this.setState({sorted:sorted,...this.updateIngredientState(value,status)})
+        })
+        this.searchbar.reset();
+    }
+    handleReject(e){
+        let value = this.searchbar.getValue()
+        let status = this.searchbar.getStatus()
+        client.updateIngredient(value,0,(sorted)=>{
+            this.setState({sorted:sorted,excluded:this.state.excluded.add(value)})
+        })   
+        this.searchbar.reset();     
+    }
+    render() {
         return (
             <div onClick={this.closeAllDropdowns}>
             <div className="jumbotron">
@@ -131,7 +149,7 @@ class Search extends Component {
             </div>
             <div className="container-fluid">
                 <div id='searchbar-toolbar-container'>
-                    <form onSubmit={(e)=>{e.preventDefault();this.searchbar.reset();this.setState({ingredients:this.state.ingredients.add(this.ingredient)})}}>
+                    <form onSubmit={this.handleSubmit}>
                         <div className='input-group'>
                             <div className={this.dropdownState('ingredients','input-group-btn')} onClick={this.blockPropagation}>
                                 <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
@@ -143,9 +161,16 @@ class Search extends Component {
                                     <div className="dropdown-header">Added Ingredients</div>
                                     {[...this.state.ingredients].map(
                                         (ingredient)=>
-                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
                                         )}
                                     {this.state.ingredients.size>0?'':<div className="dropdown-item"><i>You haven't added any ingredients!</i></div>}
+                                    <div className="dropdown-header">Excluded Ingredients</div>
+                                    {[...this.state.excluded].map(
+                                        (ingredient)=>
+                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,2)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+                                        )}
+                                    {this.state.excluded.size>0?'':<div className="dropdown-item"><i>You haven't excluded any ingredients!</i></div>}
+
                                 </div>
                             </div>
                             <SearchBar client={client} callback={this.addIngredient} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
@@ -155,7 +180,7 @@ class Search extends Component {
                                 </button>
                             </span>
                             <span className='input-group-btn'>
-                                <button className='btn btn-danger' type='button'>
+                                <button className='btn btn-danger' type='button' onClick={this.handleReject}>
                                     <span className="glyphicon glyphicon-ban-circle"></span>
                                 </button>
                             </span>
@@ -169,8 +194,16 @@ class Search extends Component {
                                 </div>
                             </div>
                         </div>
-
                     </form>
+                    <ul className="list-group">
+                        {this.state.sorted.map((recipe)=>(
+                            <li className="list-group-item">
+                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
+                                <span className='pull-right'>{'Score: '+JSON.stringify(recipe[1].map((n)=>n.toFixed(2)))}</span>
+                            </li>
+                        ))}
+                        {this.state.sorted.length?null:(<li className='list-group-item'><i>No Recipes to Show</i></li>)}
+                    </ul>
                 </div>
             </div>
             </div>

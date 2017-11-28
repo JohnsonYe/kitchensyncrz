@@ -89,6 +89,7 @@ const UNAUTH_NAME = 'GUEST'
         return new Promise((pass,fail)=>{
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
+                    // alert('got here')
                     pass(response.payload)
                 } else { //call failed, fail
                     fail(response.payload)
@@ -309,6 +310,11 @@ const UNAUTH_NAME = 'GUEST'
      */
     alertResponseCallback(response){
         alert(JSON.stringify(response))
+    }
+
+    alertAndPass(object){
+        alert('got here');
+        return object
     }
 
  }
