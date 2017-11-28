@@ -17,7 +17,6 @@ class PreviewCard extends Component{
         super(props);
         this.state = {
             removeFunc: this.props.removeFunc,
-            parent: this.props.parent,
             key: this.props.key,
         };
 
@@ -26,12 +25,7 @@ class PreviewCard extends Component{
     }
 
     removeThis(){
-
-        if(typeof(this.state.removeFunc) === 'function'){
-            this.state.removeFunc(this.props.key,this.state.parent);
-        } else {
-            console.log(typeof(this.state.removeFunc));
-        }
+            this.state.removeFunc(this.state.key);
     }
 
     render() {

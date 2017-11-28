@@ -32,7 +32,6 @@ class PersonalRecipes extends Component{
         this.setState({recipeList: initial_recipe_list});
 
         this.addRecipe = this.addRecipe.bind(this);
-        this.removeRecipe = this.removeRecipe.bind(this);
     }
 
     addRecipe(){
@@ -41,21 +40,32 @@ class PersonalRecipes extends Component{
         let updatedRecipeList = this.state.recipeList;
 
         cur_key_new += 1;
-        let newRecipe = <PreviewCard src={"https://i.imgur.com/md8f8.jpg"} removeFunc={this.removeRecipe} parent={this} key={cur_key_new}/>;
+        let newRecipe = <PreviewCard src={"https://i.imgur.com/md8f8.jpg"} removeFunc={this.removeRecipe} key={cur_key_new}/>;
         updatedRecipeMap.set(cur_key_new, newRecipe);
         updatedRecipeList.push(newRecipe);
         this.setState({recipeList: updatedRecipeList, recipeMap: updatedRecipeMap, cur_key: cur_key_new})
     }
 
-    removeRecipe(card_key,card_parent){
+    // Had to change to arrow func to get it to bind properly... should work?
+    removeRecipe = (card_key) => {
 
-        let updatedRecipes = card_parent.state.recipeMap;
+        card_key = parseInt(card_key);
+        let updatedRecipes = this.state.recipeMap;
         let updatedRecipeList = [];
-        updatedRecipes.delete(card_key);
+        console.log('This is before trying to delete one card\n');
+        console.log(updatedRecipes);
+        console.log(updatedRecipes.has(card_key));
+
+        updatedRecipes.delete(key);
+        console.log('This is after trying to delete one card\n');
+        console.log(updatedRecipes);
+        console.log(updatedRecipes.has(card_key));
         for( var [key, value] in updatedRecipes) {
+            console.log(value);
             updatedRecipeList.push(value);
+            console.log(updatedRecipeList);
         }
-        card_parent.setState({recipeMap: updatedRecipes, recipeList: updatedRecipeList});
+        this.setState({recipeMap: updatedRecipes, recipeList: updatedRecipeList});
 
     }
 
