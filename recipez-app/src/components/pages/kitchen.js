@@ -15,15 +15,58 @@ import Excluded from '../kitchenComponents/exclude'
 
 import card from '../pages/kitchenPages/kitchenComponents'
 
-function AddItem (props) {
+const AddItem = ({item, remove}) => {
 
     return (
         <div className="form-control">
-            {props.item}
-            <button id="remove" type="submit">X</button>
+            {item}
+            <button id="remove"
+                    type="submit"
+                    onClick={()=> remove(item.id)}>X</button>
         </div>
     );
 }
+
+const ItemList = ( {items, remove} ) => {
+
+    // Map through nodes
+    const itemNode = items.map((item)=>
+        (<AddItem item = {item} key={item.id} remove={remove} />));
+
+    return (<div id ="gap"> {itemNode} </div>);
+}
+
+const ItemForm = ({addProtein}) => {
+
+        // Input Tracker
+        let input;
+
+        return (
+
+            // Add to the form
+            <form onSubmit={(e) => {
+                e.preventDefault();
+
+                // Preventing empty answers
+                if( input.value !== '') {
+                    addProtein(input.value);
+
+                    // Clearing
+                    input.value = '';
+                }
+            }}>
+
+                <div class="input-group">
+                    <input className="form-control col-md-12" type= "text"
+                           ref={node => { input = node; }} />
+
+                    <button class="add" type="submit" id="add">
+                        +
+                    </button>
+                </div>
+            </form>
+        );
+    };
 
 class kitchen extends Component {
 
@@ -54,28 +97,20 @@ class kitchen extends Component {
             fruit: fruitData,
             other: otherData,
 
-            inputValue: ''
         };
 
-        this.updateInputValue = this.updateInputValue.bind(this);
         this.addProtein = this.addProtein.bind(this);
         this.removeProtein = this.removeProtein.bind(this);
         this.renderProtein = this.renderProtein.bind(this);
     }
 
     /* Functionality methods */
-    updateInputValue(e){
-        this.setState({inputValue: e.target.value})
-    }
 
-    addProtein(e){
-        e.preventDefault();
-        if( this.state.inputValue !== '') {
-            this.setState({protein: this.state.protein.concat(this.state.inputValue)});
-            this.setState({pCount: (++this.state.pCount)});
-            this.setState({numItems: (++this.state.numItems)});
-            this.setState({inputValue: ''});
-        }
+    addProtein(val){
+        this.setState({protein: this.state.protein.concat(val)});
+        this.setState({pCount: (++this.state.pCount)});
+        this.setState({numItems: (++this.state.numItems)});
+
     }
 
     removeProtein(e){
@@ -87,10 +122,15 @@ class kitchen extends Component {
     }
 
     renderProtein(){
+
         return(
-            <AddItem
-                item={this.state.protein[ (this.state.pCount) - 1]}
-            />
+            <div>
+                <ItemList
+                    items={this.state.protein}
+                    remove={this.removeProtein.bind(this)}
+                />
+            </div>
+
         );
     }
 
@@ -134,30 +174,16 @@ class kitchen extends Component {
 
                             <div className = "container-fluid">
                                 <div className="input-group">
-
-                                    <form onSubmit={this.addProtein}>
-                                        <input className="form-control"
-                                               type= "text"
-                                               value={this.state.inputValue}
-                                               onChange={e => this.updateInputValue(e)}
-                                        />
-                                    </form>
-
-                                    <span className="input-group-btn">
-                                        <button className="btn btn-success" type="submit">
-                                            <i className="glyphicon glyphicon-plus"/>
-                                        </button>
-                                    </span>
+                                    <ItemForm addProtein = {this.addProtein.bind(this)}/>
                                 </div>
 
-                                <DynamicList
-                                    renderLI={this.renderProtein()}
-                                    list = {this.state.protein}
-                                />
+
+                                {this.renderProtein()}
 
                             </div>
+
                             <Tab.Container id="left-tabs-example" defaultActiveKey="Protein">
-                                <div className="row">
+                                <div className="row clearfix">
                                     <div className="col-sm-3 col-md-2">
                                         <Nav bsStyle="pills" stacked>
                                             <NavItem eventKey="Protein">
