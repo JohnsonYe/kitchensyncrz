@@ -6,33 +6,31 @@
  */
 import React, { Component } from 'react';
 import { Jumbotron, Tab, Nav, NavItem } from 'react-bootstrap';
-import DynamicList from "../dynamicList";
-
-//Components
-import FoodItems from '../kitchenComponents/pantry'
-import CookwareItems from '../kitchenComponents/cookware'
-import Excluded from '../kitchenComponents/exclude'
 
 import card from '../pages/kitchenPages/kitchenComponents'
 
 const AddItem = ({item, remove}) => {
-    return (
-        <form className="form-inline">
-             <div className="form-control btn-group col-8">
-                {item}
-             </div>
-                 <button className = "btn btn-danger btn-lg mg-3"
-                         type = "submit"
-                         onClick = {()=> remove(item.id)}
-                         style = {{float:'right', display:'block'}}>
 
-                     <i className = "glyphicon glyphicon-trash" />
-                 </button>
-                 <button className = "btn btn-warning btn-lg mg-3"
-                         type = "submit"
-                         style={{float:'right', display:'block'}}>
-                     <i className = "glyphicon glyphicon-ban-circle" />
-                 </button>
+    return (
+
+        <form className="form-inline">
+            <div className="form-control btn-group col-12" id="del">
+                {item}
+                <button className = "btn btn-danger btn-lg mg-3"
+                        id = "delBtn"
+                        type = "submit"
+                        onClick = {()=> remove(item.id)}
+                        style = {{float:'right', display:'block'}}>
+
+                    <i className = "glyphicon glyphicon-trash" />
+                </button>
+                <button className = "btn btn-warning btn-lg mg-3"
+                        id = "delBtn"
+                        type = "submit"
+                        style={{float:'right', display:'block'}}>
+                    <i className = "glyphicon glyphicon-ban-circle" />
+                </button>
+            </div>
 
         </form>
     );
@@ -44,42 +42,72 @@ const ItemList = ( {items, remove} ) => {
     const itemNode = items.map((item)=>
         (<AddItem item = {item} key={item.id} remove={remove} />));
 
-    return (<div> {itemNode} </div>);
+    return (<div> {itemNode}  </div>);
 }
 
-const ItemForm = ({addProtein}) => {
+const ItemForm = ( {addProtein,
+                      addDairy,
+                      addVegetable,
+                      addFruit,
+                      addGrain,
+                      addOther,
+                      getKey} ) => {
 
-        // Input Tracker
-        let input;
+    // Input Tracker
+    let input;
 
-        return (
+    return (
+        // Add to the form
+        <form onSubmit={(e) => {
+            e.preventDefault();
 
-            // Add to the form
-            <form onSubmit={(e) => {
-                e.preventDefault();
+            // Preventing empty answers
+            if( input.value !== '') {
 
-                // Preventing empty answers
-                if( input.value !== '') {
-                    addProtein(input.value);
-
-                    // Clearing
-                    input.value = '';
+                // Call the add function for each group
+                switch( getKey ){
+                    case "Protein":
+                        addProtein(input.value);
+                        break;
+                    case "Dairy":
+                        addDairy(input.value);
+                        break;
+                    case "Vegetable":
+                        addVegetable(input.value);
+                        break;
+                    case "Fruit":
+                        addFruit(input.value);
+                        break;
+                    case "Grain":
+                        addGrain(input.value);
+                        break;
+                    case "Other":
+                        addOther(input.value);
+                        break;
+                    default:
+                        break;
                 }
-            }}>
 
-                <div className="input-group">
-                    <input className="form-control" type= "text"
-                           ref={node => { input = node; }} />
+                // Clearing
+                input.value = '';
+            }
+        }}>
 
-                    <span className = "input-group-btn">
+            <div className="input-group">
+                <input className="form-control" type= "text" id = "enter"
+                       autocomplete="off"
+                       placeholder="Add to Pantry"
+                       ref={node => { input = node; }} />
+
+                <span className = "input-group-btn">
                         <button className="btn btn-success" type="submit">
                             <i className = "glyphicon glyphicon-plus" />
                         </button>
                     </span>
-                </div>
-            </form>
-        );
-    };
+            </div>
+        </form>
+    );
+};
 
 class kitchen extends Component {
 
@@ -88,54 +116,84 @@ class kitchen extends Component {
         var
             proteinData = [],
             dairyData = [],
-            veggieData = [],
+            vegetableData = [],
             grainData = [],
             fruitData = [],
             otherData = [];
 
         this.state = {
-            pCount: 0,
-            dCount: 0,
-            vCount: 0,
-            gCount: 0,
-            fCount: 0,
-            oCount: 0,
             numItems: 0,
             numRestock: 0,
 
             protein: proteinData,
             dairy: dairyData,
-            veggie: veggieData,
+            vegetable: vegetableData,
             grain: grainData,
             fruit: fruitData,
             other: otherData,
 
+            key: "Protein"
+
         };
 
+        this.getKey = this.getKey.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
+
+        // Protein
         this.addProtein = this.addProtein.bind(this);
         this.removeProtein = this.removeProtein.bind(this);
         this.renderProtein = this.renderProtein.bind(this);
+
+        // Dairy
+        this.addDairy = this.addDairy.bind(this);
+        this.removeDairy = this.removeDairy.bind(this);
+        this.renderDairy = this.renderDairy.bind(this);
+
+        // Veggies
+        this.addVegetable = this.addVegetable.bind(this);
+        this.removeVegetable = this.removeVegetable.bind(this);
+        this.renderVegetable = this.renderVegetable.bind(this);
+
+        // Fruit
+        this.addFruit = this.addFruit.bind(this);
+        this.removeFruit = this.removeFruit.bind(this);
+        this.renderFruit = this.renderFruit.bind(this);
+
+        // Grain
+        this.addGrain = this.addGrain.bind(this);
+        this.removeGrain = this.removeGrain.bind(this);
+        this.renderGrain = this.renderGrain.bind(this);
+
+        // Other
+        this.addOther = this.addOther.bind(this);
+        this.removeOther = this.removeOther.bind(this);
+        this.renderOther = this.renderOther.bind(this);
+    }
+
+    getKey(){
+        return this.state.key;
     }
 
     /* Functionality methods */
 
+    handleSelect( key ){
+        this.setState({key: key });;
+    }
+
+    //Protein functions
     addProtein(val){
         this.setState({protein: this.state.protein.concat(val)});
-        this.setState({pCount: (++this.state.pCount)});
         this.setState({numItems: (++this.state.numItems)});
-
     }
 
     removeProtein(e){
-        if( this.state.pCount > 0 ){
+        if( this.state.protein.length > 0 ){
             this.state.protein.splice( this.state.protein.indexOf(e));
-            this.setState({pCount: (--this.state.pCount)});
             this.setState({numItems: (--this.state.numItems)});
         }
     }
 
     renderProtein(){
-
         return(
             <div>
                 <ItemList
@@ -143,7 +201,126 @@ class kitchen extends Component {
                     remove={this.removeProtein.bind(this)}
                 />
             </div>
+        );
+    }
 
+    // Dairy functions
+    addDairy(val){
+        this.setState({dairy: this.state.dairy.concat(val)});
+        this.setState({numItems: (++this.state.numItems)});
+    }
+
+    removeDairy(e){
+        if( this.state.dairy.length > 0 ){
+            this.state.dairy.splice( this.state.dairy.indexOf(e));
+            this.setState({numItems: (--this.state.numItems)});
+        }
+    }
+
+    renderDairy(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.dairy}
+                    remove={this.removeDairy.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    // Veggie functions
+    addVegetable(val){
+        this.setState({vegetable: this.state.vegetable.concat(val)});
+        this.setState({numItems: (++this.state.numItems)});
+    }
+
+    removeVegetable(e){
+        if( this.state.vegetable.length > 0 ){
+            this.state.vegetable.splice( this.state.vegetable.indexOf(e));
+            this.setState({numItems: (--this.state.numItems)});
+        }
+    }
+
+    renderVegetable(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.vegetable}
+                    remove={this.removeVegetable.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    // Fruit functions
+    addFruit(val){
+        this.setState({fruit: this.state.fruit.concat(val)});
+        this.setState({numItems: (++this.state.numItems)});
+    }
+
+    removeFruit(e){
+        if( this.state.fruit.length > 0 ){
+            this.state.fruit.splice( this.state.fruit.indexOf(e));
+            this.setState({numItems: (--this.state.numItems)});
+        }
+    }
+
+    renderFruit(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.fruit}
+                    remove={this.removeFruit.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    // Grain functions
+    addGrain(val){
+        this.setState({grain: this.state.grain.concat(val)});
+        this.setState({numItems: (++this.state.numItems)});
+    }
+
+    removeGrain(e){
+        if( this.state.grain.length > 0 ){
+            this.state.grain.splice( this.state.grain.indexOf(e));
+            this.setState({numItems: (--this.state.numItems)});
+        }
+    }
+
+    renderGrain(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.grain}
+                    remove={this.removeGrain.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    // Other functions
+    addOther(val){
+        this.setState({grain: this.state.other.concat(val)});
+        this.setState({numItems: (++this.state.numItems)});
+    }
+
+    removeOther(e){
+        if( this.state.other.length > 0 ){
+            this.state.other.splice( this.state.other.indexOf(e));
+            this.setState({numItems: (--this.state.numItems)});
+        }
+    }
+
+    renderOther(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.other}
+                    remove={this.removeOther.bind(this)}
+                />
+            </div>
         );
     }
 
@@ -187,15 +364,21 @@ class kitchen extends Component {
 
                             <div className = "container-fluid">
                                 <div className="input-group">
-                                    <ItemForm addProtein = {this.addProtein.bind(this)}/>
+                                    <ItemForm
+                                        addProtein = {this.addProtein.bind(this)}
+                                        addDairy = {this.addDairy.bind(this)}
+                                        addVegetable = {this.addVegetable.bind(this)}
+                                        addFruit = {this.addFruit.bind(this)}
+                                        addGrain = {this.addGrain.bind(this)}
+                                        addOther = {this.addOther.bind(this)}
+                                        getKey = {this.getKey()}
+                                    />
                                 </div>
-
-
-                                {this.renderProtein()}
-
                             </div>
 
-                            <Tab.Container id="left-tabs-example" defaultActiveKey="Protein">
+                            <br />
+
+                            <Tab.Container defaultActiveKey={this.state.key} onSelect={this.handleSelect.bind(this)}>
                                 <div className="row clearfix">
                                     <div className="col-sm-3 col-md-2">
                                         <Nav bsStyle="pills" stacked>
@@ -206,13 +389,13 @@ class kitchen extends Component {
                                                 Dairy
                                             </NavItem>
                                             <NavItem eventKey="Vegetable">
-                                                Vegetables
-                                            </NavItem>
-                                            <NavItem eventKey="Grain">
-                                                Grain
+                                                Vegetable
                                             </NavItem>
                                             <NavItem eventKey="Fruit">
                                                 Fruit
+                                            </NavItem>
+                                            <NavItem eventKey="Grain">
+                                                Grain
                                             </NavItem>
                                             <NavItem eventKey="Other">
                                                 Other
@@ -222,22 +405,22 @@ class kitchen extends Component {
                                     <div className="col-sm-9 col-md-10">
                                         <Tab.Content animation>
                                             <Tab.Pane eventKey="Protein">
-                                                Protein
+                                                {this.renderProtein()}
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="Dairy">
-                                                Dairy
+                                                {this.renderDairy()}
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="Vegetable">
-                                                Vegetable
-                                            </Tab.Pane>
-                                            <Tab.Pane eventKey="Grain">
-                                                Grain
+                                                {this.renderVegetable()}
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="Fruit">
-                                                Fruit
+                                                {this.renderFruit()}
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="Grain">
+                                                {this.renderGrain()}
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="Other">
-                                                Other
+                                                {this.renderOther()}
                                             </Tab.Pane>
                                         </Tab.Content>
                                     </div>
