@@ -7,14 +7,12 @@
 import React, { Component } from 'react';
 import { Jumbotron, Tab, Nav, NavItem } from 'react-bootstrap';
 
-import card from '../pages/kitchenPages/kitchenComponents'
-
 const AddItem = ({item, remove}) => {
 
     return (
 
         <form className="form-inline">
-            <div className="form-control btn-group col-12" id="del">
+            <div className="form-control btn-group col-11" id="del">
                 {item}
                 <button className = "btn btn-danger btn-lg mg-3"
                         id = "delBtn"
@@ -26,7 +24,8 @@ const AddItem = ({item, remove}) => {
                 </button>
                 <button className = "btn btn-warning btn-lg mg-3"
                         id = "delBtn"
-                        type = "submit"
+                        type = "button"
+                        onClick = { this.className = "btn btn-danger btn-lg mg-3 disabled"}
                         style={{float:'right', display:'block'}}>
                     <i className = "glyphicon glyphicon-ban-circle" />
                 </button>
@@ -193,6 +192,12 @@ class kitchen extends Component {
         }
     }
 
+    outProtein(e){
+        if( this.state.protein.length > 0 ){
+
+        }
+    }
+
     renderProtein(){
         return(
             <div>
@@ -228,7 +233,7 @@ class kitchen extends Component {
         );
     }
 
-    // Veggie functions
+    // Vegetable functions
     addVegetable(val){
         this.setState({vegetable: this.state.vegetable.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
@@ -389,7 +394,7 @@ class kitchen extends Component {
                                                 Dairy
                                             </NavItem>
                                             <NavItem eventKey="Vegetable">
-                                                Vegetable
+                                                Vegetables
                                             </NavItem>
                                             <NavItem eventKey="Fruit">
                                                 Fruit
@@ -402,7 +407,7 @@ class kitchen extends Component {
                                             </NavItem>
                                         </Nav>
                                     </div>
-                                    <div className="col-sm-9 col-md-10">
+                                    <div className="col-sm-9 col-md-10" id = "tabs">
                                         <Tab.Content animation>
                                             <Tab.Pane eventKey="Protein">
                                                 {this.renderProtein()}
