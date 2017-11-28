@@ -16,8 +16,8 @@ class PreviewCard extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            removeFunc: this.props.removeFunc,
-            key: this.props.key,
+            removeFunc: props.removeFunc,
+            card_key: props.card_key,
         };
 
         this.removeThis = this.removeThis.bind(this);
@@ -25,7 +25,7 @@ class PreviewCard extends Component{
     }
 
     removeThis(){
-            this.state.removeFunc(this.state.key);
+            this.state.removeFunc(this.state.card_key);
     }
 
     render() {
@@ -45,7 +45,7 @@ class PreviewCard extends Component{
                             Edit
                         </div>
                         <div className={"btn btn-warning"} onClick={this.removeThis}>
-                            Delete
+                            Delete {this.state.card_key}
                         </div>
                     </div>
 

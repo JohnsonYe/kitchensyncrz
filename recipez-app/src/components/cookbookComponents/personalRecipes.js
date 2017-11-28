@@ -20,17 +20,6 @@ class PersonalRecipes extends Component{
             cur_key: 0,
         };
 
-        this.addRecipe();
-        this.addRecipe();
-
-        let initial_recipe_list = [];
-        for( var [key, value] of this.state.recipeMap){
-
-            initial_recipe_list.push(value);
-
-        }
-        this.setState({recipeList: initial_recipe_list});
-
         this.addRecipe = this.addRecipe.bind(this);
     }
 
@@ -40,7 +29,9 @@ class PersonalRecipes extends Component{
         let updatedRecipeList = this.state.recipeList;
 
         cur_key_new += 1;
-        let newRecipe = <PreviewCard src={"https://i.imgur.com/md8f8.jpg"} removeFunc={this.removeRecipe} key={cur_key_new}/>;
+        console.log('the new key is');
+        console.log(cur_key_new);
+        let newRecipe = <PreviewCard src={"https://i.imgur.com/md8f8.jpg"} removeFunc={this.removeRecipe} card_key={cur_key_new}/>;
         updatedRecipeMap.set(cur_key_new, newRecipe);
         updatedRecipeList.push(newRecipe);
         this.setState({recipeList: updatedRecipeList, recipeMap: updatedRecipeMap, cur_key: cur_key_new})
@@ -50,24 +41,19 @@ class PersonalRecipes extends Component{
     removeRecipe = (card_key) => {
 
         card_key = parseInt(card_key);
+        console.log(card_key);
         let updatedRecipes = this.state.recipeMap;
-        let updatedRecipeList = [];
-        console.log('This is before trying to delete one card\n');
-        console.log(updatedRecipes);
-        console.log(updatedRecipes.has(card_key));
 
-        updatedRecipes.delete(key);
-        console.log('This is after trying to delete one card\n');
-        console.log(updatedRecipes);
-        console.log(updatedRecipes.has(card_key));
-        for( var [key, value] in updatedRecipes) {
-            console.log(value);
+        let updatedRecipeList = [];
+
+        updatedRecipes.delete(card_key);
+
+        for( let [key, value] of updatedRecipes) {
             updatedRecipeList.push(value);
-            console.log(updatedRecipeList);
         }
         this.setState({recipeMap: updatedRecipes, recipeList: updatedRecipeList});
 
-    }
+    };
 
     render(){
         return(
