@@ -6,7 +6,6 @@
  */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {Button,Glyphicon,Form,InputGroup,FormControl,Dropdown,MenuItem} from 'react-bootstrap';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
 import SearchBar from '../SearchComponents/SearchBar'
@@ -22,26 +21,17 @@ class Search extends Component {
         this.componentWillUnmount = this.componentWillUnmount.bind(this);
 
 		this.test = 'test '
-        this.dataPullTest = this.dataPullTest.bind(this);
         this.addIngredient = this.addIngredient.bind(this);
-        this.dataReciever = this.dataReciever.bind(this);
+        this.removeIngredient = this.removeIngredient.bind(this);
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
-		this.state = {test_field:'Search!',
-                        field:'',test_output:null,
-                        data_pulled:false,
-                        entries:[{value:'',index:0}],
-                        ingredients:new Set(),
+		this.state = {  ingredients:new Set(),
                         excluded: new Set(),
-                        selected:null,
                         completions:[],
-                        dropdown:{ingredients:false},
+                        dropdown:{ingredients:false,filters:false},
                         sorted:[],
                     };
-        this.fieldChange = this.fieldChange.bind(this);
 
         this.planner = new PlannerHelper();
-        this.textEntry = this.textEntry.bind(this);
-        this.autocomplete = this.autocomplete.bind(this);
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
         this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
@@ -57,13 +47,6 @@ class Search extends Component {
     componentWillUnmount(){
         window.removeEventListener('click', this.closeAllDropdowns);
     }
-	dataPullTest(e){
-		e.preventDefault();
-        client.relevanceSearch(this.state.field,this.dataReciever,this.state.test_output)
-	}
-    changeIngredientFocus(ingredient){
-        this.setState({selected:ingredient})
-    }
     addIngredient(ingredient){
         this.ingredient = ingredient;
     }
@@ -77,30 +60,6 @@ class Search extends Component {
             }
         }) 
 
-    }
-    dataReciever(result){
-        if(!result.status){
-            this.setState({test_field:'failed :(',test_output:result.payload});
-        } else {
-            this.setState({test_field:'Success!', test_output:result.payload,data_pulled:true});
-        }
-    }
-    fieldChange(event,index){
-        if(index == this.state.entries.length - 1){
-
-        }
-    }
-    textEntry(base){
-        // alert(base)
-        this.setState({field:base})
-        if(base.length>0){
-            client.autocomplete(base,this.autocomplete)
-        } else {
-            this.setState({completions:[]})
-        }
-    }
-    autocomplete(completions){
-        this.setState({completions:completions})
     }
     toggleDropdown(event,id){
         this.setState({dropdown:Object.assign(this.state.dropdown,{[id]:!this.state.dropdown[id]})})
