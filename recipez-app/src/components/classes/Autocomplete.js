@@ -4,8 +4,6 @@
  * Date Created: 11/7/2017
  * Description: This file will serve as the autocomplete engine for finding valid database keys
  */
-import JSZip from 'jszip'
-
 class Autocomplete{
     constructor(binary){
         this.insert = this.insert.bind(this)
@@ -15,27 +13,23 @@ class Autocomplete{
         this.dfs = this.dfs.bind(this);
 
         this.loadTree = this.loadTree.bind(this);
-        this.getCompletions = this.getCompletions.bind(this);
+        // this.getCompletions = this.getCompletions.bind(this);
 
-        this.loadBinary = this.loadBinary.bind(this);
+        // this.loadBinary = this.loadBinary.bind(this);
+        this.loadJSON = this.loadJSON.bind(this);
         this.loadList = this.loadList.bind(this);
 
-        this.baseStream = new Promise((resolve,reject)=>{reject('Tree not loaded')});
+        // this.baseStream = new Promise.reject('Tree not loaded');
     }
 
-    loadBinary(binary,callback,err){ //get read for some async insantiy
-        var zip = new JSZip()
-        this.baseStream = zip.loadAsync(binary,{base64:true}) //another layer of async -> F U N
-           .then((file)=>zip.file('Ingredient.tst').async('string'))
-           .then(this.loadTree)
-           .then(callback(this)) //return this autocompleter so we can use it asynchronously without holding a reference
-           .catch(err)  // we wont catch    
+    loadJSON(json){
+        return this.loadTree(json)
     }
 
-    loadList(list,callback){
+    loadList(list){
         this.root = this.getNode('m');
         list.forEach((str)=>this.insert(this.root,str,0))
-        callback(this)
+        return this
     }
 
     loadTree(unzipped){
@@ -43,10 +37,10 @@ class Autocomplete{
         return this
     }
 
-    getCompletions(base,callback){
-        // return this.baseStream
-        return this.baseStream.then((auto)=>callback(auto.getCompletion(base)))
-    }
+    // getCompletions(base,callback){
+    //     // return this.baseStream
+    //     return this.baseStream.then((auto)=>callback(auto.getCompletion(base)))
+    // }
 
     getCompletion(base){
         return this.search(this.root,base,0)

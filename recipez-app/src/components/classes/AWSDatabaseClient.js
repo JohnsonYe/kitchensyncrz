@@ -23,6 +23,7 @@ const UNAUTH_NAME = 'GUEST'
  class DBClient {
     constructor(){
         this.getDBItems = this.getDBItems.bind(this);
+        this.getDBItemPromise = this.getDBItemPromise.bind(this);
         this.registerPrototype = this.registerPrototype.bind(this);
         this.getPrototype = this.getPrototype.bind(this);
         this.unpackItem = this.unpackItem.bind(this);
@@ -75,6 +76,25 @@ const UNAUTH_NAME = 'GUEST'
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
+    }
+
+    /**
+     * [get a Promise object containing the database items requested]
+     * @param  {[String]} tableName [name of table to get items from]
+     * @param  {[String]} keyField  [name of field used as database key]
+     * @param  {[JSON]} keys      [keys to fetch items with]
+     * @return {[Promise]}           [Promise object with pending DB response]
+     */
+    getDBItemPromise(tableName,keyField,keys){
+        return new Promise((pass,fail)=>{
+            this.getDBItems(tableName,keyField,keys,(response)=>{
+                if(response.status){//call succeeded, pass
+                    pass(response.payload)
+                } else { //call failed, fail
+                    fail(response.payload)
+                }
+            });
+        });
     }
 
     /*

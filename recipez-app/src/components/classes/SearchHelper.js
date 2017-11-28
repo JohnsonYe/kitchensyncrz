@@ -6,6 +6,8 @@
  */
 import DBClient from "./AWSDatabaseClient"
 import Autocomplete from '../classes/Autocomplete';
+import JSZip from 'jszip'
+
 
  class SearchHelper {
     constructor(){
@@ -19,20 +21,18 @@ import Autocomplete from '../classes/Autocomplete';
         this.shouldReset = false
         this.recipeMap = null
 
-        this.asyncCompletions = new Promise((resolve,reject)=>{
-            this.client.getDBItems('Miscellaneous','Name',['IngredientTree'],
-                (response)=>{
-                    if(response.status){
-                        new Autocomplete().loadBinary(response.payload[0].Data.B,resolve,reject)
-                    } else {
-                        reject('Failed to load tree')
-                    }})
-                })
+        let zip = new JSZip();
+        //I lOvE aSyNc ChAiNiNg
+        this.asyncCompletions = this.client.getDBItemPromise('Miscellaneous','Name',['IngredientTree'])
+            .then((payload)=>payload[0].Data.B)
+            .then((binary)=>zip.loadAsync(binary,{base64:true}))
+            .then((file)=>zip.file('Ingredient.tst').async('string'))
+            .then((json)=>new Autocomplete().loadJSON(json))
+            // .catch((err)=>err)
     }
 
     autocomplete(base,callback){
-        this.asyncCompletions.then((auto)=>auto.getCompletions(base,callback))
-        // return this.auto.getCompletions()
+        this.asyncCompletions.then((auto)=>callback(auto.getCompletion(base))).catch((err)=>'Error when loading autocomplete')
     }
 
     relevanceSearch(ingredients,target)

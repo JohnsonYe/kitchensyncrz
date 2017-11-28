@@ -154,6 +154,15 @@ $search-grad-end:#4dad1a;
     }
 }
 
+// .positioned-searchbar-container{
+//     position:relative;
+// }
+
+.search-form-overlay *{
+    z-index: inherit;
+    background:none;
+}
+
 
 
 

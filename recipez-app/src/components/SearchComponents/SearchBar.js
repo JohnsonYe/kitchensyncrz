@@ -134,12 +134,13 @@ class SearchBar extends Component{
         // <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
         // <Autosuggest datalist={['egg','bacon','crossaint']} placeholder='Enter ingredients . . . '/>        
         return(
-            <div className={this.getSearchHighlight()+" "+(this.state.completions.length?'open':'closed')}>
+            <div className={this.getSearchHighlight()+" positioned-searchbar-container "+(this.state.completions.length?'open':'closed')}>
+                {/*<input className="form-control" style={{'z-index':-10000,'position':'absolute','pointer-events':'none'}} value='dddddddddddddddddddddddddddddddddddddd'/>*/}
                 <input 
                     id="ingredient" 
                     type="text" 
                     data-toggle="dropdown" 
-                    className="form-control search-adjust" 
+                    className="form-control search-adjust search-form-overlay" 
                     placeholder="Enter ingredients or recipes . . ." 
                     onChange={this.handleChange}
                     onKeyDown={this.handleKeyDown}
@@ -147,6 +148,7 @@ class SearchBar extends Component{
                     autocomplete="off"
                     autofocus="on"
                     value={this.state.value}
+                    // style={{'z-index':1,'position':'relative'}}
                     />
                 <div class="dropdown-menu">
                     {this.state.completions.map((key)=>(<div className='dropdown-item'>{key}</div>))}
