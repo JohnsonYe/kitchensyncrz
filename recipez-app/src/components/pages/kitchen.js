@@ -16,14 +16,25 @@ import Excluded from '../kitchenComponents/exclude'
 import card from '../pages/kitchenPages/kitchenComponents'
 
 const AddItem = ({item, remove}) => {
-
     return (
-        <div className="form-control">
-            {item}
-            <button id="remove"
-                    type="submit"
-                    onClick={()=> remove(item.id)}>X</button>
-        </div>
+        <form className="form-inline">
+             <div className="form-control btn-group col-8">
+                {item}
+             </div>
+                 <button className = "btn btn-danger btn-lg mg-3"
+                         type = "submit"
+                         onClick = {()=> remove(item.id)}
+                         style = {{float:'right', display:'block'}}>
+
+                     <i className = "glyphicon glyphicon-trash" />
+                 </button>
+                 <button className = "btn btn-warning btn-lg mg-3"
+                         type = "submit"
+                         style={{float:'right', display:'block'}}>
+                     <i className = "glyphicon glyphicon-ban-circle" />
+                 </button>
+
+        </form>
     );
 }
 
@@ -33,7 +44,7 @@ const ItemList = ( {items, remove} ) => {
     const itemNode = items.map((item)=>
         (<AddItem item = {item} key={item.id} remove={remove} />));
 
-    return (<div id ="gap"> {itemNode} </div>);
+    return (<div> {itemNode} </div>);
 }
 
 const ItemForm = ({addProtein}) => {
@@ -56,13 +67,15 @@ const ItemForm = ({addProtein}) => {
                 }
             }}>
 
-                <div class="input-group">
-                    <input className="form-control col-md-12" type= "text"
+                <div className="input-group">
+                    <input className="form-control" type= "text"
                            ref={node => { input = node; }} />
 
-                    <button class="add" type="submit" id="add">
-                        +
-                    </button>
+                    <span className = "input-group-btn">
+                        <button className="btn btn-success" type="submit">
+                            <i className = "glyphicon glyphicon-plus" />
+                        </button>
+                    </span>
                 </div>
             </form>
         );

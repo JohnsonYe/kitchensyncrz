@@ -30,7 +30,7 @@ export const TodoList = ({todos, remove}) => {
     const todoNode = todos.map((todo)=>
         (<Todo todo={todo} key={todo.id} remove={remove}/>));
 
-    return (<div id ="gap">{todoNode}</div>);
+    return (<div>{todoNode}</div>);
 }
 
 class lists extends Component{

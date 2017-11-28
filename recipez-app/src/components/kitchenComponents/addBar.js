@@ -18,28 +18,28 @@ export const TodoForm = ({addTodo}) => {
 
         // Add to the form
         <form onSubmit={(e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            // Preventing empty answers
-            if( input.value !== '') {
-                addTodo(input.value);
+        // Preventing empty answers
+        if( input.value !== '') {
+            addTodo(input.value);
 
-                // Clearing
-                input.value = '';
-            }
-            }}>
+            // Clearing
+            input.value = '';
+        }
+    }}>
 
-            <div class="input-group">
-                <input className="form-control col-md-12" type= "text"
-                    ref={node => { input = node; }} />
+        <div class="input-group">
+            <input className="form-control col-md-12" type= "text"
+                   ref={node => { input = node; }} />
 
-                <button class="add" type="submit" id="add">
+            <button class="add" type="submit" id="add">
                 +
                 <span></span>
-                </button>
-            </div>
-        </form>
-    );
+            </button>
+        </div>
+    </form>
+);
 };
 
 // Mixin, use for multiple extensions
