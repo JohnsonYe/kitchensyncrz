@@ -25,7 +25,11 @@ class SearchBar extends Component{
         this.focusHiddenForm = this.focusHiddenForm.bind(this);
         this.addItem = this.addItem.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleKeyUp = this.handleKeyUp.bind(this);
         this.reset = this.reset.bind(this);
+
+        this.getSearchHighlight = this.getSearchHighlight.bind(this);
     }
 
     focusHiddenForm(e){
@@ -62,6 +66,29 @@ class SearchBar extends Component{
         }  
     }
 
+    handleKeyDown(e){
+        switch(e.keyCode){
+            case 16/*SHIFT*/:
+                this.setState({shiftDown:true})
+                break;
+            case 13/*ENTER*/:
+                break;
+            case 40/*DOWN*/:
+                break;
+            case 38/*UP*/:
+                break;
+
+        }
+    }
+
+    handleKeyUp(e){
+        switch(e.keyCode){
+            case 16/*SHIFT*/:
+                this.setState({shiftDown:false})
+                break;
+        }
+    }
+
     getOldSearchBar(){
         var promptContent = this.state.query.length?
                 (<div className='search-text-entry'>
@@ -92,13 +119,22 @@ class SearchBar extends Component{
         this.setState({value:'',completions:[]})
     }
 
+    /**
+     * [return a classname which reflects the current status of the searchbar]
+     * @return {String} [validation states: success->user will add ingredient to search
+     *                                      error  ->user will exclude ingredient from search]
+     */
+    getSearchHighlight(){
+        return (this.state.value&&this.state.value.length?(this.state.shiftDown?'has-error':'has-success'):'')
+    }
+
     render(){
 
         var options = {selectHintOnEnter:true,minLength:1,submitFormOnEnter:true,highlightOnlyResult:true}
         // <Typeahead {...options} placeholder='Enter ingredients or recipes' options={this.state.completions} emptyLabel=''/>
         // <Autosuggest datalist={['egg','bacon','crossaint']} placeholder='Enter ingredients . . . '/>        
         return(
-            <div className={(this.state.completions.length?'open':'closed')}>
+            <div className={this.getSearchHighlight()+" "+(this.state.completions.length?'open':'closed')}>
                 <input 
                     id="ingredient" 
                     type="text" 
@@ -106,6 +142,8 @@ class SearchBar extends Component{
                     className="form-control search-adjust" 
                     placeholder="Enter ingredients or recipes . . ." 
                     onChange={this.handleChange}
+                    onKeyDown={this.handleKeyDown}
+                    onKeyUp={this.handleKeyUp}
                     autocomplete="off"
                     autofocus="on"
                     value={this.state.value}

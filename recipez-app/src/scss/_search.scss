@@ -8,6 +8,8 @@
 $search-bar-height: 60px;
 $left-padding-amt: 100px;
 
+
+
 .searchbar-base{
     position:relative;
     width:100%;
@@ -134,6 +136,22 @@ $search-grad-end:#4dad1a;
 
 .search-adjust{
     padding-left: 5px;
+}
+
+#searchbar-toolbar-container .dropdown-toggle:after{
+    display: none;
+}
+
+.dropdown-item{
+    .hover-option{
+        display:none;
+    }
+    &:hover{ 
+        .hover-option{
+            display:inline;
+            color:red;
+        }
+    }
 }
 
 
