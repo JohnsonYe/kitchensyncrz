@@ -31,7 +31,7 @@ class PersonalRecipes extends Component{
         cur_key_new += 1;
         console.log('the new key is');
         console.log(cur_key_new);
-        let newRecipe = <PreviewCard src={"https://i.imgur.com/md8f8.jpg"} removeFunc={this.removeRecipe} card_key={cur_key_new}/>;
+        let newRecipe = <PreviewCard src={"https://i.imgur.com/md8f8.jpg"} removeFunc={this.removeRecipe} card_key={cur_key_new} description={cur_key_new}/>;
         updatedRecipeMap.set(cur_key_new, newRecipe);
         updatedRecipeList.push(newRecipe);
         this.setState({recipeList: updatedRecipeList, recipeMap: updatedRecipeMap, cur_key: cur_key_new})
@@ -47,7 +47,7 @@ class PersonalRecipes extends Component{
         let updatedRecipeList = [];
 
         updatedRecipes.delete(card_key);
-
+        console.log(updatedRecipes);
         for( let [key, value] of updatedRecipes) {
             updatedRecipeList.push(value);
         }

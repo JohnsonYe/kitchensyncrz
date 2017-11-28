@@ -18,6 +18,7 @@ class PreviewCard extends Component{
         this.state = {
             removeFunc: props.removeFunc,
             card_key: props.card_key,
+            description: props.description,
         };
 
         this.removeThis = this.removeThis.bind(this);
@@ -39,7 +40,7 @@ class PreviewCard extends Component{
 
                         </h6>
                         <p className="card-text">
-                            Description
+                            Description {this.state.description}
                         </p>
                         <div className="btn btn-primary">
                             Edit
