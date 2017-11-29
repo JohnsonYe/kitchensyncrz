@@ -9,44 +9,39 @@
  * TODO: Need to make it so you can pass a prop for the type (personal/saved) and dynamically determine which it will be
  */
 import React, {Component} from 'react';
-
+let noImg = require("./no-photo.png");
 class PreviewCard extends Component{
 
 
     constructor(props) {
         super(props);
-        this.state = {
-            removeFunc: props.removeFunc,
-            card_key: props.card_key,
-            description: props.description,
-        };
-
+        this.noImg = require("./no-photo.png");
         this.removeThis = this.removeThis.bind(this);
 
     }
 
     removeThis(){
-            this.state.removeFunc(this.state.card_key);
+            this.props.removeFunc(this.props.card_key);
     }
 
     render() {
         return (
             <div className={"col-md-2"}>
                 <div className="card recipes">
-                    <img className="card-img-top" src={this.props.src} alt="Food"/>
+                    <img className="card-img-top" src={(this.props.src) ? this.props.src : this.noImg} alt="Food"/>
 
                     <div className="card-body">
                         <h6 className="card-title">
 
                         </h6>
                         <p className="card-text">
-                            Description {this.state.description}
+                            Description
                         </p>
                         <div className="btn btn-primary">
                             Edit
                         </div>
                         <div className={"btn btn-warning"} onClick={this.removeThis}>
-                            Delete {this.state.card_key}
+                            Delete {this.props.card_key}
                         </div>
                     </div>
 
