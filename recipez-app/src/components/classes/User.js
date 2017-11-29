@@ -278,7 +278,6 @@
             (response) => {
                 if(response.status){
                     this.addUserData((data)=>{
-                        //alert(JSON.stringify(data))
                         data.shoppingList[item] = {item:item};
                         return data
                 })
@@ -288,25 +287,6 @@
         })
     }
 
-
-    deleteRecipe(recipeName){
-        this.client.updateItem(
-            this.client.buildUpdateRequest(
-                'User',
-                'username',this.client.getUsername(),
-                this.client.buildRemoveElementUpdateExpression('cookbook',recipeName)),
-            (response)=>{
-                if(response.status){
-                    this.addUserData((data)=>{
-                        delete data.cookbook[recipeName];
-                        return data
-                    })
-                } else {
-                    //the request failed, what should we do?
-                    alert(response.payload)
-                }
-            })
-    }
 
     getPlanner(){
         /*
