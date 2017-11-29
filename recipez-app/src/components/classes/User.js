@@ -160,26 +160,47 @@
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         this.getUserData('pantry').then(callback)
+         //this.getUserData('pantry').then(callback)
+         return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
     }
+
 
     addToPantry(ingredient,unit,amount){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
-                'username',this.client.getUsername(),
+                'username',
+                this.client.getUsername(),
                 this.client.buildMapUpdateExpression('pantry',ingredient,{M:{amount:{N:amount.toString()},unit:{S:unit}}})),
-            function(response){if(response.status) this.userData.pantry[ingredient] = {amount:amount,unit:unit}}.bind(this))
-
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.pantry[ingredient] = {amount:amount,unit:unit};
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
 
     removeFromPantry(ingredient){
         this.client.updateItem(
-            this.client.buildUpdateDeleteRequest(
+            this.client.buildUpdateRequest(
                 'User',
-                'username',this.client.getUsername(),
-                this.client.buildRemoveElementUpdateExpression('pantry',ingredient)),
-            function(response){if(response.status&&this.userData.pantry[ingredient]) delete this.userData.pantry[ingredient]}.bind(this))
+                'username',
+                this.client.getUsername(),
+                this.client.buildRemoveElementUpdateExpression('pantry', ingredient)),
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        delete data.pantry[ingredient];
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
 
     getCookbook(callback){
@@ -192,6 +213,7 @@
          //            "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
     }
 
+
     addToCookbook(recipe, info){
         this.client.updateItem(
             this.client.buildUpdateRequest(
@@ -199,17 +221,35 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildMapUpdateExpression('cookbook', recipe, {S:info})),
-            function(response){if(response.status) this.userData.cookbook[recipe] = {info:info}}.bind(this))
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.cookbook[recipe] = {info:info};
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
 
     removeFromCookbook(recipe){
         this.client.updateItem(
-            this.client.buildUpdateDeleteRequest(
+            this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('cookbook', recipe)),
-            function(response){if(response.status&&this.userData.cookbook[recipe]) delete this.userData.cookbook[recipe]; else(JSON.stringify(response))}.bind(this))
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        delete data.cookbook[recipe];
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
 
 
@@ -229,7 +269,16 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildStringSetAppendUpdateExpression('cookware', {SS:[item]})),
-            function(response){if(response.status) this.userData.cookware[item] = {item:item}; else alert(JSON.stringify(response))}.bind(this))
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.cookware[item] = {item:item};
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
 
     removeFromCookware(item){
@@ -239,7 +288,16 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildRemoveSetElementUpdateExpression('cookware', item)),
-            function(response){if(response.status&&this.userData.cookware[item]) delete this.userData.cookware[item]; else alert(JSON.stringify(response))}.bind(this))
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        delete data.cookware[item];
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
 
 
@@ -255,8 +313,18 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildStringSetAppendUpdateExpression('exclude', {SS:[ingredient]})),
-            function(response){if(response.status) this.userData.exclude[ingredient] = {ingredient:ingredient}; else alert(JSON.stringify(response)) }.bind(this))
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.exclude[ingredient] = {ingredient:ingredient};
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
     }
+
 
     removeFromExclusionList(ingredient){
         this.client.updateItem(
@@ -265,7 +333,21 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildRemoveSetElementUpdateExpression('exclude', ingredient)),
-            function(response){if(response.status&&this.userData.exclude[ingredient]) delete this.userData.exclude[ingredient]; else alert(JSON.stringify(response)) }.bind(this))
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        delete data.exclude[ingredient];
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
+    }
+
+    getShoppingList(callback){
+        return this.getUserData('shoppingList').then(response=>{alert(JSON.stringify(response));callback(response)})
+
     }
 
     addToShoppingList(item){
@@ -279,6 +361,25 @@
                 if(response.status){
                     this.addUserData((data)=>{
                         data.shoppingList[item] = {item:item};
+                        return data
+                })
+             }else {
+                alert(response.payload)
+            }
+        })
+    }
+
+    removeFromShoppingList(item){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildRemoveSetElementUpdateExpression('shoppingList', item)),
+            (response) => {
+                if(response.status){
+                    this.addUserData((data)=>{
+                        delete data.shoppingList[item];
                         return data
                 })
              }else {

@@ -187,9 +187,9 @@ const UNAUTH_NAME = 'GUEST'
 
     buildRemoveSetElementUpdateExpression(attrName,elemName){
         return {
-            expr: 'REMOVE '+attrName+":v",
+            expr: 'DELETE '+attrName+" :v",
             names:undefined,
-            values:{":v":{SS:[elemName]}}
+            values:{":v": {"SS": [elemName]}}
         }
     }
 

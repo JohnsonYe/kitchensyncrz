@@ -113,23 +113,34 @@ class Search extends Component {
     }
 
     mortensButton(){
-        this.setState({morten: this.user.client.getUsername()});                                  // THIS WORKS
-        //this.setState({morten: this.user.getCookbook()});                                         // THIS WORKS
-        // this.user.addToPantry('milk','none',1)                                                   // THIS WORKS
-        //this.user.addToCookware('knife')                                                          // THIS WORKS
+        this.setState({morten: this.user.client.getUsername()});                                  
+        //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
+        
+        
+        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry)}));                     // THIS WORKS
+        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry['milk'])}));             // THIS WORKS
+        //this.user.addToPantry('prok','none',1)                                                            // THIS WORKS
+        //this.user.removeFromPantry('prok')                                                                // THIS WORKS
+        
 
-        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry['milk'])}));     // THIS WORKS
-        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry)}));             // THIS WORKS
-        // this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))       // THIS WORKS
-        //this.user.addToExclusionList('corn')
-        //this.user.removeFromExclusionList('corn')
-        this.user.addToShoppingList('milk')
-        //this.user.getCookware(cookware=> this.setState({morten:JSON.stringify(cookware)}));       // THIS WORKS
-        //this.user.removeFromCookware('spoon');                                                      // THIS DOES NOT WORKS
+        //this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))                // THIS WORKS   
+        //this.user.addToCookbook('pork', 'This is how you do')                                             // THIS WORKS
+        //this.user.removeFromCookbook('pork')                                                              // THIS WORKS
 
-        //this.user.getExclusionList(cookware=> this.setState({morten:JSON.stringify(cookware)}))
-        //this.user.addToCookbook('pork', 'This is how you do')
-        //this.user.removeFromCookbook('pork')
+
+        //this.user.getCookware(cookware=> this.setState({morten:JSON.stringify(cookware)}));               // THIS WORKS
+        //this.user.addToCookware('spoon')                                                                  // THIS WORKS
+        //this.user.removeFromCookware('spoon');                                                            // THIS WORKS
+
+
+        //this.user.getExclusionList(exlcude=> this.setState({morten:JSON.stringify(exlcude)}))             // THIS WORKS
+        //this.user.addToExclusionList('corn')                                                              // THIS WORKS
+        //this.user.removeFromExclusionList('corn')                                                         // THIS WORKS
+        
+
+        //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
+        //this.user.addToShoppingList('milk')                                                               // THIS WORKS
+        //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
 
     }
 
