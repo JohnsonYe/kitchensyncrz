@@ -157,6 +157,16 @@ const UNAUTH_NAME = 'GUEST'
         }
     }
 
+    buildRemoveSetElementUpdateExpression(attrName,elemName){
+        return {
+            expr: 'REMOVE '+attrName+":v",
+            names:undefined,
+            values:{":v":{SS:[elemName]}}
+        }
+    }
+
+
+
     buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
                 "TableName":tableName,
