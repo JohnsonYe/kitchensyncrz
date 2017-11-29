@@ -157,10 +157,6 @@
      * }
      */
     getPantry(callback){
-        /*
-         * What should this object look like? We need to decide on formatting/nesting of data
-         */
-         //this.getUserData('pantry').then(callback)
          return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
     }
 
@@ -204,13 +200,7 @@
     }
 
     getCookbook(callback){
-        /*
-         * What should this object look like? We need to decide on formatting/nesting of data
-         */
         return this.getUserData('cookbook').then(response=>{alert(JSON.stringify(response));callback(response)})
-        //return this.userData.cookbook
-         // return new Set(["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies",
-         //            "To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"])
     }
 
 
@@ -255,11 +245,7 @@
 
 
     getCookware(callback){
-        /*
-         * What should this object look like? We need to decide on formatting/nesting of data
-         */
         return this.getUserData('cookware').then(response=>{alert(JSON.stringify(response));callback(response)})
-        //return [{Name:'spoon',difficulty:1},{Name:'whisk',difficulty:2},{Name:'food processor',difficulty:8}]
     }
 
     addToCookware(item){
