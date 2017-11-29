@@ -145,6 +145,7 @@ class SearchBar extends Component{
             <div className={this.getSearchHighlight()+" positioned-searchbar-container "+(this.state.completions.length?'open':'closed')}>
                 {/*<input className="form-control" style={{'z-index':-10000,'position':'absolute','pointer-events':'none'}} value='dddddddddddddddddddddddddddddddddddddd'/>*/}
                 <input 
+                    name="search"
                     id="ingredient" 
                     type="text" 
                     data-toggle="dropdown" 

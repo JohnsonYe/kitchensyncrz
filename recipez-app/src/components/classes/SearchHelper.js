@@ -39,7 +39,7 @@ import JSZip from 'jszip'
      * @param {[type]}   search     [description]
      * @param {Function} callback   [description]
      */
-    updateIngredient(ingredient,search,callback){
+    updateIngredient(ingredient,search,callback,escape){
         this.ingredientMap = //push another link to the chain to update the status of the ingredient map
             this.ingredientMap.then((map)=>{ //load the new ingredient if necessary
                 if(!map.has(ingredient)){ //update the map if the ingredient isnt in it or we are removing it
@@ -52,6 +52,10 @@ import JSZip from 'jszip'
                     return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],true]),ingredient,callback)                    
                 } else if(search!=1){ //use the value in the map to complete the action
                     return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]&&search!=-1]),ingredient,callback)
+                } else {
+                    if(escape){
+                        escape(ingredient)
+                    }
                 }
                 //since this ingredient is already in the map, dont modify the map or fire the callback
                 //callers should not rely on this method to use the callback for any given set of arguments

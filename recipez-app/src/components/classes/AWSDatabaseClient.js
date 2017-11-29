@@ -319,7 +319,6 @@ const UNAUTH_NAME = 'GUEST'
 
  }
 
-
  var static_client = new DBClient();
 
  DBClient.getClient = () => static_client;
