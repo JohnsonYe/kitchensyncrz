@@ -77,7 +77,7 @@ const ItemList = ( {items, remove, addOut} ) => {
 }
 
 const RestockList = ( {items, remove, addBack} ) => {
-    const itemNode = items.map((item)=>
+    const itemNode = items.map( (item) =>
         (<AddRestock item = {item}
                      key={item.id}
                      remove={remove}
@@ -268,6 +268,7 @@ class kitchen extends Component {
         // Handle Restock List
         this.addOut = this.addOut.bind(this);
         this.removeOut = this.removeOut.bind(this);
+        this.returnOut = this.returnOut.bind(this);
         this.renderOut = this.renderOut.bind(this);
 
         // Preferences Modal
@@ -503,29 +504,28 @@ class kitchen extends Component {
         );
     }
 
-    // Out List
-    addOut(e, val){
+    // Add to the Restock List
+    addOut(val){
         this.setState({out: this.state.out.concat(val)});
-        this.setState({numItems: (--this.state.numItems)});
         this.setState({numRestock: (++this.state.numRestock)});
         switch( this.state.key ){
             case "Protein":
-                this.removeProtein(e);
+                this.removeProtein(val);
                 break;
             case "Dairy":
-                this.removeDairy(e);
+                this.removeDairy(val);
                 break;
             case "Vegetable":
-                this.removeVegetable(e);
+                this.removeVegetable(val);
                 break;
             case "Fruit":
-                this.removeFruit(e);
+                this.removeFruit(val);
                 break;
             case "Grain":
-                this.removeGrain(e);
+                this.removeGrain(val);
                 break;
             case "Other":
-                this.removeOther(e);
+                this.removeOther(val);
                 break;
             default:
                 break;
@@ -533,17 +533,39 @@ class kitchen extends Component {
     }
 
     returnOut(e){
-        if( this.state.out.length > 0){
-            this.state.out.splice( this.state.out.indexof(e), 1);
-            this.setState({numItem: (++this.state.numItems)});
+        if( this.state.out.length > 0 ){
+            this.state.out.splice( this.state.out.indexOf(e), 1);
             this.setState({numRestock: (--this.state.numRestock)});
+            switch( this.state.key ){
+                case "Protein":
+                    this.addProtein(e);
+                    break;
+                case "Dairy":
+                    this.addDairy(e);
+                    break;
+                case "Vegetable":
+                    this.addVegetable(e);
+                    break;
+                case "Fruit":
+                    this.addFruit(e);
+                    break;
+                case "Grain":
+                    this.addGrain(e);
+                    break;
+                case "Other":
+                    this.addOther(e);
+                    break;
+                default:
+                    break;
+            }
+
         }
     }
 
     //Trashing
     removeOut(e){
         if( this.state.out.length > 0 ) {
-            this.state.out.splice(this.state.out.indexof(e), 1);
+            this.state.out.splice(this.state.out.indexOf(e), 1);
             this.setState({numRestock: (--this.state.numRestock)});
         }
     }
