@@ -56,7 +56,7 @@ function DailyPlannerItem(props) {
 
 function ShoppingListItem(props) {
     return (
-        <a href="#" className="list-group-item list-group-item-action">{props.name} {props.index}</a>
+        <a href="#" className="list-group-item list-group-item-action">{props.name} </a>
     );
 }
 
@@ -77,7 +77,7 @@ class Planner extends Component {
             numMealsPrepared: 0,
             meals: [],
             items: [],
-            data: data
+            mealData: data
         };
 
         this.addMeal = this.addMeal.bind(this);
@@ -100,7 +100,7 @@ class Planner extends Component {
         this.state.meals[this.state.numMeals] = "Meal-" + this.state.numMeals;
         this.setState({ meals : this.state.meals });
         this.setState({ numMeals: (++this.state.numMeals) });
-        this.state.data.getMealData();
+        this.state.mealData.createMeal( 0, "Split Pea Soup", 5, 30);
     }
     /** TODO Removes card from Daily Meal Planner*/
     removeMeal() {
@@ -134,6 +134,34 @@ class Planner extends Component {
 
     /** Render Items Start **/
 
+
+    renderWeekCol() {
+
+    }
+
+    renderWeekPlanner() {
+        return (
+            <div className="row">
+                <div className="col-3
+                                            border
+                                            border-left-0
+                                            border-top-0
+                                            border-bottom-0
+                                            border-dark">
+                    <div className="mx-auto">
+                        <h2>Daily Meal Planner</h2>
+                        <p>{this.state.date}</p>
+                        <h3>{this.state.numMeals}</h3>
+                        <p>Meals</p>
+                        <h3>{this.state.numMealsPrepared}</h3>
+                        <p>Prepared</p>
+                    </div>
+                </div>
+
+            </div>
+        );
+    }
+
     renderDayPlanner() {
         return(
                 <div className="row">
@@ -162,7 +190,7 @@ class Planner extends Component {
                             onClick={this.removeMeal}>Remove Test</button>
                         <UpNextCard/>
                         <DynamicList
-                            renderLI={this.renderMeal(0,"start", "end", "Duration", "Meal")}
+                            renderLI={this.renderMeal("start", "end", "Duration", "Meal")}
                             list={this.state.meals}
                         />
                     </div>
@@ -170,11 +198,8 @@ class Planner extends Component {
         );
     }
 
-    renderWeekPlanner() {
 
-    }
-
-    renderMeal(index, start, end, duration, name) {
+    renderMeal(start, end, duration, name) {
         return (
             <DailyPlannerItem
                 name={name}
@@ -185,18 +210,13 @@ class Planner extends Component {
         );
     }
 
-    renderItem(index, name) {
+    renderItem(name) {
         return (
             <ShoppingListItem
                 name={name}
-                index={index}
             />
         );
     }
-
-    renderWeekCol(day) {
-    }
-
 
     renderShoppingList() {
         return (
@@ -224,7 +244,7 @@ class Planner extends Component {
                         onClick={this.removeItem}>Remove Test</button>
                     <ul className="list-group">
                         <DynamicList
-                            renderLI={this.renderItem(0, "Item")}
+                            renderLI={this.renderItem("Item")}
                             list={this.state.items}
                         />
                     </ul>

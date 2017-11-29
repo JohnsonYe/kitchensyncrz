@@ -6,36 +6,30 @@
  */
 import DBClient from "./AWSDatabaseClient";
 import User from './User';
+import RecipeHelper from './RecipeHelper';
 
 class PlannerHelper{
+
     constructor(){
         this.client = DBClient.getClient();
+        this.recipes = new RecipeHelper();
         this.user = User.getUser(this.client.getUsername());
 
         //Access Meal Data data[dayOfWeek][mealIndex]
-        this.mealData = [
-            [],  //Sun
-            [],  //Mon
-            [],  //Tue
-            [],  //Wed
-            [],  //Thur
-            [],  //Fri
-            []   //Sat
-        ];
+        this.mealData = []
+        this.getMealData( (mealData) => this.mealData = mealData);
 
-
+        //Methods
         this.addMeal = this.addMeal.bind(this);
         this.removeMeal = this.removeMeal.bind(this);
-        // this.addMeal('Monday.breakfast','chicken noodle soup',(e)=>alert(JSON.stringify(e.payload)));
-
     }
 
-    addMeal(day,recipe,target){
-    }
+    addMeal(day, recipe, hr, min) {
 
+    }
 
     removeMeal(day,recipe){
-
+        //this.mealData[day].
     }
 
      /**
@@ -44,71 +38,69 @@ class PlannerHelper{
       * @param start - the time you plan to start cooking this meal
       * @return {recipe: *, startTime: *, endTime: *} a.k.a meal object
       */
-     createMeal(recipe, startHr, startMin) {
-
+     createMeal(day, recipe, startHr, startMin) {
          /**TODO Anything that has to do with recipes is subject to change since I'm not sure how define recipe objects
           */
 
          var hr = 0,
              endMin = 0,
              endHr = 0,
-             total = 0;
+             total = 0,
+             recipes = [];
 
-         total = startMin + recipe.duration;
-         hr = Math.floor(total/60);
 
-         endMin = total - (hr)*(60);
-         endHr = startHr + hr;
 
-         //check if hr passed to the next day
-         if( endHr >= 24) {
-             endHr = (24 - endHr)*(-1);  //converts to correct time
-         }
+         this.recipes.loadRecipe(recipe, (recipeData)=>{
+             recipes.push(recipe);
 
-         return {
-             recipe: recipe,
-             startHr: startHr ,
-             startMin: startMin,
-             endHr: endHr,
-             endMin: endMin
-         };
+             total = startMin + 0; //recipeData.TimeCost;
+
+             hr = Math.floor(total/60);
+
+             endMin = total - (hr)*(60);
+             endHr = startHr + hr;
+
+             //check if hr passed to the next day
+             if( endHr >= 24) {
+                 endHr = (24 - endHr) * (-1);  //converts to correct time
+             }
+
+             var meal = {
+                 recipes: recipes,
+                 startHr: startHr ,
+                 startMin: startMin,
+                 endHr: endHr,
+                 endMin: endMin
+             };
+
+             //create a meal
+             this.mealData.days[day].mealData.push(meal);
+             alert(JSON.stringify(this.mealData))
+             //push that meal into the correct spot in mealData
+             this.pushMealData();
+             //call pushMealData
+
+         });
      }
 
      /**
       * This function will retrieve the users mealData array that is currently in the DataBase
       * @returns [] Array of meal
       */
-     getMealData() {
-         return this.user.getUserData('planner').then((e)=>alert(JSON.stringify(e)));
+     getMealData(callback) {
+         return this.user.getUserData('planner').then((e)=>{alert(JSON.stringify(e));callback(e)});
      }
 
      /**
       * Pushes the local mealData containing changes user made to Database
       */
      pushMealData() {
+         this.client.updateItem(
+             this.client.buildUpdateRequest(
+                 'User','username',this.client.getUsername(),
+                 this.client.buildSetUpdateExpression('planner', {M:DBClient.getClient().packItem(this.mealData, User.PlannerPrototype)})),
+             (response)=>{alert(JSON.stringify(response.payload))})
      }
-    /**
-     * Adds a meal to mealData in order. Order is determined by start hour of recipe. Overlapping meal times are not
-     * allowed.
-     * @param day - index of day where the meal should be added (recall order is ... [Sun, Mon, Tue ...])
-     * @param mealObj - takes a meal object
-     * @return error - if meal trying to be added overlaps with the time of meal in mealData
-     */
-    addMeal(day, mealObj){
-
-        //update dataBase with changes
-        this.pushMealData();
-    }
-
-    /**
-     * Removes a meal from mealData according to the specified name of recipe or meal.
-     * @param day - index of day in mealData
-     * @param mealIndex -
-     */
-    removeMeal(day, mealIndex) {
-        //update dataBase with changes
-        this.pushMealData();
-    }
 }
 
  export default PlannerHelper;

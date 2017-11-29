@@ -52,7 +52,7 @@ const UNAUTH_NAME = 'GUEST'
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':ss}),
-            'N': (n,p)=>({'N':n}),
+            'N': (n,p)=>({'N':n+''}),
         }
     }
 
@@ -250,7 +250,7 @@ const UNAUTH_NAME = 'GUEST'
                 //for now, developers working with the database must be careful with adding new fields
                 unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
-                    alert(key)
+                    //alert(key)
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })

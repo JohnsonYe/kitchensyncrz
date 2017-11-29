@@ -272,7 +272,7 @@
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
-    planner:{type: 'L',inner:{type:'L',inner:{type:User.DayPrototype._NAME}}}
+    planner:{type:User.PlannerPrototype._NAME}
  }
 
 
