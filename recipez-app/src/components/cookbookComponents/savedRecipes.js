@@ -5,64 +5,46 @@
  * The component that displays all of the user's saved recipes
  */
 
-import React from 'react';
+import React, {Component} from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
 
-function SavedRecipes(props){
-    return(
-        <div>
-            <div className="row">
-                <div className="col-md-2">
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
+//TODO: Make some sort of function to automatically add and display preview cards
+class SavedRecipes extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            imgSrc:"http://cdn-image.foodandwine.com/sites/default/files/styles/4_3_horizontal_inbody_900x506/public/1502824044/royal-farms-best-gas-station-food-FT-SS0817.jpg?itok=ig79fdSU",
+            recipes: [],
 
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
+        }
 
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
+        this.state.recipes = [
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+                <PreviewCard src={this.state.imgSrc}/>,
+        ];
 
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
+    }
 
-                    <PreviewCard/>
-                </div>
-            </div>
+    // Method to add a recipe to this.state.recipes, dynamically adding to the recipe display
+    removeRecipe(){
 
-            <div className="row">
-                <div className="col-md-2">
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
 
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
 
-                    <PreviewCard/>
-                </div>
-                <div className="col-md-2">
+    }
 
-                    <PreviewCard/>
+    render(){
+        return(
+            <div>
+                <div className={"row"}>
+                    {this.state.recipes}
                 </div>
-                <div className="col-md-2">
-
-                    <PreviewCard/>
-                </div>
-
-            </div>
-        </div>
-    );
+            </div>);
+    }
 
 }
 

@@ -59,10 +59,12 @@ class Cookbook extends Component {
                                 <Tabs defaultActiveKey={1}>
                                     <Tab eventKey={1} title={"Saved Recipes"}>
                                         Saved Recipes here
+                                        {/* This is where the saved recipes component will be displayed*/}
                                         <SavedRecipes/>
                                     </Tab>
                                     <Tab eventKey={2} title={"Personal Recipes"}>
                                         Personal Recipes here
+                                        {/* This is where the personal recipes component will be displayed*/}
                                         <PersonalRecipes/>
                                     </Tab>
                                 </Tabs>

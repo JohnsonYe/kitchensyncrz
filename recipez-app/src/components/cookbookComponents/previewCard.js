@@ -5,31 +5,56 @@
  * Serves as the basic preview card, either for the saved recipes or for the personal recipes
  */
 
-import React from 'react';
+/**
+ * TODO: Need to make it so you can pass a prop for the type (personal/saved) and dynamically determine which it will be
+ */
+import React, {Component} from 'react';
 
-function PreviewCard(props){
-    return(
+class PreviewCard extends Component{
 
-        <div className="card mg-2">
-            <img className="card-img-top" src="https://timedotcom.files.wordpress.com/2017/02/chicken-bird.jpg?quality=85" alt="Food" />
 
-            <div className="card-body">
-                <h6 className="card-title">
+    constructor(props) {
+        super(props);
+        this.state = {
+            removeFunc: this.props.removeFunc,
+            key: this.props.key,
+        };
 
-                </h6>
-                <p className="card-text">
-                    Description
-                </p>
-                <a href="#" className="btn btn-primary">
-                    Edit
-                </a>
+        this.removeThis = this.removeThis.bind(this);
+
+    }
+
+    removeThis(){
+            this.state.removeFunc(this.state.key);
+    }
+
+    render() {
+        return (
+            <div className={"col-md-2"}>
+                <div className="card recipes">
+                    <img className="card-img-top" src={this.props.src} alt="Food"/>
+
+                    <div className="card-body">
+                        <h6 className="card-title">
+
+                        </h6>
+                        <p className="card-text">
+                            Description
+                        </p>
+                        <div className="btn btn-primary">
+                            Edit
+                        </div>
+                        <div className={"btn btn-warning"} onClick={this.removeThis}>
+                            Delete
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-        </div>
 
-
-    );
-
+        );
+    }
 }
 
 export default PreviewCard;
