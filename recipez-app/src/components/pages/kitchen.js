@@ -5,9 +5,9 @@
  * Description: This file will serve as the Kitchen page
  */
 import React, { Component } from 'react';
-import { Jumbotron, Tab, Nav, NavItem } from 'react-bootstrap';
+import { Jumbotron, Tab, Nav, NavItem, Modal, Button, Popover, Tooltip, OverlayTrigger} from 'react-bootstrap';
 
-const AddItem = ({item, remove}) => {
+const AddItem = ({item, remove, addOut}) => {
 
     return (
 
@@ -16,8 +16,8 @@ const AddItem = ({item, remove}) => {
                 {item}
                 <button className = "btn btn-danger btn-lg mg-3"
                         id = "delBtn"
-                        type = "submit"
-                        onClick = {()=> remove(item.id)}
+                        type = "button"
+                        onClick = {()=> remove(item)}
                         style = {{float:'right', display:'block'}}>
 
                     <i className = "glyphicon glyphicon-trash" />
@@ -25,7 +25,7 @@ const AddItem = ({item, remove}) => {
                 <button className = "btn btn-warning btn-lg mg-3"
                         id = "delBtn"
                         type = "button"
-                        onClick = { this.className = "btn btn-danger btn-lg mg-3 disabled"}
+                        onClick = {()=> addOut(item) }
                         style={{float:'right', display:'block'}}>
                     <i className = "glyphicon glyphicon-ban-circle" />
                 </button>
@@ -35,11 +35,53 @@ const AddItem = ({item, remove}) => {
     );
 }
 
-const ItemList = ( {items, remove} ) => {
+const AddRestock = ({item, remove, addBack}) => {
+
+    return (
+
+        <form className="form-inline">
+            <div className="form-control btn-group col-11" id="del">
+                {item}
+                <button className = "btn btn-danger btn-lg mg-3"
+                        id = "delBtn"
+                        type = "button"
+                        onClick = {()=> remove(item.id)}
+                        style = {{float:'right', display:'block'}}>
+
+                    <i className = "glyphicon glyphicon-trash" />
+                </button>
+                <button className = "btn btn-success btn-lg mg-3"
+                        id = "delBtn"
+                        type = "button"
+                        onClick = {()=> addBack(item) }
+                        style={{float:'right', display:'block'}}>
+                    <i className = "glyphicon glyphicon-plus" />
+                </button>
+            </div>
+
+        </form>
+    );
+}
+
+const ItemList = ( {items, remove, addOut} ) => {
 
     // Map through nodes
     const itemNode = items.map((item)=>
-        (<AddItem item = {item} key={item.id} remove={remove} />));
+        (<AddItem item = {item}
+                  key={item.id}
+                  remove={remove}
+                  addOut={addOut}
+         />));
+
+    return (<div> {itemNode}  </div>);
+}
+
+const RestockList = ( {items, remove, addBack} ) => {
+    const itemNode = items.map((item)=>
+        (<AddRestock item = {item}
+                     key={item.id}
+                     remove={remove}
+                     addBack = {addBack} />));
 
     return (<div> {itemNode}  </div>);
 }
@@ -102,11 +144,47 @@ const ItemForm = ( {addProtein,
                         <button className="btn btn-success" type="submit">
                             <i className = "glyphicon glyphicon-plus" />
                         </button>
-                    </span>
+                </span>
             </div>
         </form>
     );
 };
+
+const ECAdd = ({addExclude}) => {
+
+    // Input Tracker
+    let input;
+
+    return (
+        // Add to the form
+        <form onSubmit={(e) => {
+            e.preventDefault();
+
+            // Preventing empty answers
+            if( input.value !== '') {
+
+                addExclude(input.value);
+
+                // Clearing
+                input.value = '';
+            }
+        }}>
+
+            <div className="input-group">
+                <input className="form-control" type= "text" id = "enter"
+                       autocomplete="off"
+                       placeholder="Add to Exclude"
+                       ref={node => { input = node; }} />
+
+                <span className = "input-group-btn">
+                        <button className="btn btn-success" type="submit">
+                            <i className = "glyphicon glyphicon-plus" />
+                        </button>
+                </span>
+            </div>
+        </form>
+    );
+}
 
 class kitchen extends Component {
 
@@ -118,7 +196,9 @@ class kitchen extends Component {
             vegetableData = [],
             grainData = [],
             fruitData = [],
-            otherData = [];
+            otherData = [],
+            outData = [],
+            excludeData = [];
 
         this.state = {
             numItems: 0,
@@ -130,6 +210,11 @@ class kitchen extends Component {
             grain: grainData,
             fruit: fruitData,
             other: otherData,
+            exclude: excludeData,
+
+            out: outData,
+
+            showEditor: false,
 
             key: "Protein"
 
@@ -167,6 +252,20 @@ class kitchen extends Component {
         this.addOther = this.addOther.bind(this);
         this.removeOther = this.removeOther.bind(this);
         this.renderOther = this.renderOther.bind(this);
+
+        // Handle Restock List
+        this.addOut = this.addOut.bind(this);
+        this.removeOut = this.removeOut.bind(this);
+        this.renderOut = this.renderOut.bind(this);
+
+        // Preferences Modal
+        this.open = this.open.bind(this);
+        this.close = this.close.bind(this);
+
+        // Exclude List
+        this.addExclude = this.addExclude.bind(this);
+        this.removeExclude = this.removeExclude.bind(this);
+        this.renderExclude = this.renderExclude.bind(this);
     }
 
     getKey(){
@@ -187,14 +286,8 @@ class kitchen extends Component {
 
     removeProtein(e){
         if( this.state.protein.length > 0 ){
-            this.state.protein.splice( this.state.protein.indexOf(e));
+            this.state.protein.splice( this.state.protein.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
-        }
-    }
-
-    outProtein(e){
-        if( this.state.protein.length > 0 ){
-
         }
     }
 
@@ -204,6 +297,7 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.protein}
                     remove={this.removeProtein.bind(this)}
+                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -217,7 +311,7 @@ class kitchen extends Component {
 
     removeDairy(e){
         if( this.state.dairy.length > 0 ){
-            this.state.dairy.splice( this.state.dairy.indexOf(e));
+            this.state.dairy.splice( this.state.dairy.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
         }
     }
@@ -228,6 +322,7 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.dairy}
                     remove={this.removeDairy.bind(this)}
+                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -241,7 +336,7 @@ class kitchen extends Component {
 
     removeVegetable(e){
         if( this.state.vegetable.length > 0 ){
-            this.state.vegetable.splice( this.state.vegetable.indexOf(e));
+            this.state.vegetable.splice( this.state.vegetable.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
         }
     }
@@ -252,6 +347,7 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.vegetable}
                     remove={this.removeVegetable.bind(this)}
+                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -265,7 +361,7 @@ class kitchen extends Component {
 
     removeFruit(e){
         if( this.state.fruit.length > 0 ){
-            this.state.fruit.splice( this.state.fruit.indexOf(e));
+            this.state.fruit.splice( this.state.fruit.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
         }
     }
@@ -276,6 +372,7 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.fruit}
                     remove={this.removeFruit.bind(this)}
+                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -289,7 +386,7 @@ class kitchen extends Component {
 
     removeGrain(e){
         if( this.state.grain.length > 0 ){
-            this.state.grain.splice( this.state.grain.indexOf(e));
+            this.state.grain.splice( this.state.grain.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
         }
     }
@@ -300,6 +397,7 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.grain}
                     remove={this.removeGrain.bind(this)}
+                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -313,7 +411,7 @@ class kitchen extends Component {
 
     removeOther(e){
         if( this.state.other.length > 0 ){
-            this.state.other.splice( this.state.other.indexOf(e));
+            this.state.other.splice( this.state.other.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
         }
     }
@@ -324,10 +422,101 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.other}
                     remove={this.removeOther.bind(this)}
+                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
     }
+
+    // Other functions
+    addExclude(val){
+        this.setState({exclude: this.state.exclude.concat(val)});
+    }
+
+    removeExclude(e){
+        if( this.state.exclude.length > 0 ){
+            this.state.exclude.splice( this.state.other.indexOf(e), 1);
+        }
+    }
+
+    renderExclude(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.exclude}
+                    remove={this.removeExclude.bind(this)}
+                    addOut={this.addOut.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    // Out List
+    addOut(e, val){
+        this.setState({out: this.state.out.concat(val)});
+        this.setState({numItems: (--this.state.numItems)});
+        this.setState({numRestock: (++this.state.numRestock)});
+        switch( this.state.key ){
+            case "Protein":
+                this.removeProtein(e);
+                break;
+            case "Dairy":
+                this.removeDairy(e);
+                break;
+            case "Vegetable":
+                this.removeVegetable(e);
+                break;
+            case "Fruit":
+                this.removeFruit(e);
+                break;
+            case "Grain":
+                this.removeGrain(e);
+                break;
+            case "Other":
+                this.removeOther(e);
+                break;
+            default:
+                break;
+        }
+    }
+
+    returnOut(e){
+        if( this.state.out.length > 0){
+            this.state.out.splice( this.state.out.indexof(e), 1);
+            this.setState({numItem: (++this.state.numItems)});
+            this.setState({numRestock: (--this.state.numRestock)});
+        }
+    }
+
+    //Trashing
+    removeOut(e){
+        if( this.state.out.length > 0 ) {
+            this.state.out.splice(this.state.out.indexof(e), 1);
+            this.setState({numRestock: (--this.state.numRestock)});
+        }
+    }
+    renderOut(){
+        return(
+            <div>
+                <RestockList
+                    items={this.state.out}
+                    remove={this.removeOut.bind(this)}
+                    addBack={this.returnOut.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    /**Method that opens Modal*/
+    open() {
+        this.setState( {showEditor: true} );
+    }
+
+    /**Method that closes modal*/
+    close() {
+        this.setState( {showEditor: false} );
+    }
+
 
     render() {
 
@@ -336,8 +525,35 @@ class kitchen extends Component {
             <div>
 
                 <div className="jumbotron">
-                    <h1>Kitchen</h1>
+                    <h1> Kitchen </h1>
                 </div>
+
+                <div>
+
+                    <Button
+                        bsStyle="primary"
+                        bsSize="large"
+                        onClick={this.open}
+                    >
+                        Preferences
+                    </Button>
+
+                    <Modal show={this.state.showEditor} onHide={this.close}>
+                        <Modal.Header>
+                            <Modal.Title>Preferences</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <ECAdd
+                                addExclude = {this.addExclude.bind(this)}
+                            />
+                            {this.renderExclude()}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button onClick={this.close}>Close</Button>
+                        </Modal.Footer>
+                    </Modal>
+                </div>
+
 
                 <div className="container">
 
@@ -432,12 +648,12 @@ class kitchen extends Component {
                                 </div>
                             </Tab.Container>
 
-
                         </div>
 
                         <div className = "col-md-4" >
                             <div className = "container-fluid mg-3">
-
+                                <h3> Needs Restock: </h3>
+                                {this.renderOut()}
                             </div>
                         </div>
 
