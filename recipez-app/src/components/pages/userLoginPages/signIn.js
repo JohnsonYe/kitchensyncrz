@@ -34,7 +34,8 @@ class SignIn extends Component{
             await this.client.login(this.state.userName, this.state.password);
             this.client.authenticated = true;
             this.client.user = this.state.userName;
-            alert(this.client.getUsername());
+            //alert(this.client.getUsername());
+            this.props.history.push("/Search");
         } catch (e) {
             alert(e);
         }

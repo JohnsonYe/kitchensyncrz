@@ -1,24 +1,5 @@
 @import "_config.scss";
 
-.modal-backdrop {
-  z-index: 90;
-}
-
-.modal{
-  display: block;
-}
-
-.meal-item {
-  border-style: solid;
-  border-width: thin;
-  padding: 12px;
-}
-
-.shoppinglist-item {
-  border-style: solid;
-  border-width: thin;
-  padding: 12px;
-}
 
 /* ruleset for all jumbotrons across website*/
 .jumbotron {
@@ -27,12 +8,9 @@
   margin-top: -150px;
   overflow: hidden;
   height: 180px;
-  h1{
-    //color: #c5c8c6
-  }
 }
 
-/* little icon that opens nav bar, will have to be 
+/* little icon that opens nav bar, will have to be
  * adjusted as we change the img */
 .ks-icon {
   overflow: hidden;
@@ -66,6 +44,7 @@
     margin-top: 30px;
   }
 }
+<<<<<<< HEAD
 
 .header {
   position: relative;
