@@ -150,7 +150,7 @@ const ItemForm = ( {addProtein,
     );
 };
 
-const ECAdd = ({addExclude}) => {
+const ECAdd = ({addExclude, addCookware, getModalKey}) => {
 
     // Input Tracker
     let input;
@@ -163,7 +163,12 @@ const ECAdd = ({addExclude}) => {
             // Preventing empty answers
             if( input.value !== '') {
 
-                addExclude(input.value);
+                alert( getModalKey );
+                if( getModalKey == "Exclude" ) {
+                    addExclude(input.value);
+                }else if( getModalKey == "Cookware"){
+                    addCookware(input.value);
+                }
 
                 // Clearing
                 input.value = '';
@@ -173,7 +178,7 @@ const ECAdd = ({addExclude}) => {
             <div className="input-group">
                 <input className="form-control" type= "text" id = "enter"
                        autocomplete="off"
-                       placeholder="Add to Exclude"
+                       placeholder="Add"
                        ref={node => { input = node; }} />
 
                 <span className = "input-group-btn">
@@ -198,11 +203,13 @@ class kitchen extends Component {
             fruitData = [],
             otherData = [],
             outData = [],
-            excludeData = [];
+            excludeData = [],
+            cookwareData = [];
 
         this.state = {
             numItems: 0,
             numRestock: 0,
+            numExclude: 0,
 
             protein: proteinData,
             dairy: dairyData,
@@ -211,17 +218,22 @@ class kitchen extends Component {
             fruit: fruitData,
             other: otherData,
             exclude: excludeData,
+            cookware: cookwareData,
 
             out: outData,
 
-            showEditor: false,
+            showExclude: false,
+            showCookware: false,
 
-            key: "Protein"
+            key: "Protein",
+            modalKey: "Exclude"
 
         };
 
         this.getKey = this.getKey.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
+
+        this.getModalKey = this.getModalKey.bind(this);
 
         // Protein
         this.addProtein = this.addProtein.bind(this);
@@ -259,17 +271,30 @@ class kitchen extends Component {
         this.renderOut = this.renderOut.bind(this);
 
         // Preferences Modal
-        this.open = this.open.bind(this);
-        this.close = this.close.bind(this);
+        this.openExclude = this.openExclude.bind(this);
+        this.closeExclude = this.closeExclude.bind(this);
+
+        //Cookware Modal
+        this.openCookware = this.openCookware.bind(this);
+        this.closeCookware = this.closeCookware.bind(this);
 
         // Exclude List
         this.addExclude = this.addExclude.bind(this);
         this.removeExclude = this.removeExclude.bind(this);
         this.renderExclude = this.renderExclude.bind(this);
+
+        //Cookware List
+        this.addCookware = this.addCookware.bind(this);
+        this.removeCookware = this.removeCookware.bind(this);
+        this.renderCookware = this.renderCookware.bind(this);
     }
 
     getKey(){
         return this.state.key;
+    }
+
+    getModalKey(){
+        return this.state.modalKey;
     }
 
     /* Functionality methods */
@@ -428,14 +453,16 @@ class kitchen extends Component {
         );
     }
 
-    // Other functions
+    // Exclude functions
     addExclude(val){
         this.setState({exclude: this.state.exclude.concat(val)});
+        this.setState({numExclude: (++this.state.numExclude)});
     }
 
     removeExclude(e){
-        if( this.state.exclude.length > 0 ){
-            this.state.exclude.splice( this.state.other.indexOf(e), 1);
+        if( this.state.numExclude > 0 ){
+            this.state.exclude.splice( this.state.exclude.indexOf(e), 1);
+            this.setState({numExclude: (--this.state.numExclude)});
         }
     }
 
@@ -445,6 +472,31 @@ class kitchen extends Component {
                 <ItemList
                     items={this.state.exclude}
                     remove={this.removeExclude.bind(this)}
+                    addOut={this.addOut.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    // Cookware functions
+    addCookware(val){
+        this.setState({cookware: this.state.cookware.concat(val)});
+        this.setState({numCookware: (++this.state.numCookware)});
+    }
+
+    removeCookware(e){
+        if( this.state.numCookware > 0 ){
+            this.state.cookware.splice( this.state.cookware.indexOf(e), 1);
+            this.setState({numCookware: (--this.state.numCookware)});
+        }
+    }
+
+    renderCookware(){
+        return(
+            <div>
+                <ItemList
+                    items={this.state.cookware}
+                    remove={this.removeCookware.bind(this)}
                     addOut={this.addOut.bind(this)}
                 />
             </div>
@@ -495,6 +547,7 @@ class kitchen extends Component {
             this.setState({numRestock: (--this.state.numRestock)});
         }
     }
+
     renderOut(){
         return(
             <div>
@@ -508,13 +561,25 @@ class kitchen extends Component {
     }
 
     /**Method that opens Modal*/
-    open() {
-        this.setState( {showEditor: true} );
+    openExclude() {
+        this.setState( {modalKey: "Exclude" });
+        this.setState( {showExclude: true} );
     }
 
     /**Method that closes modal*/
-    close() {
-        this.setState( {showEditor: false} );
+    closeExclude() {
+        this.setState( {showExclude: false} );
+    }
+
+    /**Method that opens Modal*/
+    openCookware() {
+        this.setState( {modalKey: "Cookware"} );
+        this.setState( {showCookware: true} );
+    }
+
+    /**Method that closes modal*/
+    closeCookware() {
+        this.setState( {showCookware: false} );
     }
 
 
@@ -525,35 +590,65 @@ class kitchen extends Component {
             <div>
 
                 <div className="jumbotron">
-                    <h1> Kitchen </h1>
+                    <h1>Kitchen</h1>
+
+                    <div id = "Modal">
+
+                        <Button
+                            bsStyle="primary"
+                            bsSize="large"
+                            onClick={this.openExclude}
+                        >
+                            Preferences
+                        </Button>
+
+                        <Modal show={this.state.showExclude} onHide={this.closeExclude}>
+                            <Modal.Header>
+                                <Modal.Title>Preferences</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <ECAdd
+                                    addExclude = {this.addExclude.bind(this)}
+                                    addCookware = {this.addCookware.bind(this)}
+                                    modalKey = {this.getModalKey()}
+                                />
+                                {this.renderExclude()}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button onClick={this.closeExclude}>Close</Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </div>
+
+                    <div id = "Modal">
+
+                        <Button
+                            bsStyle="primary"
+                            bsSize="large"
+                            onClick={this.openCookware}
+                        >
+                            Cookware
+                        </Button>
+
+                        <Modal show={this.state.showCookware} onHide={this.closeCookware}>
+                            <Modal.Header>
+                                <Modal.Title>Cookware</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <ECAdd
+                                    addExclude = {this.addExclude.bind(this)}
+                                    addCookware = {this.addCookware.bind(this)}
+                                    modalKey = {this.getModalKey()}
+                                />
+                                {this.renderCookware()}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button onClick={this.closeCookware}>Close</Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </div>
+
                 </div>
-
-                <div>
-
-                    <Button
-                        bsStyle="primary"
-                        bsSize="large"
-                        onClick={this.open}
-                    >
-                        Preferences
-                    </Button>
-
-                    <Modal show={this.state.showEditor} onHide={this.close}>
-                        <Modal.Header>
-                            <Modal.Title>Preferences</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <ECAdd
-                                addExclude = {this.addExclude.bind(this)}
-                            />
-                            {this.renderExclude()}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button onClick={this.close}>Close</Button>
-                        </Modal.Footer>
-                    </Modal>
-                </div>
-
 
                 <div className="container">
 
