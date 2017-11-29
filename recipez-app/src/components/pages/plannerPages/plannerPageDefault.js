@@ -11,99 +11,181 @@
  * Components: dailyMealPlanner, shoppingList
  */
 import React, { Component } from 'react';
-import { Grid , Row, Col, Table } from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
+
+import MealEditor from "./editMealPage";
+
+function DailyPlannerItem(props) {
+
+    const noImg = "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
+
+    return (
+        <div className="card m-3 hoverable">
+            <div className="card bg-light">
+                <div className="card-body">
+                    <MealEditor />
+                    <p>5:15 AM to 7:15 AM - 2hours</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ShoppingListItem(props) {
+    return (
+        <a href="#" className="list-group-item list-group-item-action">Item {props.num}</a>
+    );
+}
+
+class DynamicList extends Component{
+
+    constructor(props) {
+        super(props);
+    }
+    render() {
+
+        if( this.props.type === "item" ) {
+            return (
+                Object.keys(this.props.list).map((key) => {
+                    return <ShoppingListItem meal={this.props.list[key]}/>
+                })
+            );
+        }
+        else {
+            return (
+                Object.keys(this.props.list).map((key) => {
+                    return <DailyPlannerItem meal={this.props.list[key]}/>
+                })
+            );
+        }
+    }
+}
 
 class Planner extends Component {
 
     constructor(props) {
         super(props);
-        var now = new Date(),
+        var
+            now = new Date(),
+            //Days of the Week String References
             days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
             today = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            mealTable = (
-                <Table striped bordered condensed hover>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Today's Meals</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>[Time Block]</td>
-                        <td>Meal 1</td>
-                    </tr>
-                    <tr>
-                        <td>[Time Block]</td>
-                        <td>Meal 2</td>
-                    </tr>
-                    <tr>
-                        <td>[Time Block</td>
-                        <td>Meal 3</td>
-                    </tr>
-                    </tbody>
-                </Table>
-            );
-
+            mealData = [], /*TODO Change to getMealData after testing*/
+            itemData = [];
 
         this.state = {
+            day: now.getDate(),
             date: today,
             numMeals: 0,
             numShopItems: 0,
             numMealsPrepared: 0,
-            mealTable: mealTable
+            meals: mealData,
+            items: itemData
         };
+
+        this.addMeal = this.addMeal.bind(this);
+        this.removeMeal = this.removeMeal.bind(this);
+        this.addItem = this.addItem.bind(this);
+        this.removeItem = this.removeItem.bind(this);
+
+    }
+
+    /**
+     * Adds a meal to the list
+     */
+    addMeal() {
+        this.state.meals[this.state.numMeals] = "Meal-" + this.state.numMeals;
+        this.setState({ meals : this.state.meals });
+        this.setState({ numMeals: (++this.state.numMeals) });
+    }
+
+    /** TODO Removes card from Daily Meal Planner*/
+    removeMeal() {
+        this.state.meals.splice((this.state.numMeals-1),1);
+        this.setState({ meals : this.state.meals });
+        this.setState({ numMeals: (--this.state.numMeals) });
+    }
+
+    /**
+     * Adds a meal to the list
+     */
+    addItem() {
+        this.state.items[this.state.numShopItems] = "Item-" + this.state.numShopItems;
+        this.setState({ items : this.state.items });
+        this.setState({ numShopItems: (++this.state.numShopItems) });
+    }
+
+    /** TODO Removes card from Daily Meal Planner*/
+    removeItem() {
+        this.state.items.splice((this.state.numShopItems-1),1);
+        this.setState({ items : this.state.items });
+        this.setState({ numShopItems: (--this.state.numShopItems) });
     }
 
     render() {
-        return (
 
+        return (
             <div>
-                <div className="jumbotron">
+                <div className="jumbotron jumbotron-fluid">
                     <h1>Planner</h1>
                 </div>
 
-            <Grid fluid={true} className='container-fluid'>
-                <Row className='content'>
-                    <Col xs={6} md={4}>
-                        <h3>Daily Meal Planner</h3>
-                        <h5>{this.state.date}</h5>
-                    </Col>
-                    <Col xs={1}></Col>
-                    <Col xs={2} md={1} >
-                        <h1>{this.state.numMeals}</h1>
-                        <h4>Meals</h4>
-                    </Col>
-                    <Col xs={1}></Col>
-                    <Col xs={2} md={1} >
-                        <h1>{this.state.numMealsPrepared}</h1>
-                        <h4>Prepared</h4>
-                    </Col>
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="row">
+                            <div className="col-4">
+                                <h3>Daily Meal Planner</h3>
+                                <h6>{this.state.date}</h6>
+                                <h3>{this.state.numMeals}</h3>
+                                <h6>Meals</h6>
+                                <h3>{this.state.numMealsPrepared}</h3>
+                                <h6>Prepared</h6>
+                            </div>
+                            <div className="col-8">
+                                <Button
+                                    bsSize="small"
+                                    bsStyle="secondary"
+                                    onClick={this.addMeal}>Test</Button>
+                                <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={this.removeMeal}>Remove Test</button>
+                                <DynamicList list={this.state.meals}/>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="row">
+                            <div className="col-4">
+                                <h3>Shopping List</h3>
+                                <h3>{this.state.numShopItems}</h3>
+                                <h6>Items</h6>
+                            </div>
 
+                            <div className="col-8">
+                                <Button
+                                    bsSize="small"
+                                    bsStyle="secondary"
+                                    onClick={this.addItem}>Test</Button>
+                                <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={this.removeItem}>Remove Test</button>
 
-                    <Col xs={8} md={4}>
-                        <h3>Shopping List</h3>
-                    </Col>
-                    <Col xs={2} md={2} >
-                        <h1>{this.state.numShopItems}</h1>
-                        <h4>Items</h4>
-                    </Col>
-                </Row>
+                                <ul className="list-group">
+                                    <DynamicList type="item" list={this.state.items}/>
+                                </ul>
 
-                <Row>
-                    <Col className="meal-list-container" xs={12} md={6}>
-                        {this.state.mealTable}
-                    </Col>
-                    <Col className="shopping-list" xs={12} md={6}>
-                    </Col>
-                </Row>
+                            </div>
+                        </div>
+                        </div>
 
-                <Row className="button-section">
-                    <button>View Full Week Planner</button>
-                </Row>
-            </Grid>
+                    </div>
+
+                    <div className="row">
+                        Button Goes Here
+                    </div>
+                </div>
             </div>
-
         );
     }
 }
