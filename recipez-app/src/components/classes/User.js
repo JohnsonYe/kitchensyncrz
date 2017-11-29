@@ -12,8 +12,14 @@
 
  class User {
     constructor(){
-        this.client = DBClient.getClient()
-        this.client.registerPrototype(User.PantryItemPrototype)
+        this.client = DBClient.getClient();
+        this.client.registerPrototype(User.PantryItemPrototype);
+
+        //Planner data
+        this.client.registerPrototype(User.PlannerPrototype);
+        this.client.registerPrototype(User.DayPrototype);
+        this.client.registerPrototype(User.MealPrototype);
+
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -235,6 +241,25 @@
     }
  }
 
+ User.MealPrototype = {
+     _NAME: "Meal",
+     recipes: { type: 'L' ,inner:{ type:'S'} },
+     startHr: {type: 'N'},
+     startMin: {type: 'N'},
+     endHr: {type: 'N'},
+     endMin: {type: 'N'}
+ }
+
+ User.DayPrototype = {
+     _NAME: "Day",
+     mealData: {type: 'L' ,inner:{ type: User.MealPrototype._NAME} }
+ }
+
+ User.PlannerPrototype = {
+     _NAME: "Planner",
+     days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
+ }
+
  User.PantryItemPrototype = {
     _NAME:'PANTRYITEM',
     amount:{type:'N'},
@@ -247,7 +272,7 @@
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
-    planner:{}
+    planner:{type: 'L',inner:{type:'L',inner:{type:User.DayPrototype._NAME}}}
  }
 
 

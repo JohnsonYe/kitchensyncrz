@@ -123,11 +123,17 @@ class MealEditor extends Component {
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this.handleDaySelection = this.handleDaySelection.bind(this);
+        this.handleHourSelection = this.handleHourSelection.bind(this);
     }
 
     /** Updates the day the meal will be planned */
     handleDaySelection(evt) {
         this.setState({ dayOnBtn: this.state.days[evt] });
+    }
+
+    /**TODO Implement this*/
+    handleHourSelection(evt) {
+        this.setState( { hourOnBtn: evt});
     }
 
 

@@ -221,10 +221,11 @@ const UNAUTH_NAME = 'GUEST'
         return client_style_map
     }
 
-    registerPrototype(proto){
+    registerPrototype(proto, ){
         if(!proto._NAME){
             throw new TypeError('No _NAME specified for prototype: ' + JSON.stringify(proto))
         }
+
         this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
         this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
     }
@@ -239,7 +240,7 @@ const UNAUTH_NAME = 'GUEST'
         }
         //unpack an item from AWS
         // alert(JSON.stringify(item)+'\n'+JSON.stringify(prototype))
-        var unpacked = {}
+        var unpacked = {};
         Object.keys(item).forEach((key)=>{
             try{
                 unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
@@ -249,6 +250,7 @@ const UNAUTH_NAME = 'GUEST'
                 //for now, developers working with the database must be careful with adding new fields
                 unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
+                    alert(key)
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })

@@ -4,64 +4,39 @@
  * Date Created: 11/13/2017
  * Description: This file will assist in database transactions involving the planner feature
  */
-import DBClient from "./AWSDatabaseClient"
+import DBClient from "./AWSDatabaseClient";
+import User from './User';
 
 class PlannerHelper{
     constructor(){
-        var now = new Date(); // Andrew added
-        this.client = DBClient.getClient()
+        this.client = DBClient.getClient();
+        this.user = User.getUser(this.client.getUsername());
+
+        //Access Meal Data data[dayOfWeek][mealIndex]
+        this.mealData = [
+            [],  //Sun
+            [],  //Mon
+            [],  //Tue
+            [],  //Wed
+            [],  //Thur
+            [],  //Fri
+            []   //Sat
+        ];
+
+
         this.addMeal = this.addMeal.bind(this);
         this.removeMeal = this.removeMeal.bind(this);
-        var mealData = [];
         // this.addMeal('Monday.breakfast','chicken noodle soup',(e)=>alert(JSON.stringify(e.payload)));
+
     }
 
     addMeal(day,recipe,target){
-        this.client.updateItem(
-            this.client.buildUpdateRequest(
-                'User','username',this.client.getUsername(),
-                this.client.buildMapUpdateExpression('planner',day,{S:recipe})),
-                this.client.pushResponseToHandle(target));
-
     }
 
 
     removeMeal(day,recipe){
 
     }
-
-     /**TEST ============================================================================*/
-     testMealData(){
-
-         var recipe1 = {
-                 name: "Spaghetti",
-                 duration: 30,
-                 link: "http://food.fnr.sndimg.com/content/dam/images/food/fullset/2014/9/23/1/FNM_110114-Spaghetti-with-Pecan-Herb-Pesto-Recipe_s4x3.jpg.rend.hgtvcom.616.462.suffix/1412282745840.jpeg",
-                 description: "I tell all my hoes ... rack it up"
-             },
-             recipe2 = {
-                 name: "Booty",
-                 duration: 120,
-                 link: "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png",
-                 description: "Love is not just a verb"
-             };
-
-         var meal1 = this.createMeal(recipe1, 12, 30),
-             meal2 = this.createMeal(recipe2, 2, 45);
-
-         //Access Meal Data data[dayOfWeek][mealIndex]
-         var data = [
-             [],  //Sun
-             [meal1, meal2],  //Mon
-             [],  //Tue
-             [],  //Wed
-             [],  //Thur
-             [],  //Fri
-             []   //Sat
-         ];
-
-         return data;
-     }
 
      /**
       * This function creates a meal object that could be added to one of the entries in mealData.
@@ -98,14 +73,13 @@ class PlannerHelper{
              endMin: endMin
          };
      }
-     /** ======================================END OF TEST STUFF=======================================================*/
 
      /**
       * This function will retrieve the users mealData array that is currently in the DataBase
       * @returns [] Array of meal
       */
      getMealData() {
-         return [];
+         return this.user.getUserData('planner').then((e)=>alert(JSON.stringify(e)));
      }
 
      /**

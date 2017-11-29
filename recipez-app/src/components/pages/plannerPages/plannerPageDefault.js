@@ -15,33 +15,33 @@ import {Button} from 'react-bootstrap';
 
 import DynamicList from "../../dynamicList"
 import MealEditor from "./editMealPage"
+import PlannerHelper from "../../classes/Planner";
 
-/**Lets the user know what recipe is up next to cook*/
+/**Lets the user know what recipe is up next to cook will be placed in Daily Meal Planner*/
 function UpNextCard(props){
 
     const img1 = "http://twolovesstudio.com/wp-content/uploads/sites/5/2017/05/99-Best-Food-Photography-Tips-5-1.jpg";
     const img2 = "https://static1.squarespace.com/static/533dbfc0e4b0a3ebd0e44c92/t/552f072de4b0b098cbb115b6/1429145391117/Chris+Sanchez+Food+photo";
     return (
-            <div className="card m-3">
-                <div className="view overlay hm-zoom">
-                    <img
-                        className="img-fluid "
-                        src={img2}
-                        alt="Food Porn"
-                    />
-                    <div className="mask flex-center waves-effect waves-light">
-                        <p className="white-text">Get Started</p>
-                    </div>
-                </div>
-                <div className="card-img-overlay">
-                    <h3 className="card-title text-white">Up next ...</h3>
+        <div className="card m-3">
+            <div className="view overlay hm-zoom">
+                <img
+                    className="img-fluid "
+                    src={img2}
+                    alt="Food Porn"
+                />
+                <div className="mask flex-center waves-effect waves-light">
+                    <p className="white-text">Get Started</p>
                 </div>
             </div>
+            <div className="card-img-overlay">
+                <h3 className="card-title text-white">Up next ...</h3>
+            </div>
+        </div>
     );
 }
 
 function DailyPlannerItem(props) {
-
     return (
         <div className="card m-3 hoverable">
             <div className="card transparent">
@@ -61,25 +61,23 @@ function ShoppingListItem(props) {
 }
 
 class Planner extends Component {
-
     constructor(props) {
         super(props);
         var
             now = new Date(),
             //Days of the Week String References
-            days = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
-            today = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            mealData = [], /*TODO Change to getMealData after testing*/
-            itemData = [];
-
+            days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            date = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
+            data = new PlannerHelper();
         this.state = {
             day: now.getDate(),
-            date: today,
+            date: date,
             numMeals: 0,
             numShopItems: 0,
             numMealsPrepared: 0,
-            meals: mealData,
-            items: itemData
+            meals: [],
+            items: [],
+            data: data
         };
 
         this.addMeal = this.addMeal.bind(this);
@@ -88,6 +86,8 @@ class Planner extends Component {
         this.removeItem = this.removeItem.bind(this);
         this.renderMeal = this.renderMeal.bind(this);
         this.renderItem = this.renderItem.bind(this);
+        this.renderDayPlanner = this.renderDayPlanner.bind(this);
+        this.renderShoppingList = this.renderShoppingList.bind(this);
 
     }
 
@@ -100,6 +100,7 @@ class Planner extends Component {
         this.state.meals[this.state.numMeals] = "Meal-" + this.state.numMeals;
         this.setState({ meals : this.state.meals });
         this.setState({ numMeals: (++this.state.numMeals) });
+        this.state.data.getMealData();
     }
     /** TODO Removes card from Daily Meal Planner*/
     removeMeal() {
@@ -126,11 +127,52 @@ class Planner extends Component {
             this.setState({numShopItems: (--this.state.numShopItems)});
         }
     }
+
     /** Functionality Methods End **/
 
     /**===============================================================================================================*/
 
     /** Render Items Start **/
+
+    renderDayPlanner() {
+        return(
+                <div className="row">
+                    <div className="col-3
+                                            border
+                                            border-left-0
+                                            border-top-0
+                                            border-bottom-0
+                                            border-dark">
+                        <div className="mx-auto">
+                            <h2>Daily Meal Planner</h2>
+                            <p>{this.state.date}</p>
+                            <h3>{this.state.numMeals}</h3>
+                            <p>Meals</p>
+                            <h3>{this.state.numMealsPrepared}</h3>
+                            <p>Prepared</p>
+                        </div>
+                    </div>
+                    <div className="col-9">
+                        <Button
+                            bsSize="small"
+                            bsStyle="secondary"
+                            onClick={this.addMeal}>Test</Button>
+                        <button
+                            className="btn btn-danger btn-sm"
+                            onClick={this.removeMeal}>Remove Test</button>
+                        <UpNextCard/>
+                        <DynamicList
+                            renderLI={this.renderMeal(0,"start", "end", "Duration", "Meal")}
+                            list={this.state.meals}
+                        />
+                    </div>
+                </div>
+        );
+    }
+
+    renderWeekPlanner() {
+
+    }
 
     renderMeal(index, start, end, duration, name) {
         return (
@@ -150,7 +192,45 @@ class Planner extends Component {
                 index={index}
             />
         );
+    }
 
+    renderWeekCol(day) {
+    }
+
+
+    renderShoppingList() {
+        return (
+            <div className="row">
+                <div className="col-3
+                                            border
+                                            border-left-0
+                                            border-top-0
+                                            border-bottom-0
+                                            border-dark">
+                    <div className="mx-auto">
+                        <h2>Shopping List</h2>
+                        <h2>{this.state.numShopItems}</h2>
+                        <p>Items</p>
+                    </div>
+                </div>
+
+                <div className="col-9">
+                    <Button
+                        bsSize="small"
+                        bsStyle="secondary"
+                        onClick={this.addItem}>Test</Button>
+                    <button
+                        className="btn btn-danger btn-sm"
+                        onClick={this.removeItem}>Remove Test</button>
+                    <ul className="list-group">
+                        <DynamicList
+                            renderLI={this.renderItem(0, "Item")}
+                            list={this.state.items}
+                        />
+                    </ul>
+                </div>
+            </div>
+        );
     }
 
     /** Render Items End **/
@@ -158,8 +238,6 @@ class Planner extends Component {
 
     /** Driver */
     render() {
-        var count = 0;
-
         return (
             <div>
                 <div className="jumbotron jumbotron-fluid">
@@ -169,72 +247,12 @@ class Planner extends Component {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-md-6">
-                            <div className="row">
-                            <div className="col-3
-                                            border
-                                            border-left-0
-                                            border-top-0
-                                            border-bottom-0
-                                            border-dark">
-                                    <div className="mx-auto">
-                                        <h2>Daily Meal Planner</h2>
-                                        <p>{this.state.date}</p>
-                                        <h3>{this.state.numMeals}</h3>
-                                        <p>Meals</p>
-                                        <h3>{this.state.numMealsPrepared}</h3>
-                                        <p>Prepared</p>
-                                    </div>
-                            </div>
-                            <div className="col-9">
-                                <Button
-                                    bsSize="small"
-                                    bsStyle="secondary"
-                                    onClick={this.addMeal}>Test</Button>
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={this.removeMeal}>Remove Test</button>
-                                <UpNextCard/>
-                                <DynamicList
-                                    renderLI={this.renderMeal(0,"start", "end", "Duration", "Meal")}
-                                    list={this.state.meals}
-                                />
-                            </div>
-                            </div>
+                            {this.renderDayPlanner()}
                         </div>
+
                         <div className="col-md-6">
-                            <div className="row">
-                            <div className="col-3
-                                            border
-                                            border-left-0
-                                            border-top-0
-                                            border-bottom-0
-                                            border-dark">
-                                <div className="mx-auto">
-                                    <h2>Shopping List</h2>
-                                    <h2>{this.state.numShopItems}</h2>
-                                    <p>Items</p>
-                                </div>
-                            </div>
-
-                            <div className="col-9">
-                                <Button
-                                    bsSize="small"
-                                    bsStyle="secondary"
-                                    onClick={this.addItem}>Test</Button>
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={this.removeItem}>Remove Test</button>
-                                <ul className="list-group">
-                                    <DynamicList
-                                        renderLI={this.renderItem(0, "Item")}
-                                        list={this.state.items}
-                                    />
-                                </ul>
-
-                            </div>
+                            {this.renderShoppingList()}
                         </div>
-                        </div>
-
                     </div>
 
                     <div className="row">
