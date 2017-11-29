@@ -84,7 +84,7 @@ class SignIn extends Component{
                                 </div>
                                 <button onClick={this.handleSubmit}
                                         disabled={!this.validateForm()}
-                                        type="submit" className="btn btn-primary">Login</button>
+                                        type="submit" className="btn-med btn-primary">Login</button>
                                 <br />
                                 <br />
                                 <p>Don’t have an account? Click <Link to="/Register">here</Link> to Register!</p>
