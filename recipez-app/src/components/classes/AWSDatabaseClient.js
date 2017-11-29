@@ -40,6 +40,9 @@ const UNAUTH_NAME = 'GUEST'
         this.unpackItem = this.unpackItem.bind(this);
         this.login = this.login.bind(this);
         this.getUsername = this.getUsername.bind(this);
+        this.getUserToken = this.getUserToken.bind(this);
+        this.getCurrentUser = this.getCurrentUser.bind(this);
+        this.authUser = this.authUser.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false;
@@ -220,6 +223,42 @@ const UNAUTH_NAME = 'GUEST'
     getUsername(){
         return this.user
     }
+
+
+     async authUser() {
+         const currentUser = this.getCurrentUser();
+
+         if (currentUser === null) {
+             return false;
+         }
+
+         await this.getUserToken(currentUser);
+
+         return true;
+     }
+
+     getUserToken(currentUser) {
+         return new Promise((resolve, reject) => {
+             currentUser.getSession(function(err, session) {
+                 if (err) {
+                     reject(err);
+                     return;
+                 }
+                 resolve(session.getIdToken().getJwtToken());
+             });
+         });
+     }
+
+     getCurrentUser() {
+         const userPool = new CognitoUserPool({
+             UserPoolId: up.USER_POOL_ID,
+             ClientId: up.APP_CLIENT_ID
+         });
+         return userPool.getCurrentUser();
+     }
+
+
+
 
     unpackFormatting(aws_response) {
 

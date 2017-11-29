@@ -1,18 +1,22 @@
 /**
  * Title: signIn.js
- * Author: Osama Qarni
- * Date Created: 11/17/2017
- * Description: This file will serve as the form/page for user sign in.
+ * Author: Osama Qarni, Michael Yee
+ * Date Created: 11/23/2017
+ * Description: Contains the Sign in elements for Kitchen
+ * Sync which includes a form for the username and password,
+ * and a submit button which validates with the database.
  */
-import Register from "./register";
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
-import "../../../scss/App.scss";
+
+import React, {Component} from 'react';
+import {
+    BrowserRouter as Router,
+    Route,
+    Link,
+} from 'react-router-dom';
 import DBClient from "../../classes/AWSDatabaseClient";
 
 
-import React, { Component } from 'react';
-
-class SignIn extends Component {
+class SignIn extends Component{
 
     constructor(props){
         super(props);
@@ -22,14 +26,10 @@ class SignIn extends Component {
         this.state = {
             userName: '',
             password: '',
-            email: ''
-
         }
     }
 
     handleSubmit = async event => {
-        event.preventDefault();
-
         try {
             await this.client.login(this.state.userName, this.state.password);
             this.client.authenticated = true;
@@ -44,54 +44,55 @@ class SignIn extends Component {
         return this.state.userName.length > 0 && this.state.password.length > 0;
     }
 
-
-
-
+    handleKeyEnter = (e) => {
+        if(e.charCode === 13) {
+            if(!this.validateForm()){
+                alert("Please fill out all the fields!");
+            }
+            else{
+                this.handleSubmit();
+            }
+        }
+    }
 
 
     render() {
-        return (
+
+        return(
             <div>
-                <div className="jumbotron">
-                    <h1>Sign in to Kitchen Sync</h1>
+                <div className="jumbotron" onSubmit={this.handleSubmit}>
+                    <h1>Sign In</h1>
                 </div>
-                <div className="container-fluid" id="Kitchen-Content">
-
-                    <form onSubmit={this.handleSubmit}>
-                        <label>
-                            User Name
-                            <input type="text" value={this.state.userName} onChange={e => this.setState({userName: e.target.value})}/>
-                        </label>
-                    </form>
-                    <form>
-                        <label>
-                            Password
-                            <input type="password" value={this.state.password} onChange={e => this.setState({password: e.target.value})}/>
-                        </label>
-                    </form>
-                    <form>
-                        <button
-                            onClick={this.handleSubmit}
-                            disabled={!this.validateForm()}
-                            type="submit"
-                        >
-                            Login
-                        </button>
-                    </form>
-                    <form>
-                        <label>
-                            Don't have an account?
-                        </label>
-                        <button>
-                            Register
-                        </button>
-                    </form>
-
+                <div className="container">
+                    <div className="row">
+                        <div className="col-5 mx-auto">
+                            <div className=".mx-auto">
+                                <div className="form-group">
+                                    <label for="userName">Username:</label>
+                                    <input type="text" value={this.state.userName}
+                                           onChange={e => this.setState({userName: e.target.value})}
+                                           onKeyPress={this.handleKeyEnter}
+                                           className="form-control" id="userName" />
+                                </div>
+                                <div className="form-group .mx-auto">
+                                    <label for="pwd">Password:</label>
+                                    <input type="password" value={this.state.password}
+                                           onChange={e => this.setState({password: e.target.value})}
+                                           onKeyPress={this.handleKeyEnter}
+                                           className="form-control" id="pwd" />
+                                </div>
+                                <button onClick={this.handleSubmit}
+                                        disabled={!this.validateForm()}
+                                        type="submit" className="btn btn-primary">Login</button>
+                                <br />
+                                <br />
+                                <p>Don’t have an account? Click <Link to="/Register">here</Link> to Register!</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         );
-
     }
 }
 

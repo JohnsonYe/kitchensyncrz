@@ -28,7 +28,7 @@ import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
 import Recipe from "./components/pages/recipe";
-
+import DBClient from "./components/classes/AWSDatabaseClient";
 import SignIn from './components/pages/userLoginPages/signIn';
 import Register from "./components/pages/userLoginPages/register";
 
@@ -37,10 +37,36 @@ import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 class App extends Component {
 
+    constructor(props){
+        super(props);
+
+        this.client = DBClient.getClient();
+
+
+    }
+
+    async componentDidMount() {
+        try {
+            if (await this.client.authUser()) {
+                this.client.authenticated = true;
+            }
+        }
+        catch(e) {
+            alert(e);
+        }
+
+        this.setState({ isAuthenticating: false});
+    }
+
+
     componentWillMount() {
         this.setState({
-        isMenuOpened: false
+            isMenuOpened: false,
+            isAuthenticating: true
+
         })
+
+
     }
 
 
@@ -48,8 +74,14 @@ class App extends Component {
         this.setState({ isMenuOpened: !this.state.isMenuOpened });
     }
 
+    handleLogout = event => {
+        this.client.authenticated = false;
+        alert(this.client.isLoggedIn());
+    }
+
     render() {
         return (
+            !this.state.isAuthenticating &&
             <Router>
                 <div className="App">
                     <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
@@ -76,13 +108,15 @@ class App extends Component {
                                     <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Register" onClick={this.handleClick.bind(this)}>Register</Link>
-                                </li>
-                                <li>
                                     <Link to="/SignIn" onClick={this.handleClick.bind(this)}>Sign in</Link>
                                 </li>
                                 <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
+                                    <button
+                                        onClick={this.handleLogout.bind(this)}
+                                        disabled={!this.client.isLoggedIn()
+                                        }>
+                                        Sign out
+                                    </button>
                                 </li>
                             </ul>
                         </OffCanvasMenu>
