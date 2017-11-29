@@ -31,9 +31,15 @@ import Recipe from "./components/pages/recipe";
 import SignIn from "./components/pages/signIn";
 import Register from "./components/pages/register";
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
+import DBClient from './components/classes/AWSDatabaseClient';
 
 
 class App extends Component {
+
+    constructor(props){
+        super(props);
+        this.client = DBClient.getClient();
+    }
 
     componentWillMount() {
         this.setState({
@@ -41,8 +47,18 @@ class App extends Component {
         })
     }
 
+    // toggle nav bar
     handleClick() {
         this.setState({ isMenuOpened: !this.state.isMenuOpened });
+    }
+
+    // should the user sign out from the nav bar on App.js
+    SignOut() {
+        // handle signout logic
+
+
+        // close the nav bar
+        this.handleClick.bind(this);
     }
 
     render() {
@@ -79,7 +95,7 @@ class App extends Component {
                                     <Link to="/SignIn" onClick={this.handleClick.bind(this)}>Sign in</Link>
                                 </li>
                                 <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
+                                    <Link to="/" onClick={this.SignOut}>Sign out</Link>
                                 </li>
                             </ul>
                         </OffCanvasMenu>

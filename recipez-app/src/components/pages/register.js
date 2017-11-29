@@ -15,36 +15,14 @@ import {
 } from 'react-router-dom';
 import DBClient from "../classes/AWSDatabaseClient";
 
-/*function RegisterForm(props){
-
-    return (
-        <div className=".mx-auto">
-            <div className="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" className="form-control" id="email" />
-            </div>
-            <div className="form-group .mx-auto">
-                <label for="pwd">Password:</label>
-                <input type="password" className="form-control" id="pwd" />
-            </div>
-            <div className="form-group .mx-auto">
-                <label for="pwd2">Confirm Password:</label>
-                <input type="password" className="form-control" id="pwd2" />
-            </div>
-            <button type="submit" className="btn btn-primary .mx-auto">Register</button>
-            <br />
-            <br />
-            <p>Already have an account? Click <Link to="/SignIn">here</Link> to Sign In!</p>
-        </div>
-    );
-}*/
-
 class Register extends Component{
     constructor(props){
         super(props);
 
+        // our singleton client
         this.client = DBClient.getClient();
 
+        // fields from register form
         this.state = {
             userName: '',
             password: '',
@@ -54,12 +32,15 @@ class Register extends Component{
     }
 
     handleSubmit = async event => {
+        // check if password and confirm password match, then register
         if(this.state.password == this.state.confirmpassword){
             try {
                 //handle register logic
 
-                alert("Registered!");
-            } catch (e) {
+
+                alert(this.state.userName + " registered!");
+            } 
+            catch (e) {
                 alert(e);
             }
         }
@@ -69,74 +50,75 @@ class Register extends Component{
     
     };
 
+    // check if all fields are non empty
     validateForm() {
         return this.state.userName.length > 0 && this.state.email.length > 0
         && this.state.password.length > 0 && this.state.confirmpassword.length > 0;
     }
     
+    // enter key submits form 
     handleKeyEnter = (e) => {
         if(e.charCode === 13) {
             if(!this.validateForm()){
                 alert("Please fill out all fields!");
             }
             else{
-                this.handleSubmit;
+                this.handleSubmit();
             }
         }
     }
 
-render() {
+    render() {
 
-    return(
-        <div>
-            <div className="jumbotron">
-                <h1>Register</h1>
-            </div>
-            <div className="container">
-                <div className="row">
+        return(
+            <div>
+                <div className="jumbotron">
+                    <h1>Register</h1>
+                </div>
+                <br />
+                <br />
+                <div className="container" onSubmit={this.handleSubmit}>
                     <div className="col-5 mx-auto">
-                        <div className=".mx-auto">
-                            <div className="form-group">
-                                <label for="userName">Username:</label>
-                                <input type="text" value={this.state.userName} 
-                                onChange={e => this.setState({userName: e.target.value})} 
-                                onKeyPress={this.handleKeyEnter}
-                                className="form-control" id="userName" />
-                            </div>
-                            <div className="form-group">
-                                <label for="email">Email Address:</label>
-                                <input type="text" value={this.state.email} 
-                                onChange={e => this.setState({email: e.target.value})} 
-                                onKeyPress={this.handleKeyEnter}
-                                className="form-control" id="email" />
-                            </div>
-                            <div className="form-group .mx-auto">
-                                <label for="pwd">Password:</label>
-                                <input type="password" value={this.state.password}
-                                onChange={e => this.setState({password: e.target.value})}
-                                onKeyPress={this.handleKeyEnter} 
-                                className="form-control" id="pwd" />
-                            </div>
-                            <div className="form-group .mx-auto">
-                                <label for="pwd2">Confirm Password:</label>
-                                <input type="password" value={this.state.confirmpassword}
-                                onChange={e => this.setState({confirmpassword: e.target.value})} 
-                                onKeyPress={this.handleKeyEnter}
-                                className="form-control" id="pwd2" />
-                            </div>
-                            <button onClick={this.handleSubmit} 
-                            disabled={!this.validateForm()}
-                            type="submit" className="btn btn-primary .mx-auto">Register</button>
-                            <br />
-                            <br />
-                            <p>Already have an account? Click <Link to="/SignIn">here</Link> to Sign In!</p>
+                        <div className="form-group">
+                            <label for="userName">Username:</label>
+                            <input type="text" value={this.state.userName} 
+                            onChange={e => this.setState({userName: e.target.value})} 
+                            onKeyPress={this.handleKeyEnter}
+                            className="form-control" id="userName" />
                         </div>
+                        <div className="form-group">
+                            <label for="email">Email Address:</label>
+                            <input type="text" value={this.state.email} 
+                            onChange={e => this.setState({email: e.target.value})} 
+                            onKeyPress={this.handleKeyEnter}
+                            className="form-control" id="email" />
+                        </div>
+                        <div className="form-group .mx-auto">
+                            <label for="pwd">Password:</label>
+                            <input type="password" value={this.state.password}
+                            onChange={e => this.setState({password: e.target.value})}
+                            onKeyPress={this.handleKeyEnter} 
+                            className="form-control" id="pwd" />
+                        </div>
+                        <div className="form-group .mx-auto">
+                            <label for="pwd2">Confirm Password:</label>
+                            <input type="password" value={this.state.confirmpassword}
+                            onChange={e => this.setState({confirmpassword: e.target.value})} 
+                            onKeyPress={this.handleKeyEnter}
+                            className="form-control" id="pwd2" />
+                        </div>
+                        
+                        <button onClick={this.handleSubmit} 
+                        disabled={!this.validateForm()}
+                        type="submit" className="btn-med btn-primary">Register</button>
+                        <br />
+                        <br />
+                        <p>Already have an account? Click <Link to="/SignIn">here</Link> to Sign In!</p>
                     </div>
                 </div>
             </div>
-        </div>
-    );
-}
+        );
+    }
 }
 
 export default Register;
