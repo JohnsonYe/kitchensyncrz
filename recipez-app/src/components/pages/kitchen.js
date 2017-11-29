@@ -5,16 +5,16 @@
  * Description: This file will serve as the Kitchen page
  */
 import React, { Component } from 'react';
-import { Jumbotron, Tab, Nav, NavItem, Modal, Button, Popover, Tooltip, OverlayTrigger} from 'react-bootstrap';
+import { Jumbotron, Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
 
 const AddItem = ({item, remove, addOut}) => {
 
     return (
 
-        <form className="form-inline">
-            <div className="form-control btn-group col-11" id="del">
+        <form>
+            <div className="form-control" id="del">
                 {item}
-                <button className = "btn btn-danger btn-lg mg-3"
+                <button className = "btn btn-danger"
                         id = "delBtn"
                         type = "button"
                         onClick = {()=> remove(item)}
@@ -22,7 +22,7 @@ const AddItem = ({item, remove, addOut}) => {
 
                     <i className = "glyphicon glyphicon-trash" />
                 </button>
-                <button className = "btn btn-warning btn-lg mg-3"
+                <button className = "btn btn-warning"
                         id = "delBtn"
                         type = "button"
                         onClick = {()=> addOut(item) }
@@ -39,10 +39,10 @@ const AddRestock = ({item, remove, addBack}) => {
 
     return (
 
-        <form className="form-inline">
-            <div className="form-control btn-group col-11" id="del">
+        <form>
+            <div className="form-control" id="del">
                 {item}
-                <button className = "btn btn-danger btn-lg mg-3"
+                <button className = "btn btn-danger btn-lg"
                         id = "delBtn"
                         type = "button"
                         onClick = {()=> remove(item.id)}
@@ -50,7 +50,7 @@ const AddRestock = ({item, remove, addBack}) => {
 
                     <i className = "glyphicon glyphicon-trash" />
                 </button>
-                <button className = "btn btn-success btn-lg mg-3"
+                <button className = "btn btn-success btn-lg"
                         id = "delBtn"
                         type = "button"
                         onClick = {()=> addBack(item) }
@@ -430,7 +430,7 @@ class kitchen extends Component {
 
     // Other functions
     addOther(val){
-        this.setState({grain: this.state.other.concat(val)});
+        this.setState({other: this.state.other.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
     }
 
@@ -460,7 +460,7 @@ class kitchen extends Component {
     }
 
     removeExclude(e){
-        if( this.state.numExclude > 0 ){
+        if( this.state.exclude.length > 0 ){
             this.state.exclude.splice( this.state.exclude.indexOf(e), 1);
             this.setState({numExclude: (--this.state.numExclude)});
         }
@@ -485,7 +485,7 @@ class kitchen extends Component {
     }
 
     removeCookware(e){
-        if( this.state.numCookware > 0 ){
+        if( this.state.cookware.length > 0 ){
             this.state.cookware.splice( this.state.cookware.indexOf(e), 1);
             this.setState({numCookware: (--this.state.numCookware)});
         }
@@ -595,11 +595,11 @@ class kitchen extends Component {
                     <div id = "Modal">
 
                         <Button
-                            bsStyle="primary"
-                            bsSize="large"
+                            bsStyle="secondary"
+                            bsSize="primary"
                             onClick={this.openExclude}
                         >
-                            Preferences
+                            Preferences: {this.state.numExclude}
                         </Button>
 
                         <Modal show={this.state.showExclude} onHide={this.closeExclude}>
@@ -607,10 +607,14 @@ class kitchen extends Component {
                                 <Modal.Title>Preferences</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
+                                <label class="checkbox-inline"><input type="checkbox"/> Vegan </label>
+                                <label class="checkbox-inline"><input type="checkbox"/> Vegetarian </label>
+                                <label class="checkbox-inline"><input type="checkbox"/> Gluten-Free </label>
+                                <br />
                                 <ECAdd
                                     addExclude = {this.addExclude.bind(this)}
                                     addCookware = {this.addCookware.bind(this)}
-                                    modalKey = {this.getModalKey()}
+                                    getModalKey = {this.getModalKey()}
                                 />
                                 {this.renderExclude()}
                             </Modal.Body>
@@ -638,7 +642,7 @@ class kitchen extends Component {
                                 <ECAdd
                                     addExclude = {this.addExclude.bind(this)}
                                     addCookware = {this.addCookware.bind(this)}
-                                    modalKey = {this.getModalKey()}
+                                    getModalKey = {this.getModalKey()}
                                 />
                                 {this.renderCookware()}
                             </Modal.Body>
@@ -657,17 +661,17 @@ class kitchen extends Component {
                     </div>
 
                     <div className = "row" >
-                        <div className = "col-md-3 col-sm-5" >
+                        <div className = "col-md-3 col-sm-5 col-xs-5" >
                             <div className = "card mg-3 card-bg-light text-center">
                                 <div className = "card-title"><h1>{this.state.numItems}</h1></div>
                                 <div className = "card-body"> Total Items: </div>
                             </div>
                         </div>&nbsp;
 
-                        <div className = "col-md-3 col-sm-5" >
+                        <div className = "col-md-3 col-sm-5 col-xs-5" >
                             <div className = "card mg-3 card-bg-light text-center">
                                 <div className = "card-title"><h1>{this.state.numRestock}</h1></div>
-                                <div className = "card-body"> Needs Restock: </div>
+                                <div className = "card-body"> Restock: </div>
                             </div>
                         </div>
                     </div>
@@ -696,7 +700,7 @@ class kitchen extends Component {
 
                             <Tab.Container defaultActiveKey={this.state.key} onSelect={this.handleSelect.bind(this)}>
                                 <div className="row clearfix">
-                                    <div className="col-sm-3 col-md-2">
+                                    <div className="col-xs-4 col-sm-4 col-md-3">
                                         <Nav bsStyle="pills" stacked>
                                             <NavItem eventKey="Protein">
                                                 Protein
@@ -718,7 +722,7 @@ class kitchen extends Component {
                                             </NavItem>
                                         </Nav>
                                     </div>
-                                    <div className="col-sm-9 col-md-10" id = "tabs">
+                                    <div className="col-xs-8 col-sm-8 col-md-9" id = "tabs">
                                         <Tab.Content animation>
                                             <Tab.Pane eventKey="Protein">
                                                 {this.renderProtein()}
