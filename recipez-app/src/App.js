@@ -65,16 +65,14 @@ class App extends Component {
             isAuthenticating: true
 
         })
-
-
     }
-
 
     handleClick() {
         this.setState({ isMenuOpened: !this.state.isMenuOpened });
     }
 
     handleLogout = event => {
+        this.client.signOutUser();
         this.client.authenticated = false;
         alert(this.client.isLoggedIn());
     }
@@ -113,8 +111,8 @@ class App extends Component {
                                 <li>
                                     <button
                                         onClick={this.handleLogout.bind(this)}
-                                        disabled={!this.client.isLoggedIn()
-                                        }>
+                                        disabled={!this.client.authenticated}
+                                    >
                                         Sign out
                                     </button>
                                 </li>

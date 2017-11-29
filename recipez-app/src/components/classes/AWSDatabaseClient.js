@@ -43,6 +43,7 @@ const UNAUTH_NAME = 'GUEST'
         this.getUserToken = this.getUserToken.bind(this);
         this.getCurrentUser = this.getCurrentUser.bind(this);
         this.authUser = this.authUser.bind(this);
+        this.signOutUser = this.signOutUser.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false;
@@ -255,6 +256,14 @@ const UNAUTH_NAME = 'GUEST'
              ClientId: up.APP_CLIENT_ID
          });
          return userPool.getCurrentUser();
+     }
+
+     signOutUser() {
+         const currentUser = this.getCurrentUser();
+
+         if (currentUser !== null) {
+             currentUser.signOut();
+         }
      }
 
 
