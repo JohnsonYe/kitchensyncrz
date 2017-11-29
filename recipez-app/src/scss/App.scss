@@ -44,7 +44,6 @@
     margin-top: 30px;
   }
 }
-<<<<<<< HEAD
 
 .header {
   position: relative;
@@ -89,74 +88,6 @@
   }
 }
 
-body {
-  #Kitchen-Tabs{
-    
-    /** pushes kitchen tabs a little bit up i guess **/
-    margin-top: -100px;
-    overflow: hidden;
-
-    position: relative;
-    display: inline-block ;
-    list-style-type: none;
-    background: powderblue;
-    width: 100%;
-    
-
-    #pantry{
-      display: inline-block;
-      margin: 10px;
-      color: dimgray;
-      cursor: pointer;
-    }
-
-    #cookware{
-      display: inline-block;
-      margin: 10px;
-      color: dimgray;
-      cursor: pointer;
-    }
-
-    #exclude{
-      display: inline-block;
-      margin: 10px;
-      color: dimgray;
-      cursor: pointer;
-    }
-  }
-
-  #Kitchen-Content{
-    display: block;
-    vertical-align: middle;
-    align-content: center;
-    text-align: center;
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-
-    #gap{
-      margin-top:30px;
-    }
-
-    #add{
-      cursor: pointer;
-      background: powderblue;
-      color: green;
-      font-weight: bold;
-    }
-
-    #remove{
-      position: absolute;
-      right: 0px;
-      bottom: 0px;
-      top:0px;
-      cursor: pointer;
-      color: red;
-      background: powderblue;
-      font-weight: bold;
-    }
-
-  }
-
+.navbar-icon {
+  width: 20%;
 }
