@@ -68,7 +68,8 @@
                     username:   response.payload[0].username.S,
                     cookbook:   response.payload[0].cookbook.M,
                     cookware:   new Set(response.payload[0].cookware.SS),
-                    exclude:    new Set(response.payload[0].cookware.SS),
+                    exclude:    new Set(response.payload[0].exclude.SS),
+                    shopppingList: new Set(response.payload[0].shopppingList.SS)
                     pantry:     this.client.unpackMap(response.payload[0].pantry.M),
                     planner:{}
                 }
@@ -149,7 +150,7 @@
                 'username',
                 this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('cookbook', recipe)),
-            function(response){if(response.status&&this.userData[recipe]) delete this.userData[recipe]; else(JSON.stringify(response))}.bind(this))
+            function(response){if(response.status&&this.userData.cookbook[recipe]) delete this.userData.cookbook[recipe]; else(JSON.stringify(response))}.bind(this))
     }
 
 
@@ -174,14 +175,19 @@
 
     removeFromCookware(item){
         this.client.updateItem(
-            this.client.buildUpdateDeleteRequest(
+            this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildRemoveElementUpdateExpression('cookware', item)),
+                this.client.buildRemoveSetElementUpdateExpression('cookware', item)),
             function(response){if(response.status&&this.userData.cookware[item]) delete this.userData.cookware[item]; else alert(JSON.stringify(response))}.bind(this))
     }
 
+
+    getExclusionList(callback){
+        return this.getUserData('exclude').then(response=>{alert(JSON.stringify(response));callback(response)})
+
+    }
 
     addToExclusionList(ingredient){
         this.client.updateItem(
@@ -195,13 +201,28 @@
 
     removeFromExclusionList(ingredient){
         this.client.updateItem(
-            this.client.buildUpdateDeleteRequest(
+            this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildRemoveElementUpdateExpression('exclude', ingredient)),
-            function(response){if(response.status&&this.userData[ingredient]) delete this.userData[ingredient]; else alert(JSON.stringify(response)) }.bind(this))
+                this.client.buildRemoveSetElementUpdateExpression('exclude', ingredient)),
+            function(response){if(response.status&&this.userData.exclude[ingredient]) delete this.userData.exclude[ingredient]; else alert(JSON.stringify(response)) }.bind(this))
     }
+
+    addToShoppingList(item){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User',
+                'username',
+                this.client.getUsername(),
+                this.client.buildStringSetAppendUpdateExpression('shopppingList', {SS:[item]})),
+            (response) => {
+                if(response.status){
+                    this.addUserData.shopppingList[item] = {item:item}; 
+             }
+             else {
+                alert(JSON.stringify(response)) }.bind(this))  
+    }  
 
     getPlanner(){
         /*

@@ -85,9 +85,11 @@ class Search extends Component {
         // this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))       // THIS WORKS
         //this.user.addToExclusionList('corn')
         //this.user.removeFromExclusionList('corn')
+        this.user.addToShoppingList('eggs')
         //this.user.getCookware(cookware=> this.setState({morten:JSON.stringify(cookware)}));       // THIS WORKS
-        this.user.removeFromCookware('spoon');
+        //this.user.removeFromCookware('spoon');                                                      // THIS DOES NOT WORKS
 
+        //this.user.getExclusionList(cookware=> this.setState({morten:JSON.stringify(cookware)}))
         //this.user.addToCookbook('pork', 'This is how you do')
         //this.user.removeFromCookbook('pork')
 
