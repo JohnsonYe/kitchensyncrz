@@ -147,6 +147,7 @@ class Register extends Component{
                                 <div className="form-group">
                                     <label for="userName">Username:</label>
                                     <input type="text" value={this.state.userName}
+                                           bsSize="large"
                                            onChange={e => this.setState({userName: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
                                            className="form-control" id="userName" />
@@ -174,9 +175,10 @@ class Register extends Component{
                                 </div>
                                 <button onClick={this.handleSubmit}
                                         disabled={!this.validateForm()}
-                                        type="submit" className="btn btn-primary .mx-auto">Register</button>
+                                        type="submit" className="btn-med btn-primary .mx-auto">Register</button>
                                 <br />
                                 <br />
+                                
                                 <p>Already have an account? Click <Link to="/SignIn">here</Link> to Sign In!</p>
                             </div>
                         </div>

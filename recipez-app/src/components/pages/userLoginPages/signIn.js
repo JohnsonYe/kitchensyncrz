@@ -61,7 +61,7 @@ class SignIn extends Component{
 
         return(
             <div>
-                <div className="jumbotron" onSubmit={this.handleSubmit}>
+                <div className="jumbotron">
                     <h1>Sign In</h1>
                 </div>
                 <div className="container">
@@ -75,19 +75,20 @@ class SignIn extends Component{
                                            onKeyPress={this.handleKeyEnter}
                                            className="form-control" id="userName" />
                                 </div>
-                                <div className="form-group .mx-auto">
+                                <div className="form-group">
                                     <label for="pwd">Password:</label>
                                     <input type="password" value={this.state.password}
                                            onChange={e => this.setState({password: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control" id="pwd" />
+                                           className="form-control input-lg" id="pwd" />
                                 </div>
                                 <button onClick={this.handleSubmit}
                                         disabled={!this.validateForm()}
-                                        type="submit" className="btn btn-primary">Login</button>
+                                        type="submit" className="btn-med btn-primary">Login</button>
                                 <br />
                                 <br />
                                 <p>Don’t have an account? Click <Link to="/Register">here</Link> to Register!</p>
+                                
                             </div>
                         </div>
                     </div>

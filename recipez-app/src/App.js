@@ -72,9 +72,10 @@ class App extends Component {
     }
 
     handleLogout = event => {
+        this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
-        alert(this.client.isLoggedIn());
+        //alert(this.client.isLoggedIn());
     }
 
     render() {
@@ -106,15 +107,11 @@ class App extends Component {
                                     <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
                                 </li>
                                 <li>
-                                    <Link to="/SignIn" onClick={this.handleClick.bind(this)}>Sign in</Link>
-                                </li>
-                                <li>
-                                    <button
-                                        onClick={this.handleLogout.bind(this)}
-                                        disabled={!this.client.authenticated}
-                                    >
-                                        Sign out
-                                    </button>
+                                    {
+                                        this.client.authenticated ? 
+                                        <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> : 
+                                        <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                    }
                                 </li>
                             </ul>
                         </OffCanvasMenu>
