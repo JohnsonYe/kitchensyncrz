@@ -5,6 +5,7 @@
  * Description: This file will handle search functionality through the DBClient
  */
 import DBClient from "./AWSDatabaseClient"
+import RecipeHelper from "./RecipeHelper"
 import Autocomplete from '../classes/Autocomplete';
 import JSZip from 'jszip'
 
@@ -37,14 +38,17 @@ import JSZip from 'jszip'
         //use DBClient batch request
         this.ingredientMap = this.ingredientMap.then((map)=>{
         return this.client.getDBItemPromise('Ingredients','Name',ingredients)
+                    .catch((err)=>{console.error(err);throw new Error(err)})//keep the map chain alive even if we error
                     .then((payload)=>{
-                        payload.forEach((ingredient)=>{
-                            map.set(ingredient.Name.S,[5,ingredient,3]);
+                        console.log(JSON.stringify(payload));
+                        payload.map((ingredient)=>this.client.unpackItem(ingredient,RecipeHelper.IngredientPrototype))
+                        .forEach((ingredient)=>{
+                            map.set(ingredient.Name,[5,ingredient,3]);
                             // alert(JSON.stringify(map));
                         });
                         return map
                     })
-                    .catch((err)=>{alert(err);return map})//keep the map chain alive even if we error
+                    .catch((err)=>{console.error(err);return map})//keep the map chain alive even if we error
         })
     }
 
@@ -63,9 +67,11 @@ import JSZip from 'jszip'
                         //status codes: 0 -- excluded
                         //              1 -- added
                         //              3 -- unused
-                        .then((payload)=>map.set(ingredient,[search,payload[0],3]))//put the retrieved info in the map
+                        .then((payload)=>this.client.unpackItem(payload[0],RecipeHelper.IngredientPrototype))
+                        // .then((ingredientObject)=>{alert(JSON.stringify(ingredientObject));return ingredientObject})
+                        .then((ingredientObject)=>map.set(ingredientObject.Name,[search,ingredientObject,3]))//put the retrieved info in the map
                         .then((map2)=>this.updateResultList(map2,ingredient,callback,nosort))
-                        .catch((err)=>map)//invalid DB key? ignore it (for now?)
+                        .catch((err)=>{alert(err);return map})//invalid DB key? fail quietly so the chain stays alive
                     )
                 } else {
                     return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]]),ingredient,callback,nosort) 
@@ -91,15 +97,15 @@ import JSZip from 'jszip'
             }
             map.get(ingredient)[2] = updateType==1?1:3;
             let recipeTracker = new Set()
-            map.get(ingredient)[1].recipes.L.forEach((recipe)=>{
-                let recipeName = recipe.M.Name.S
+            map.get(ingredient)[1].recipes.forEach((recipe)=>{
+                let recipeName = recipe.Name
                 if(!recipeTracker.has(recipeName)){
                     recipeTracker.add(recipeName)
                     let prevEntry = this.recipeMap.has(recipeName)?this.recipeMap.get(recipeName):[0,0,0]; //set base values to 0 if no entry exists
                     this.recipeMap.set(recipeName,[
                         prevEntry[0],
                         prevEntry[1]+updateType,
-                        prevEntry[2]+updateType*(+recipe.M.Importance.N)
+                        prevEntry[2]+updateType*(+recipe.Importance)
                         ])
                 }
             })
@@ -116,10 +122,10 @@ import JSZip from 'jszip'
             }
             map.get(ingredient)[2] = updateType==2?3:0;
             let adjustment = (updateType==0)?1:-1;
-            map.get(ingredient)[1].recipes.L.forEach((recipe)=>{
-                let prevEntry = this.recipeMap.has(recipe.M.Name.S)?this.recipeMap.get(recipe.M.Name.S):[0,0,0]; //set base values to 0 if no entry exists
+            map.get(ingredient)[1].recipes.forEach((recipe)=>{
+                let prevEntry = this.recipeMap.has(recipe.Name)?this.recipeMap.get(recipe.Name):[0,0,0]; //set base values to 0 if no entry exists
                 //increment the rejection score by one
-                this.recipeMap.set(recipe.M.Name.S,[prevEntry[0]+adjustment,prevEntry[1],prevEntry[2]])
+                this.recipeMap.set(recipe.Name,[prevEntry[0]+adjustment,prevEntry[1],prevEntry[2]])
             })
             //this should only get called from a Promise chain
             //branch the chain into the supplied callback

@@ -7,6 +7,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
+import RecipeHelper from '../classes/RecipeHelper';
 import PlannerHelper from '../classes/Planner';
 import SearchBar from '../SearchComponents/SearchBar'
 
@@ -15,11 +16,11 @@ class Search extends Component {
 		super(props);
 
         this.client = new SearchHelper();
+        this.recipeHelper = new RecipeHelper();
 
         this.componentWillMount = this.componentWillMount.bind(this);
         this.componentWillUnmount = this.componentWillUnmount.bind(this);
 
-		this.test = 'test '
         this.addIngredient = this.addIngredient.bind(this);
         this.removeIngredient = this.removeIngredient.bind(this);
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
@@ -35,21 +36,13 @@ class Search extends Component {
             this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
             // use a promise.all to wait for all ingredients to load asynchronously
             Promise.all(
-                Array.from(this.state.ingredients).map((ingredient)=>{
-                        return new Promise((pass,fail)=>{
-                            this.client.updateIngredient(ingredient,1,()=>{pass(ingredient)},(name)=>{fail(name)},true)
-                    })
-                }),
-                Array.from(this.state.excluded).map((excluded)=>{
-                        return new Promise((pass,fail)=>{
-                            this.client.updateIngredient(excluded,0,()=>{pass(excluded)},(name)=>{fail(name)},true)
-                    })
-                })
+                //have search manager skip sorting after each update to improve speed
+                this.massUpdateSearch(this.state.ingredients,1),this.massUpdateSearch(this.state.excluded,0)
             )
-            .catch((err)=>alert('failed'))
+            .catch((err)=>alert(err))
+            //do one sort once everything is done loading
             .then((result)=>{this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted}))})
         }
-        //NEED TO SET STATUS AFTER UPDATE
         this.planner = new PlannerHelper();
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
@@ -57,6 +50,13 @@ class Search extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReject = this.handleReject.bind(this);
 	}
+    massUpdateSearch(items,action){
+        return Array.from(items).map((item)=>{
+                return new Promise((pass,fail)=>{
+                    this.client.updateIngredient(item,action,()=>{pass(item)},()=>{fail(item)},true)
+            })
+        })
+    }
     componentWillMount(){
         window.addEventListener('click', this.closeAllDropdowns);
     }
@@ -66,15 +66,17 @@ class Search extends Component {
     addIngredient(ingredient){
         this.ingredient = ingredient;
     }
-    removeIngredient(name,code){
+    updateState(sortedResults,value,status){
+        
+        this.setState({
+            sorted:sortedResults,
+            ...this.updateIngredientState(value,status)
+        },this.updateURI)
+    }
+    removeIngredient(value,status){
         // e.preventDefault();
-        this.client.updateIngredient(name,code,(sorted)=>{
-            if(code==-1){
-                this.state.ingredients.delete(name)
-            } else {
-                this.state.excluded.delete(name)
-            }
-            this.setState({sorted:sorted,ingredients:this.state.ingredients,excluded:this.state.excluded},this.updateURI)
+        this.client.updateIngredient(value,status,(sorted)=>{
+            this.updateState(sorted,value,status);
             if(this.state.ingredients.size == 0){
                 this.closeAllDropdowns()
             }
@@ -95,12 +97,15 @@ class Search extends Component {
     }
     updateIngredientState(value,status){
         if(status == 1){
-            return {ingredients:this.state.ingredients.add(value)}
+            return {ingredients:this.state.ingredients.add(value)};
+        } else if(status==-1){
+            return {ingredients:(()=>{this.state.ingredients.delete(value);return this.state.ingredients})()};
         } else if(status == 0){
-            // alert('got here')
-            return {excluded:this.state.excluded.add(value)}
+            return {excluded:this.state.excluded.add(value)};
+        } else if(status==2){
+            return {excluded:(()=>{this.state.excluded.delete(value);return this.state.excluded})()};
         } else {
-            return {}
+            return {};
         }
     }
     handleSubmit(e){
@@ -109,7 +114,7 @@ class Search extends Component {
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
         this.client.updateIngredient(value,status,(sorted)=>{
-            this.setState({sorted:sorted,...this.updateIngredientState(value,status)},this.updateURI)
+            this.updateState(sorted,value,status);
             this.searchbar.reset();
         })
         
@@ -123,7 +128,7 @@ class Search extends Component {
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
         this.client.updateIngredient(value,0,(sorted)=>{
-            this.setState({sorted:sorted,excluded:this.state.excluded.add(value)},this.updateURI)
+            this.updateState(sorted,value,status);
             this.searchbar.reset();
         })   
              
@@ -149,7 +154,7 @@ class Search extends Component {
                                 <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
                                     <span className="glyphicon glyphicon-list"></span>
                                 </button>
-                                <div class="dropdown-menu">
+                                <div className="dropdown-menu">
                                     <div className='dropdown-item'>Add From Pantry<span className="pull-right"><span className="glyphicon glyphicon-download-alt"></span></span></div>
                                     <div role="separator" className="dropdown-divider"></div>                                    
                                     <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Clear All<span className="pull-right"><span className="glyphicon glyphicon-trash"></span></span></div>

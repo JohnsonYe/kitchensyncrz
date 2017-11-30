@@ -154,12 +154,12 @@ class SearchBar extends Component{
                     onChange={this.handleChange}
                     onKeyDown={this.handleKeyDown}
                     onKeyUp={this.handleKeyUp}
-                    autocomplete="off"
-                    autofocus="on"
+                    autoComplete="off"
+                    autoFocus="on"
                     value={this.state.value}
                     // style={{'z-index':1,'position':'relative'}}
                     />
-                <div class="dropdown-menu">
+                <div className="dropdown-menu">
                     {this.state.completions.map((key)=>(<div className='dropdown-item'>{key}</div>))}
                 </div>
             </div>

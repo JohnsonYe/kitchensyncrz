@@ -15,6 +15,8 @@ import User from '../classes/User';
         this.client = DBClient.getClient();
         this.client.registerPrototype(RecipeHelper.RecipePrototype)
         this.client.registerPrototype(RecipeHelper.ReviewPrototype)
+        this.client.registerPrototype(RecipeHelper.RecipeReferencePrototype)
+        this.client.registerPrototype(RecipeHelper.IngredientPrototype)
 
         this.createRecipe = this.createRecipe.bind(this);
         this.loadRecipe     = this.loadRecipe.bind(this);
@@ -133,6 +135,17 @@ import User from '../classes/User';
         // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
         // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
+ }
+ RecipeHelper.RecipeReferencePrototype = {
+    _NAME:'RECIPE_REFERENCE',
+    Name:{type:'S'},
+    Importance:{type:'N'}
+ }
+
+ RecipeHelper.IngredientPrototype = {
+    _NAME:'INGREDIENT_BASE',
+    Name:{type:'S'},
+    recipes:{type:'L',inner:{'type':RecipeHelper.RecipeReferencePrototype._NAME}}
  }
 
  RecipeHelper.ReviewPrototype = {
