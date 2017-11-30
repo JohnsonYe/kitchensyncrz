@@ -1,16 +1,6 @@
 @import "_config.scss";
 @import "_search.scss";
 
-.modal-backdrop {
-  z-index: 90;
-}
-
-.modal{
-  display: block;
-}
-
-
-
 
 /* ruleset for all jumbotrons across website*/
 .jumbotron {
@@ -21,7 +11,7 @@
   height: 180px;
 }
 
-/* little icon that opens nav bar, will have to be 
+/* little icon that opens nav bar, will have to be
  * adjusted as we change the img */
 .ks-icon {
   overflow: hidden;
