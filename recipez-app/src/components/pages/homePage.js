@@ -5,6 +5,7 @@
  * Description: This file will serve as the Homepage Content
  */
 import React, { Component } from 'react';
+import SearchResult from "../classes/SearchResults";
 
 class Homepage extends Component {
     render() {
@@ -16,6 +17,7 @@ class Homepage extends Component {
             <div className="container-fluid">
                 Homepage content goes here ... Our Website is currently under construction
             </div>
+            <SearchResult />
             </div>
         
         );

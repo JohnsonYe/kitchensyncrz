@@ -29,7 +29,7 @@ import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
 import Recipe from "./components/pages/recipe";
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
-
+import SearchResults from "./components/classes/SearchResults";
 
 class App extends Component {
 
