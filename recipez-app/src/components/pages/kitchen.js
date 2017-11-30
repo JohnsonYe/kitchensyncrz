@@ -6,6 +6,7 @@
  */
 import React, { Component } from 'react';
 import { Jumbotron, Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
+import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
 
 import User from '../classes/User'
 
@@ -14,7 +15,7 @@ const AddItem = ({item, remove, addOut}) => {
     return (
 
         <form>
-            <div className="form-control" id="del">
+            <div className="well well-sm" id="del">
                 {item}
                 <button className = "btn btn-danger"
                         id = "delBtn"
@@ -37,12 +38,33 @@ const AddItem = ({item, remove, addOut}) => {
     );
 }
 
+const AddExcludeCookware = ({item, remove}) => {
+
+    return (
+
+        <form>
+            <div className="well well-sm" id="del">
+                {item}
+                <button className = "btn btn-danger"
+                        id = "delBtn"
+                        type = "button"
+                        onClick = {()=> remove(item)}
+                        style = {{float:'right', display:'block'}}>
+
+                    <i className = "glyphicon glyphicon-trash" />
+                </button>
+            </div>
+
+        </form>
+    );
+}
+
 const AddRestock = ({item, remove, addBack}) => {
 
     return (
 
         <form>
-            <div className="form-control" id="del">
+            <div className="well well-sm" id="del">
                 {item}
                 <button className = "btn btn-danger btn-lg"
                         id = "delBtn"
@@ -78,6 +100,18 @@ const ItemList = ( {items, remove, addOut} ) => {
     return (<div> {itemNode}  </div>);
 }
 
+const ExcludeCookwareList = ( {items, remove} ) => {
+
+    // Map through nodes
+    const itemNode = items.map((item)=>
+        (<AddExcludeCookware item = {item}
+                  key={item.id}
+                  remove={remove}
+        />));
+
+    return (<div> {itemNode}  </div>);
+}
+
 const RestockList = ( {items, remove, addBack} ) => {
     const itemNode = items.map( (item) =>
         (<AddRestock item = {item}
@@ -94,6 +128,7 @@ const ItemForm = ( {addProtein,
                       addFruit,
                       addGrain,
                       addOther,
+                      addToPantry,
                       getKey} ) => {
 
     // Input Tracker
@@ -145,7 +180,7 @@ const ItemForm = ( {addProtein,
                 <span className = "input-group-btn">
                         <button className="btn btn-success"
                                 type="submit"
-                                onClick = {this.user.addToPantry('potato', 'none', 1)}>
+                                onClick = {addToPantry('turkey', 'none', 1)}>
                             <i className = "glyphicon glyphicon-plus" />
                         </button>
                 </span>
@@ -154,7 +189,7 @@ const ItemForm = ( {addProtein,
     );
 };
 
-const ECAdd = ({addExclude, addCookware, getModalKey}) => {
+const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
 
     // Input Tracker
     let input;
@@ -167,7 +202,6 @@ const ECAdd = ({addExclude, addCookware, getModalKey}) => {
             // Preventing empty answers
             if( input.value !== '') {
 
-                alert( getModalKey );
                 if( getModalKey == "Exclude" ) {
                     addExclude(input.value);
                 }else if( getModalKey == "Cookware"){
@@ -201,7 +235,7 @@ class kitchen extends Component {
         super( props );
 
         this.user = new User();
-        
+
         var
             proteinData = [],
             dairyData = [],
@@ -211,6 +245,7 @@ class kitchen extends Component {
             otherData = [],
             outData = [],
             excludeData = [],
+            prefData = [],
             cookwareData = [];
 
         this.state = {
@@ -225,6 +260,7 @@ class kitchen extends Component {
             fruit: fruitData,
             other: otherData,
             exclude: excludeData,
+            pref: prefData,
             cookware: cookwareData,
 
             out: outData,
@@ -318,13 +354,17 @@ class kitchen extends Component {
     }
 
     removeProtein(e){
+
         if( this.state.protein.length > 0 ){
             this.state.protein.splice( this.state.protein.indexOf(e), 1);
             this.setState({numItems: (--this.state.numItems)});
+            this.user.removeFromPantry('turkey');
+
         }
     }
 
     renderProtein(){
+
         return(
             <div>
                 <ItemList
@@ -462,6 +502,10 @@ class kitchen extends Component {
     }
 
     // Exclude functions
+    prefChanged = (newPref) => {
+        this.setState({ pref: newPref});
+    }
+
     addExclude(val){
         this.setState({exclude: this.state.exclude.concat(val)});
         this.setState({numExclude: (++this.state.numExclude)});
@@ -477,10 +521,9 @@ class kitchen extends Component {
     renderExclude(){
         return(
             <div>
-                <ItemList
+                <ExcludeCookwareList
                     items={this.state.exclude}
                     remove={this.removeExclude.bind(this)}
-                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -502,10 +545,9 @@ class kitchen extends Component {
     renderCookware(){
         return(
             <div>
-                <ItemList
+                <ExcludeCookwareList
                     items={this.state.cookware}
                     remove={this.removeCookware.bind(this)}
-                    addOut={this.addOut.bind(this)}
                 />
             </div>
         );
@@ -622,12 +664,13 @@ class kitchen extends Component {
                     <h1>Kitchen</h1>
                 </div>
 
+
                 <div className="container">
 
-                    <div id = "Modal">
+                    <div className = "row" id = "Modal1">
 
                         <Button
-                            bsStyle="secondary"
+                            bsStyle="primary"
                             bsSize="large"
                             onClick={this.openExclude}
                         >
@@ -639,15 +682,24 @@ class kitchen extends Component {
                                 <Modal.Title>Preferences</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <label class="checkbox-inline"><input type="checkbox"/> Vegan </label>
-                                <label class="checkbox-inline"><input type="checkbox"/> Vegetarian </label>
-                                <label class="checkbox-inline"><input type="checkbox"/> Gluten-Free </label>
+
+                                <CheckboxGroup
+                                    name="pref"
+                                    value={this.state.pref}
+                                    onChange={this.prefChanged}
+                                    style={{textAlign: 'center'}}>
+
+                                    <label style={{marginRight: '8px'}}><Checkbox value="vegan" /> Vegan </label>
+                                    <label style={{marginRight: '8px'}}><Checkbox value="vegetarian" /> Vegetarian </label>
+                                    <label style={{marginRight: '8px'}}><Checkbox value="gluten-free" /> Gluten-Free  </label>
+                                </CheckboxGroup>
                                 <br />
-                                <ECAdd
+                                <ExcludeCookwareForm
                                     addExclude = {this.addExclude.bind(this)}
                                     addCookware = {this.addCookware.bind(this)}
                                     getModalKey = {this.getModalKey()}
                                 />
+                                <br />
                                 {this.renderExclude()}
                             </Modal.Body>
                             <Modal.Footer>
@@ -656,14 +708,16 @@ class kitchen extends Component {
                         </Modal>
                     </div>
 
-                    <div className = "row" id = "Modal">
+
+
+                    <div className = "row" id = "Modal2">
 
                         <Button
-                            bsStyle="primary"
+                            bsStyle="info"
                             bsSize="large"
                             onClick={this.openCookware}
                         >
-                            Cookware
+                            Cookware: {this.state.cookware.length}
                         </Button>
 
                         <Modal show={this.state.showCookware} onHide={this.closeCookware}>
@@ -671,7 +725,7 @@ class kitchen extends Component {
                                 <Modal.Title>Cookware</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <ECAdd
+                                <ExcludeCookwareForm
                                     addExclude = {this.addExclude.bind(this)}
                                     addCookware = {this.addCookware.bind(this)}
                                     getModalKey = {this.getModalKey()}
@@ -683,6 +737,7 @@ class kitchen extends Component {
                             </Modal.Footer>
                         </Modal>
                     </div>
+
 
                     <div className="row">
                         <h3> Inventory Summary </h3>
@@ -719,6 +774,7 @@ class kitchen extends Component {
                                         addFruit = {this.addFruit.bind(this)}
                                         addGrain = {this.addGrain.bind(this)}
                                         addOther = {this.addOther.bind(this)}
+                                        addToPantry = {this.user.addToPantry.bind(this)}
                                         getKey = {this.getKey()}
                                     />
                                 </div>

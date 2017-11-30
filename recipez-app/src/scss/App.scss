@@ -63,14 +63,19 @@
     position: relative;
     display: block;
     font-size: 15px;
-    margin-bottom: 2px;
-    margin-top: -4.5px;
-    margin-right: -0.5px;
+    margin-top: -8.5px;
+    margin-right: -5.5px;
   }
 }
 
-#Modal{
+#Modal1{
   z-index: 110;
   float: right;
+  margin-left: 10px;
+}
 
+#Modal2{
+  z-index: 110;
+  float:right;
+  margin-right: 10px;
 }
