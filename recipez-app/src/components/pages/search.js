@@ -8,7 +8,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
 import PlannerHelper from '../classes/Planner';
-import SearchBar from '../SearchComponents/SearchBar'
+import SearchBar from '../SearchComponents/SearchBar';
+import SearchThumbnail from '../SearchComponents/SearchThumbnail';
 
 class Search extends Component {
 	constructor(props)  {
@@ -195,15 +196,18 @@ class Search extends Component {
                             </div>
                         </div>
                     </form>
-                    <ul className="list-group">
+                    <div className="container-fluio">
+                        <div className="row">
                         {this.state.sorted.map((recipe)=>(
-                            <li className="list-group-item">
-                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
-                                <span className='pull-right'>{'Score: '+JSON.stringify(recipe[1].map((n)=>n.toFixed(2)))}</span>
-                            </li>
+                            /*<div className="container-fluid">
+                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>*/
+                                <SearchThumbnail link={recipe[0]}/>
+                                /*<span className='pull-right'>{'Score: '+JSON.stringify(recipe[1].map((n)=>n.toFixed(2)))}</span>*/
+                            /*</div>*/
                         ))}
                         {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
-                    </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             </div>
