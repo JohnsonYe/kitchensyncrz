@@ -28,15 +28,42 @@ class Search extends Component {
 		this.test = 'test '
         this.addIngredient = this.addIngredient.bind(this);
         this.removeIngredient = this.removeIngredient.bind(this);
+
+        this.mortensButton = this.mortensButton.bind(this);
+
+        this.planner = new PlannerHelper();
+
+        this.user = new User();
+        this.toggleDropdown = this.toggleDropdown.bind(this);
+        this.dropdownState = this.dropdownState.bind(this);
+        this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleReject = this.handleReject.bind(this);
+        this.setFilter = this.setFilter.bind(this);
+        this.getFilterButton = this.getFilterButton.bind(this);
+
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
         let query = this.parseQueryString(this.props.history.location.search)
 		this.state = {  ingredients:new Set(query.ingredients?query.ingredients:[]),
                         excluded: new Set(query.excluded?query.excluded:[]),
+                        filter:query.filter?query.filter:'least_additional',
                         morten:"Do something cool?",
                         completions:[],
                         dropdown:{ingredients:false,filters:false},
                         sorted:[],
                     };
+
+
+	}
+    massUpdateSearch(items,action){
+        return Array.from(items).map((item)=>{
+                return new Promise((pass,fail)=>{
+                    this.client.updateIngredient(item,action,()=>{pass(item)},()=>{fail(item)},true)
+            })
+        })
+    }
+    componentWillMount(){
+        window.addEventListener('click', this.closeAllDropdowns);
         if(this.state.ingredients.size||this.state.excluded.size){
             //batch load all the ingredients from the URI
             this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
@@ -49,27 +76,7 @@ class Search extends Component {
             //do one sort once everything is done loading
             .then((result)=>{this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted}))})
         }
-
-        this.mortensButton = this.mortensButton.bind(this);
-
-        this.planner = new PlannerHelper();
-
-        this.user = new User();
-        this.toggleDropdown = this.toggleDropdown.bind(this);
-        this.dropdownState = this.dropdownState.bind(this);
-        this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleReject = this.handleReject.bind(this);
-	}
-    massUpdateSearch(items,action){
-        return Array.from(items).map((item)=>{
-                return new Promise((pass,fail)=>{
-                    this.client.updateIngredient(item,action,()=>{pass(item)},()=>{fail(item)},true)
-            })
-        })
-    }
-    componentWillMount(){
-        window.addEventListener('click', this.closeAllDropdowns);
+        this.setFilter(this.state.filter)
     }
     componentWillUnmount(){
         window.removeEventListener('click', this.closeAllDropdowns);
@@ -119,21 +126,29 @@ class Search extends Component {
             return {};
         }
     }
+    searchUpdateWrapper(value,status){
+        return ((sorted)=>this.searchUpdate(sorted,value,status));
+    }
+    searchUpdate(sorted,value,status){
+        console.log('Updated search results: ' + JSON.stringify([value,status]))
+        this.updateState(sorted,value,status);
+        if(this.searchbar){
+            this.searchbar.reset();
+        }
+    }
     handleSubmit(e){
         e.preventDefault();
 
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,status,(sorted)=>{
-            this.updateState(sorted,value,status);
-            this.searchbar.reset();
-        })
+        this.client.updateIngredient(value,status,this.searchUpdateWrapper(value,status))
         
     }
     updateURI(){
         this.props.history.replace('/Search?'+
                 'ingredients='+Array.from(this.state.ingredients).join(',')+
-                '&excluded='+Array.from(this.state.excluded).join(','))
+                '&excluded='+Array.from(this.state.excluded).join(',')+
+                '&filter='+this.state.filter)
     }
     handleReject(e){
         let value = this.searchbar.getValue()
@@ -150,6 +165,12 @@ class Search extends Component {
             .map((param)=>(param.split('=')))
             .map((splitParam)=>({[splitParam[0]]:splitParam[1]?splitParam[1].split(',').map((val)=>decodeURIComponent(val)):undefined}))
             .reduce((prev,item)=>Object.assign(item,prev),{})
+    }
+
+    setFilter(filter){
+        this.closeAllDropdowns()
+        this.client.setFilter(filter,this.searchUpdateWrapper())
+        this.setState({filter:filter})
     }
 
     mortensButton(){
@@ -181,6 +202,15 @@ class Search extends Component {
         //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
         //this.user.addToShoppingList('milk')                                                               // THIS WORKS
         //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
+
+    }
+
+    getFilterButton(message,icon,filter,largest){
+        let glyph = (<span className={"glyphicon glyphicon-"+icon+(largest?" pad-icon":"")}></span>);
+        if(!largest){
+            glyph = (<span className="pull-right">{glyph}</span>);
+        }
+        return (<div className='dropdown-item' onClick={(e)=>this.setFilter(filter)}>{message}{glyph}</div>);
 
     }
 
@@ -238,12 +268,14 @@ class Search extends Component {
                                     <span className="glyphicon glyphicon-filter"></span>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Import Preferences<span className="glyphicon glyphicon-download-alt pad-icon"></span></div>
-                                    <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Filter by Time<span className="pull-right"><span className="glyphicon glyphicon-time"></span></span></div>
-                                    <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Filter by Rating<span className="pull-right"><span className="glyphicon glyphicon-star"></span></span></div>
-                                    <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Filter by Cost<span className="pull-right"><span className="glyphicon glyphicon-piggy-bank"></span></span></div>
-                                    <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Filter by Difficulty<span className="pull-right"><span className="glyphicon glyphicon-sunglasses"></span></span></div>
-                                    <div className='dropdown-item' onClick={(e)=>this.props.history.push('/Search')}>Filter by Cookware<span className="pull-right"><span className="glyphicon glyphicon-cutlery"></span></span></div>
+                                    {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
+                                    {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
+                                    {this.getFilterButton('Filter by Best Match','signal','best_match')}
+                                    {this.getFilterButton('Filter by Time','time','time_filter')}
+                                    {this.getFilterButton('Filter by Cost','piggy-bank','cost_filter')}
+                                    {this.getFilterButton('Filter by Rating','star','rating_filter')}
+                                    {this.getFilterButton('Filter by Difficulty','sunglasses','difficulty_filter')}
+                                    {this.getFilterButton('Filter by Cookware','cutlery','cookware_filter')}
                                 </div>
                             </div>
                         </div>

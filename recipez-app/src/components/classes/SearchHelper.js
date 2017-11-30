@@ -31,16 +31,17 @@ import JSZip from 'jszip'
             .then((binary)=>zip.loadAsync(binary,{base64:true})) //more async
             .then((file)=>zip.file('Ingredient.tst').async('string')) //MORE ASYNC
             .then((json)=>new Autocomplete().loadJSON(json))
+            .then((autocomplete)=>{console.log('Finished loading autocomplete in searchbar: ');return autocomplete})
             // .catch((err)=>err)
     }
 
     batchLoadIngredients(ingredients){
         //use DBClient batch request
+        console.log('Loading ingredient batch: '+JSON.stringify(ingredients))
         this.ingredientMap = this.ingredientMap.then((map)=>{
         return this.client.getDBItemPromise('Ingredients','Name',ingredients)
                     .catch((err)=>{console.error(err);throw new Error(err)})//keep the map chain alive even if we error
                     .then((payload)=>{
-                        console.log(JSON.stringify(payload));
                         payload.map((ingredient)=>this.client.unpackItem(ingredient,RecipeHelper.IngredientPrototype))
                         .forEach((ingredient)=>{
                             map.set(ingredient.Name,[5,ingredient,3]);
@@ -62,6 +63,7 @@ import JSZip from 'jszip'
         this.ingredientMap = //push another link to the chain to update the status of the ingredient map
             this.ingredientMap.then((map)=>{ //load the new ingredient if necessary
                 if(!map.has(ingredient)){ //update the map if the ingredient isnt in it or we are removing it
+                    console.log('Loading ingredient: '+ingredient)
                     return (this.client.getDBItemPromise('Ingredients','Name',[ingredient])
                         //info format: [query type,object,status]
                         //status codes: 0 -- excluded
@@ -71,7 +73,7 @@ import JSZip from 'jszip'
                         // .then((ingredientObject)=>{alert(JSON.stringify(ingredientObject));return ingredientObject})
                         .then((ingredientObject)=>map.set(ingredientObject.Name,[search,ingredientObject,3]))//put the retrieved info in the map
                         .then((map2)=>this.updateResultList(map2,ingredient,callback,nosort))
-                        .catch((err)=>{alert(err);return map})//invalid DB key? fail quietly so the chain stays alive
+                        .catch((err)=>{console.error(err);return map})//invalid DB key? fail quietly so the chain stays alive
                     )
                 } else {
                     return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]]),ingredient,callback,nosort) 
@@ -85,7 +87,7 @@ import JSZip from 'jszip'
 
     /**
      * RECIPE ENTRY FORMAT:
-     * [rejection score,raw score,scaled score]
+     * [rejection score,raw score,importance score]
      */
 
     updateResultList(map,ingredient,callback,nosort){
@@ -136,15 +138,46 @@ import JSZip from 'jszip'
             }
         } else {
             //well this is awkward
+            console.error('Incorrect query code found when updating recipe map: '+updateType)
         }
         return map //keep the chain alive
     }
 
     sortRecipeMap(callback){
+        console.log('Sorting recipe map . . .')
         callback(this.sorted = Array.from(this.recipeMap.entries())
-            .sort((a,b)=>(b[1][2]-a[1][2])) //sort by scaled score first, may be changeable to raw score sort
+            .sort(this.currentFilter) //sort by selected filter
             .filter((entry)=>(entry[1][0]==0)&&(entry[1][1]!=0)) //remove rejected items (items with positive rejection score)
         )
+    }
+
+    setFilter(filter,callback,nosort){
+        this.currentFilter = this.getFilter(filter);
+        if(nosort){
+            return;
+        }
+        this.sortRecipeMap(callback);
+    }
+
+    getFilter(filter){
+        switch(filter){
+            case 'least_additional':
+                console.log('Set filter type to: ' + filter)
+                return ((a,b)=>(b[1][2]-a[1][2])); //compare importance scores
+            case 'best_match':
+                console.log('Set filter type to: ' + filter)
+                return ((a,b)=>(b[1][1]-a[1][1])); //compare raw scores
+            //THESE NEED INFO FROM A RECIPE OBJECT -- HOW SHOULD WE GET IT (efficiently)?
+            case 'time_filter':
+            case 'cost_filter':
+            case 'rating_filter':
+            case 'difficulty_filter':
+            case 'cookware_filter':
+            case 'custom':
+            default:
+                console.log('Set filter type to: none')
+                return ((a,b)=>true);
+        }
     }
 
     autocomplete(base,callback){
