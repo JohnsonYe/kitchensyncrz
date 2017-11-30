@@ -5,6 +5,7 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
+ // import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
 
  /**
   * THIS IS A SINGLETON CLASS.
@@ -19,6 +20,8 @@ var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
 
+var appClientID = '1qnpej4u0hul8mq0djs9a5r8me';
+
 
  class DBClient {
     constructor(){
@@ -32,6 +35,8 @@ const UNAUTH_NAME = 'GUEST'
 
         this.authenticated = false;
 
+        this.login();
+
         /**
          * figurative recursion hell
          */
@@ -39,9 +44,9 @@ const UNAUTH_NAME = 'GUEST'
             'S': (s,p)=>s.S,
             'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
             'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev),{}),
-            'SS':(ss,p)=>ss.SS,
+            'SS':(ss,p)=>new Set(ss.SS),
             'N': (n,p)=>n.N,
-            'SET':(s,p)=>new Set(s)
+            'SET':(s,p)=>new Set(s),
         }
 
         /**
@@ -51,9 +56,20 @@ const UNAUTH_NAME = 'GUEST'
             'S': (s,p)=>({'S':s}),
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
-            'SS':(ss,p)=>({'SS':ss}),
+            'SS':(ss,p)=>({'SS':Array.from(ss)}),
             'N': (n,p)=>({'N':n}),
+            'SET': (n,p)=>{alert('this isnt set up yet')},
         }
+    }
+
+    putDBItem(tableName,item,errCallback,successCallback){
+        db.putItem({TableName:tableName,Item:item},(err,data)=>{
+            if(err){
+                errCallback({status:false, payload: err});                
+            } else {
+                successCallback({status:true,  payload: data});                
+            }
+        })
     }
 
     /*
@@ -63,16 +79,16 @@ const UNAUTH_NAME = 'GUEST'
      *
      * string tableName: name of the table to retrieve items from
      * [string] keys: list of ingredient names to use as DB keys
-     * handle target: function handle to send items to
+     * handle callback: function handle to send items to
      */
-    getDBItems(tableName,keyField,keys,target){
+    getDBItems(tableName,keyField,keys,callback){
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
             if(err){
-                target({status:false, payload: err});
+                callback({status:false, payload: err});
             } else if(data.Responses[tableName].length == 0) {
-                target({status:false, payload: 'Item not found!'});
+                callback({status:false, payload: 'Item not found!'});
             } else {
-                target({status:true,  payload: data.Responses[tableName]});
+                callback({status:true,  payload: data.Responses[tableName]});
             }
         })
     }
@@ -196,6 +212,43 @@ const UNAUTH_NAME = 'GUEST'
     login(username,password) {
         this.user = username
         return this.authenticated = true
+
+        // let cognito = new AWS.CognitoIdentityServiceProvider();
+        // let params = {
+        //     AuthFlow:'ADMIN_NO_SRP_AUTH',
+        //     ClientId:'1qnpej4u0hul8mq0djs9a5r8me',
+        //     UserPoolId:'us-east-2_XSpVGxnOu',
+        //     AuthParameters:{
+        //         USERNAME:'test',
+        //         PASSWORD:'SECURE_password',
+        //     }
+        // };
+        // let callback = (response)=>{
+        //     if(!response.err){
+        //         console.log(response);
+        //     } else {
+        //         console.error(response.err);
+        //     }
+        // }
+        // // cognito.adminInitiateAuth(params,callback)
+
+        // let authenticationData = {
+        //     Username:'test',
+        //     Password:'SECURE_password',
+        // }
+        // let authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+        // let poolData = { 
+        //     UserPoolId : 'us-east-2_XSpVGxnOu',
+        //     ClientId : '1qnpej4u0hul8mq0djs9a5r8me'
+        // };
+        // let userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+        // let userData = {
+        //     Username : 'test',
+        //     Pool : userPool
+        // };
+        // let cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+        // cognitoUser.authenticateUser(authenticationDetails,callback);
+
     }
 
     isLoggedIn(){

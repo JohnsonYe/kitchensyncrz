@@ -22,20 +22,21 @@
         this.getPantry = this.getPantry.bind(this);
         this.addToPantry = this.addToPantry.bind(this);
         this.removeFromPantry = this.removeFromPantry.bind(this);
-
-        // this.addToPantry('zucchini','none',1)
-        // this.removeFromPantry('zucchini')
-
-        this.userData = { username:this.client.getUsername(), cookbook:{},cookware:{},pantry:{},planner:{}}
-
-        // this.client.updateItem(
-        //     this.client.buildUpdateRequest(
-        //         'User',
-        //         'username',this.client.getUsername(),
-        //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
-        //     this.client.alertResponseCallback)
-        this.loadStream = new Promise(this.loadUserData)
+        this.loadStream = new Promise(this.loadUserData);
         this.verified = false;
+        // this.createUser('hello world')
+    }
+
+    createUser(username){
+        this.loadStream = Promise.resolve({ //create a new user data object locally
+            username:username,
+            cookbook:{},
+            cookware:new Set(['fork']), //this can't be empty
+        })
+        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
+            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),fail,pass))
+        })
+        .then((data)=>console.log(data.payload))
     }
 
     /**
@@ -49,27 +50,21 @@
      * }
      */
     loadUserData(resolve,reject){
-        if(this.userData.username === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
-            // alert('rejected!')
-            reject('User is not logged in!')
-            return
-        }
+        // if(this.userData.username === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
+        //     // alert('rejected!')
+        //     reject('User is not logged in!')
+        //     return
+        // }
+         
+        // This can eventually be replaced with getDBItemPromise, which does the same thing
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
-                this.userData = {
-                    username:   response.payload[0].username.S,
-                    cookbook:   response.payload[0].cookbook.M,
-                    cookware:   new Set(response.payload[0].cookware.SS),
-                    pantry:     this.client.unpackMap(response.payload[0].pantry.M),
-                    planner:{}
-                }
                 // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
                 resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))
                 // resolve(this.userData)
             } else {
-                this.userData = null
                 // alert('rejected!')
-                reject('Failed to load user data!')
+                reject(response.payload)
             }
             /*; alert(JSON.stringify(this.userData))*/})
     }
@@ -83,12 +78,14 @@
             (response)=>{
                 if(response.status){
                     this.addUserData((data)=>{
-                        delete data.cookbook[recipeName];
+                        if(data.cookbook[recipeName]){
+                            delete data.cookbook[recipeName];
+                        }
                         return data
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -110,7 +107,7 @@
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -131,7 +128,7 @@
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -159,7 +156,17 @@
                 'User',
                 'username',this.client.getUsername(),
                 this.client.buildMapUpdateExpression('pantry',ingredient,{M:{amount:{N:amount.toString()},unit:{S:unit}}})),
-            function(response){if(response.status) this.userData.pantry[ingredient] = {amount:amount,unit:unit}}.bind(this))
+            (response)=>{
+                if(response.status){
+                    // this.userData.pantry[ingredient] = {amount:amount,unit:unit}
+                    this.addUserData((data)=>{
+                        data.pantry[ingredient] = {amount:amount,unit:unit};
+                        return data
+                    })
+                } else {
+                    console.error(response.payload)
+                }
+            })
 
     }
 
@@ -169,7 +176,18 @@
                 'User',
                 'username',this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('pantry',ingredient)),
-            function(response){if(response.status&&this.userData.pantry[ingredient]) delete this.userData.pantry[ingredient]}.bind(this))
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        if(data.pantry[ingredient]){
+                            delete data.pantry[ingredient];
+                        }
+                        return data
+                    })
+                } else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     getCookbook(callback){
@@ -245,7 +263,7 @@
     _NAME:'USERDATA',
     username:{type:'S'},
     cookbook:{type:'M',inner:{type:'S'}},
-    cookware:{type:'SS',inner:{type:'SET'}},
+    cookware:{type:'SS'},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
     planner:{}
  }
