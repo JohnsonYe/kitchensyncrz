@@ -7,6 +7,8 @@
 import React, { Component } from 'react';
 import { Jumbotron, Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
 
+import User from '../classes/User'
+
 const AddItem = ({item, remove, addOut}) => {
 
     return (
@@ -141,7 +143,9 @@ const ItemForm = ( {addProtein,
                        ref={node => { input = node; }} />
 
                 <span className = "input-group-btn">
-                        <button className="btn btn-success" type="submit">
+                        <button className="btn btn-success"
+                                type="submit"
+                                onClick = {this.user.addToPantry('potato', 'none', 1)}>
                             <i className = "glyphicon glyphicon-plus" />
                         </button>
                 </span>
@@ -195,6 +199,9 @@ class kitchen extends Component {
 
     constructor( props ){
         super( props );
+
+        this.user = new User();
+        
         var
             proteinData = [],
             dairyData = [],
@@ -613,12 +620,15 @@ class kitchen extends Component {
 
                 <div className="jumbotron">
                     <h1>Kitchen</h1>
+                </div>
+
+                <div className="container">
 
                     <div id = "Modal">
 
                         <Button
                             bsStyle="secondary"
-                            bsSize="primary"
+                            bsSize="large"
                             onClick={this.openExclude}
                         >
                             Preferences: {this.state.numExclude}
@@ -646,7 +656,7 @@ class kitchen extends Component {
                         </Modal>
                     </div>
 
-                    <div id = "Modal">
+                    <div className = "row" id = "Modal">
 
                         <Button
                             bsStyle="primary"
@@ -673,10 +683,6 @@ class kitchen extends Component {
                             </Modal.Footer>
                         </Modal>
                     </div>
-
-                </div>
-
-                <div className="container">
 
                     <div className="row">
                         <h3> Inventory Summary </h3>
