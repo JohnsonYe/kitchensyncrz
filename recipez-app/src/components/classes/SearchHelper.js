@@ -33,30 +33,38 @@ import JSZip from 'jszip'
             // .catch((err)=>err)
     }
 
+    batchLoadIngredients(ingredients){
+        //use DBClient batch request
+        this.ingredientMap = this.ingredientMap.then((map)=>{
+        return this.client.getDBItemPromise('Ingredients','Name',ingredients)
+                    .then((payload)=>{payload.forEach((ingredient)=>map.set(ingredient.Name,[5,ingredient,3]));return map})
+                    .catch((err)=>{alert(err);return map})//keep the map chain alive even if we error
+        })
+    }
+
     /**
-     * [addIngredient description]
+     * [update ingredients one at a time, use the batch loader for mass loading]
      * @param {[type]}   ingredient [description]
      * @param {[type]}   search     [description]
      * @param {Function} callback   [description]
      */
-    updateIngredient(ingredient,search,callback,escape){
+    updateIngredient(ingredient,search,callback,escape,nosort){
         this.ingredientMap = //push another link to the chain to update the status of the ingredient map
             this.ingredientMap.then((map)=>{ //load the new ingredient if necessary
                 if(!map.has(ingredient)){ //update the map if the ingredient isnt in it or we are removing it
                     return (this.client.getDBItemPromise('Ingredients','Name',[ingredient])
-                        .then((payload)=>map.set(ingredient,[search,payload[0],true]))//put the retrieved info in the map
-                        .then((map2)=>this.updateResultList(map2,ingredient,callback))
+                        //info format: [query type,object,status]
+                        //status codes: 0 -- excluded
+                        //              1 -- added
+                        //              3 -- unused
+                        .then((payload)=>map.set(ingredient,[search,payload[0],3]))//put the retrieved info in the map
+                        .then((map2)=>this.updateResultList(map2,ingredient,callback,nosort))
                         .catch((err)=>map)//invalid DB key? ignore it (for now?)
                     )
-                } else if(search == 1 && !map.get(ingredient)[2]){
-                    return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],true]),ingredient,callback)                    
-                } else if(search!=1){ //use the value in the map to complete the action
-                    return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]&&search!=-1]),ingredient,callback)
                 } else {
-                    if(escape){
-                        escape(ingredient)
-                    }
-                }
+                    if(!map.get(ingredient))alert(map.get(ingredient))
+                    return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]]),ingredient,callback,nosort) 
+                }                   
                 //since this ingredient is already in the map, dont modify the map or fire the callback
                 //callers should not rely on this method to use the callback for any given set of arguments
                 return map
@@ -69,9 +77,14 @@ import JSZip from 'jszip'
      * [rejection score,raw score,scaled score]
      */
 
-    updateResultList(map,ingredient,callback){
+    updateResultList(map,ingredient,callback,nosort){
         let updateType = map.get(ingredient)[0];
+        let status = map.get(ingredient)[2];
         if(updateType==1||updateType==-1){ //use ingredient in search
+            if((updateType==1&&status!=3)||(updateType==-1&&status!=1)){ //query doesn't fit the current status, reject it and do nothing
+                return map;
+            }
+            map.set(ingredient)[2] = updateType==1?1:3;
             let recipeTracker = new Set()
             map.get(ingredient)[1].recipes.L.forEach((recipe)=>{
                 let recipeName = recipe.M.Name.S
@@ -87,17 +100,31 @@ import JSZip from 'jszip'
             })
             //this should only get called from a Promise chain
             //branch the chain into the supplied callback
-            this.sortRecipeMap(callback)
-        } else { //reject or un-reject ingredient from search
+            if(!nosort){
+                this.sortRecipeMap(callback)
+            } else {
+                callback(ingredient)
+            }
+        } else if(updateType==0||updateType==2){ //reject or un-reject ingredient from search
+            if((updateType==0&&status!=3)||(updateType==2&&status!=0)){ //query doesn't fit the current status, reject it and do nothing
+                return map;
+            }
+            map.set(ingredient)[2] = updateType==2?3:0;
             let adjustment = (updateType==0)?1:-1;
             map.get(ingredient)[1].recipes.L.forEach((recipe)=>{
-                let prevEntry = this.recipeMap.has(ingredient)?this.recipeMap.get(recipe.M.Name.S):[0,0,0]; //set base values to 0 if no entry exists
+                let prevEntry = this.recipeMap.has(recipe.M.Name.S)?this.recipeMap.get(recipe.M.Name.S):[0,0,0]; //set base values to 0 if no entry exists
                 //increment the rejection score by one
                 this.recipeMap.set(recipe.M.Name.S,[prevEntry[0]+adjustment,prevEntry[1],prevEntry[2]])
             })
             //this should only get called from a Promise chain
             //branch the chain into the supplied callback
-            this.sortRecipeMap(callback)
+            if(!nosort){
+                this.sortRecipeMap(callback)
+            } else {
+                callback(ingredient)
+            }
+        } else {
+            //well this is awkward
         }
         return map //keep the chain alive
     }

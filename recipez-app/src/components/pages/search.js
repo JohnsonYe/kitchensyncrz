@@ -30,22 +30,26 @@ class Search extends Component {
                         dropdown:{ingredients:false,filters:false},
                         sorted:[],
                     };
-        // Promise.all([Promise.resolve('got here')]).then(alert)
-        Promise.all(
-            Array.from(this.state.ingredients).map((ingredient)=>{
-                    return new Promise((pass,fail)=>{
-                        this.client.updateIngredient(ingredient,1,()=>{pass(ingredient)},(name)=>{fail(name)})
+        if(this.state.ingredients.size||this.state.excluded.size){
+            //batch load all the ingredients from the URI
+            this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
+            // use a promise.all to wait for all ingredients to load asynchronously
+            Promise.all(
+                Array.from(this.state.ingredients).map((ingredient)=>{
+                        return new Promise((pass,fail)=>{
+                            this.client.updateIngredient(ingredient,1,()=>{pass(ingredient)},(name)=>{fail(name)},true)
+                    })
+                }),
+                Array.from(this.state.excluded).map((excluded)=>{
+                        return new Promise((pass,fail)=>{
+                            this.client.updateIngredient(excluded,0,()=>{pass(excluded)},(name)=>{fail(name)},true)
+                    })
                 })
-            }),
-            Array.from(this.state.excluded).map((excluded)=>{
-                    return new Promise((pass,fail)=>{
-                        this.client.updateIngredient(excluded,0,()=>{pass(excluded)},(name)=>{fail(name)})
-                })
-            })
-        )
-        .catch((err)=>alert('failed'))
-        .then((result)=>{this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted}))})
-
+            )
+            .catch((err)=>alert('failed'))
+            .then((result)=>{this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted}))})
+        }
+        //NEED TO SET STATUS AFTER UPDATE
         this.planner = new PlannerHelper();
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
@@ -65,8 +69,12 @@ class Search extends Component {
     removeIngredient(name,code){
         // e.preventDefault();
         this.client.updateIngredient(name,code,(sorted)=>{
-            this.state.ingredients.delete(name)
-            this.setState({sorted:sorted,ingredients:this.state.ingredients})
+            if(code==-1){
+                this.state.ingredients.delete(name)
+            } else {
+                this.state.excluded.delete(name)
+            }
+            this.setState({sorted:sorted,ingredients:this.state.ingredients,excluded:this.state.excluded},this.updateURI)
             if(this.state.ingredients.size == 0){
                 this.closeAllDropdowns()
             }
@@ -101,20 +109,24 @@ class Search extends Component {
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
         this.client.updateIngredient(value,status,(sorted)=>{
-            this.setState({sorted:sorted,...this.updateIngredientState(value,status)})
-            this.props.history.replace('/Search?'+
+            this.setState({sorted:sorted,...this.updateIngredientState(value,status)},this.updateURI)
+            this.searchbar.reset();
+        })
+        
+    }
+    updateURI(){
+        this.props.history.replace('/Search?'+
                 'ingredients='+Array.from(this.state.ingredients).join(',')+
                 '&excluded='+Array.from(this.state.excluded).join(','))
-        })
-        this.searchbar.reset();
     }
     handleReject(e){
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
         this.client.updateIngredient(value,0,(sorted)=>{
-            this.setState({sorted:sorted,excluded:this.state.excluded.add(value)})
+            this.setState({sorted:sorted,excluded:this.state.excluded.add(value)},this.updateURI)
+            this.searchbar.reset();
         })   
-        this.searchbar.reset();     
+             
     }
     parseQueryString(search){
         return search.substring(1)
