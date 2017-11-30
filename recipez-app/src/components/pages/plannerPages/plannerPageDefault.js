@@ -43,11 +43,11 @@ function UpNextCard(props){
 
 function DailyPlannerItem(props) {
     return (
-        <div className="card m-3 hoverable">
+        <div className="card m-3 hoverable blue-grey darken-4">
             <div className="card transparent">
                 <div className="card-body">
                     <MealEditor />
-                    <p>{props.start} to {props.end} - {props.duration}</p>
+                    <p className="text-white">{props.start} to {props.end} - {props.duration}</p>
                 </div>
             </div>
         </div>
@@ -88,7 +88,8 @@ class Planner extends Component {
         this.renderItem = this.renderItem.bind(this);
         this.renderDayPlanner = this.renderDayPlanner.bind(this);
         this.renderShoppingList = this.renderShoppingList.bind(this);
-
+        this.renderWeekPlanner = this.renderWeekPlanner.bind(this);
+        this.renderWeekCol = this.renderWeekCol.bind(this);
     }
 
     /** Functionality Methods **/
@@ -108,6 +109,7 @@ class Planner extends Component {
             this.state.meals.splice((this.state.numMeals - 1), 1);
             this.setState({meals: this.state.meals});
             this.setState({numMeals: (--this.state.numMeals)});
+            this.state.mealData.removeMeal(0,0,0);
         }
     }
     /**
@@ -128,6 +130,7 @@ class Planner extends Component {
         }
     }
 
+
     /** Functionality Methods End **/
 
     /**===============================================================================================================*/
@@ -135,29 +138,48 @@ class Planner extends Component {
     /** Render Items Start **/
 
 
-    renderWeekCol() {
-
+    renderWeekCol(day) {
+        return (
+            <div className="col-md col-sm-12">
+                <p>{day}</p>
+                <Button
+                    bsSize="small"
+                    bsStyle="secondary"
+                    onClick={this.addMeal}>Test</Button>
+                <button
+                    className="btn btn-danger btn-sm"
+                    onClick={this.removeMeal}>Remove Test</button>
+                <DynamicList
+                    renderLI={this.renderMeal("start", "end", "Duration", "Meal")}
+                    list={this.state.meals}
+                />
+            </div>
+        );
     }
 
     renderWeekPlanner() {
         return (
-            <div className="row">
-                <div className="col-3
+            <div className="col-md-12">
+                <div className="
                                             border
                                             border-left-0
-                                            border-top-0
-                                            border-bottom-0
+                                            border-right-0
                                             border-dark">
                     <div className="mx-auto">
-                        <h2>Daily Meal Planner</h2>
-                        <p>{this.state.date}</p>
+                        <h2>Weekly Meal Planner</h2>
                         <h3>{this.state.numMeals}</h3>
                         <p>Meals</p>
-                        <h3>{this.state.numMealsPrepared}</h3>
-                        <p>Prepared</p>
                     </div>
                 </div>
-
+                <div className="row">
+                {this.renderWeekCol("Sunday")}
+                {this.renderWeekCol("Monday")}
+                {this.renderWeekCol("Tuesday")}
+                {this.renderWeekCol("Wednesday")}
+                {this.renderWeekCol("Thursday")}
+                {this.renderWeekCol("Friday")}
+                {this.renderWeekCol("Saturday")}
+                </div>
             </div>
         );
     }
@@ -266,17 +288,16 @@ class Planner extends Component {
 
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-6">
+                        <div className="col-sm-12 col-md-6">
                             {this.renderDayPlanner()}
                         </div>
 
-                        <div className="col-md-6">
+                        <div className="col-sm-12 col-md-6">
                             {this.renderShoppingList()}
                         </div>
-                    </div>
-
+                    </div> &nbsp;
                     <div className="row">
-                        Daily Meal Planner goes here
+                            {this.renderWeekPlanner()}
                     </div>
                 </div>
             </div>
