@@ -15,6 +15,10 @@ class PersonalRecipes extends Component{
         super(props);
 
 
+        this.state = {
+            recipeList: [],
+            cur_key: 0,
+        };
 
         this.addRecipe = this.addRecipe.bind(this);
         this.userInstance = props.userInstance;
@@ -24,37 +28,27 @@ class PersonalRecipes extends Component{
         this.personalRecipeObjects = [];
         this.recipeHelper = new RecipeHelper();
 
-        this.userInstance.getCookbook((cookbook_contents) => {
-            this.cookbook = cookbook_contents;
-            for ( let [recipeName,source] of Object.entries(this.cookbook)){
-                if(source !=="none"){
-                    this.personalRecipeNames.push(recipeName);
-                    this.recipeHelper.loadRecipe(recipeName,(recipeObject) => {
-                        this.personalRecipeObjects.push(recipeObject);
-                        console.log(this.personalRecipeObjects);
-                    }, 'user001');
+        var doRecipeThings = new Promise((pass,fail)=>{
+
+            this.userInstance.getCookbook((cookbook_contents) => {
+                this.cookbook = cookbook_contents;
+                for( let [recipeName,source] of Object.entries(this.cookbook)){
+                    if(source !=="none"){
+                        this.personalRecipeNames.push(recipeName);
+                        this.recipeHelper.loadRecipe(recipeName,(recipeObject) => {
+                            this.personalRecipeObjects.push(recipeObject);
+                        }, 'user001');
+                    }
                 }
-            }
-
-            this.getFullRecipeObjectArray(this.personalRecipeNames,() => {
-                this.state = {
-                    recipeMap: new Map(),
-                    recipeList: this.personalRecipeObjects,
-                    cur_key: 0,
-                };
-            });
-
+            })
         });
 
-    }
+        Promise.all([doRecipeThings]).then((recipeList) => {
+            this.setState({recipeList: recipeList})
+        },
+            (recipeList) =>{
 
-    getFullRecipeObjectArray(recipeNames,callback){
-
-        for( let name in recipeNames){
-
-
-
-        }
+            });
 
     }
 
@@ -99,8 +93,8 @@ class PersonalRecipes extends Component{
                 <div className={"btn btn-success"} onClick={this.addRecipe}>
                     Create Recipe
                 </div>
-
                 <div className={"row"}>
+                    {this.state.recipeList}
                 </div>
             </div>
         );

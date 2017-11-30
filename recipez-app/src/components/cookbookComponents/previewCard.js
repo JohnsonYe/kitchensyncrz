@@ -41,7 +41,7 @@ class PreviewCard extends Component{
                             Edit
                         </div>
                         <div className={"btn btn-warning"} onClick={this.removeThis}>
-                            Delete {this.props.card_key}
+                            Delete
                         </div>
                     </div>
 
