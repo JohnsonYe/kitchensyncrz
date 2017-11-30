@@ -37,7 +37,13 @@ import JSZip from 'jszip'
         //use DBClient batch request
         this.ingredientMap = this.ingredientMap.then((map)=>{
         return this.client.getDBItemPromise('Ingredients','Name',ingredients)
-                    .then((payload)=>{payload.forEach((ingredient)=>map.set(ingredient.Name,[5,ingredient,3]));return map})
+                    .then((payload)=>{
+                        payload.forEach((ingredient)=>{
+                            map.set(ingredient.Name.S,[5,ingredient,3]);
+                            // alert(JSON.stringify(map));
+                        });
+                        return map
+                    })
                     .catch((err)=>{alert(err);return map})//keep the map chain alive even if we error
         })
     }
@@ -62,7 +68,6 @@ import JSZip from 'jszip'
                         .catch((err)=>map)//invalid DB key? ignore it (for now?)
                     )
                 } else {
-                    if(!map.get(ingredient))alert(map.get(ingredient))
                     return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]]),ingredient,callback,nosort) 
                 }                   
                 //since this ingredient is already in the map, dont modify the map or fire the callback
@@ -84,7 +89,7 @@ import JSZip from 'jszip'
             if((updateType==1&&status!=3)||(updateType==-1&&status!=1)){ //query doesn't fit the current status, reject it and do nothing
                 return map;
             }
-            map.set(ingredient)[2] = updateType==1?1:3;
+            map.get(ingredient)[2] = updateType==1?1:3;
             let recipeTracker = new Set()
             map.get(ingredient)[1].recipes.L.forEach((recipe)=>{
                 let recipeName = recipe.M.Name.S
@@ -109,7 +114,7 @@ import JSZip from 'jszip'
             if((updateType==0&&status!=3)||(updateType==2&&status!=0)){ //query doesn't fit the current status, reject it and do nothing
                 return map;
             }
-            map.set(ingredient)[2] = updateType==2?3:0;
+            map.get(ingredient)[2] = updateType==2?3:0;
             let adjustment = (updateType==0)?1:-1;
             map.get(ingredient)[1].recipes.L.forEach((recipe)=>{
                 let prevEntry = this.recipeMap.has(recipe.M.Name.S)?this.recipeMap.get(recipe.M.Name.S):[0,0,0]; //set base values to 0 if no entry exists
