@@ -15,29 +15,6 @@ import {
 } from 'react-router-dom';
 import DBClient from "../../classes/AWSDatabaseClient";
 
-/*function RegisterForm(props){
-    return (
-        <div className=".mx-auto">
-            <div className="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" className="form-control" id="email" />
-            </div>
-            <div className="form-group .mx-auto">
-                <label for="pwd">Password:</label>
-                <input type="password" className="form-control" id="pwd" />
-            </div>
-            <div className="form-group .mx-auto">
-                <label for="pwd2">Confirm Password:</label>
-                <input type="password" className="form-control" id="pwd2" />
-            </div>
-            <button type="submit" className="btn btn-primary .mx-auto">Register</button>
-            <br />
-            <br />
-            <p>Already have an account? Click <Link to="/SignIn">here</Link> to Sign In!</p>
-        </div>
-    );
-}*/
-
 class Register extends Component{
     constructor(props){
         super(props);
@@ -48,14 +25,21 @@ class Register extends Component{
             userName: '',
             password: '',
             confirmpassword: '',
-            email: ''
+            email: '',
+            confirmationCode: '',
+            newUser: null
         }
     }
 
     handleSubmit = async event => {
+        event.preventDefault();
+
         if(this.state.password == this.state.confirmpassword){
             try {
-                //handle register logic
+                const newUser = await this.client.register(this.state.userName, this.state.password, this.state.email);
+                this.setState({
+                    newUser: newUser
+                });
 
                 alert("Registered!");
             } catch (e) {
@@ -68,9 +52,31 @@ class Register extends Component{
 
     };
 
+    handleConfirmationSubmit = async event => {
+        event.preventDefault();
+
+        try {
+            await this.client.confirmUser(this.state.newUser, this.state.confirmationCode);
+            await this.client.authenticateUser(
+                this.state.newUser,
+                this.state.email,
+                this.state.password
+            );
+
+            this.client.authenticated = true;
+            this.props.history.push("/Search");
+        } catch (e) {
+            alert(e);
+        }
+    };
+
     validateForm() {
         return this.state.userName.length > 0 && this.state.email.length > 0
             && this.state.password.length > 0 && this.state.confirmpassword.length > 0;
+    }
+
+    validateConfirmationForm() {
+        return this.state.confirmationCode.length > 0;
     }
 
     handleKeyEnter = (e) => {
@@ -79,12 +85,55 @@ class Register extends Component{
                 alert("Please fill out all fields!");
             }
             else{
-                this.handleSubmit;
+                this.handleSubmit();
             }
         }
+    };
+
+    handleKeyEnterConfirmation = (e) => {
+        if(e.charCode === 13) {
+            if(!this.validateConfirmationForm()){
+                alert("Please enter a code!");
+            }
+            else{
+                this.handleConfirmationSubmit();
+            }
+        }
+    };
+
+    renderConfirmationForm() {
+
+        return(
+            <div>
+                <div className="jumbotron">
+                    <h1>Email Confirmation</h1>
+                </div>
+                <div className="container">
+                    <div className="row">
+                        <div className="col-5 mx-auto">
+                            <div className=".mx-auto">
+                                <div className="form-group .mx-auto">
+                                    <label for="pwd2">Confirmation Code:</label>
+                                    <input type="password" value={this.state.confirmationCode}
+                                           onChange={e => this.setState({confirmationCode: e.target.value})}
+                                           onKeyPress={this.handleKeyEnterConfirmation}
+                                           className="form-control" id="pwd2" />
+                                </div>
+                                <button onClick={this.handleConfirmationSubmit}
+                                        disabled={!this.validateConfirmationForm()}
+                                        type="submit" className="btn btn-primary .mx-auto">Confirm Email</button>
+                                <p>Check your email for confirmation code.</p>
+                                <br />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
-    render() {
+    renderRegisterForm() {
 
         return(
             <div>
@@ -133,6 +182,16 @@ class Register extends Component{
                         </div>
                     </div>
                 </div>
+            </div>
+        );
+    }
+
+    render() {
+        return (
+            <div >
+                {this.state.newUser === null
+                    ? this.renderRegisterForm()
+                    : this.renderConfirmationForm()}
             </div>
         );
     }

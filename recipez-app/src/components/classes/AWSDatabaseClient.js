@@ -44,6 +44,9 @@ const UNAUTH_NAME = 'GUEST'
         this.getCurrentUser = this.getCurrentUser.bind(this);
         this.authUser = this.authUser.bind(this);
         this.signOutUser = this.signOutUser.bind(this);
+        this.register = this.register.bind(this);
+        this.confirmUser = this.confirmUser.bind(this);
+        this.authenticateUser = this.authenticateUser.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false;
@@ -282,7 +285,60 @@ const UNAUTH_NAME = 'GUEST'
          }
      }
 
+     register(username, password, email) {
+         const userPool = new CognitoUserPool({
+             UserPoolId: up.USER_POOL_ID,
+             ClientId: up.APP_CLIENT_ID
+         });
 
+         var attributeList = [];
+
+         var dataEmail = {
+             Name : 'email',
+             Value : email
+         };
+
+         //var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+         attributeList.push(dataEmail);
+
+         return new Promise((resolve, reject) =>
+             userPool.signUp(username, password, attributeList, null, (err, result) => {
+                 if (err) {
+                     reject(err);
+                     return;
+                 }
+
+                 resolve(result.user);
+             })
+         );
+     }
+
+     confirmUser(user, confirmationCode) {
+         return new Promise((resolve, reject) =>
+             user.confirmRegistration(confirmationCode, true, function(err, result) {
+                 if (err) {
+                     reject(err);
+                     return;
+                 }
+                 resolve(result);
+             })
+         );
+     }
+
+     authenticateUser(user, email, password) {
+         const authenticationData = {
+             Username: user,
+             Password: password
+         };
+         const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+         return new Promise((resolve, reject) =>
+             user.authenticateUser(authenticationDetails, {
+                 onSuccess: result => resolve(),
+                 onFailure: err => reject(err)
+             })
+         );
+     }
 
 
     unpackFormatting(aws_response) {
