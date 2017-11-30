@@ -4,11 +4,15 @@
  * Date Created: 11/2/2017
  * Description: This file will serve as the browse/search recipe page
  */
+// Morten trying to learn how this works...
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import SearchHelper from '../classes/SearchHelper';
 import RecipeHelper from '../classes/RecipeHelper';
 import PlannerHelper from '../classes/Planner';
+import User from '../classes/User'
+
 import SearchBar from '../SearchComponents/SearchBar'
 
 class Search extends Component {
@@ -28,6 +32,7 @@ class Search extends Component {
         let query = this.parseQueryString(this.props.history.location.search)
 		this.state = {  ingredients:new Set(query.ingredients?query.ingredients:[]),
                         excluded: new Set(query.excluded?query.excluded:[]),
+                        morten:"Do something cool?",
                         completions:[],
                         dropdown:{ingredients:false,filters:false},
                         sorted:[],
@@ -44,7 +49,12 @@ class Search extends Component {
             //do one sort once everything is done loading
             .then((result)=>{this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted}))})
         }
+
+        this.mortensButton = this.mortensButton.bind(this);
+
         this.planner = new PlannerHelper();
+
+        this.user = new User();
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
         this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
@@ -141,11 +151,48 @@ class Search extends Component {
             .map((splitParam)=>({[splitParam[0]]:splitParam[1]?splitParam[1].split(',').map((val)=>decodeURIComponent(val)):undefined}))
             .reduce((prev,item)=>Object.assign(item,prev),{})
     }
+
+    mortensButton(){
+        this.setState({morten: this.user.client.getUsername()});                                  
+        //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
+        
+        
+        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry)}));                     // THIS WORKS
+        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry['milk'])}));             // THIS WORKS
+        //this.user.addToPantry('prok','none',1)                                                            // THIS WORKS
+        //this.user.removeFromPantry('prok')                                                                // THIS WORKS
+        
+
+        //this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))                // THIS WORKS   
+        //this.user.addToCookbook('pork', 'This is how you do')                                             // THIS WORKS
+        //this.user.removeFromCookbook('pork')                                                              // THIS WORKS
+
+
+        //this.user.getCookware(cookware=> this.setState({morten:JSON.stringify(cookware)}));               // THIS WORKS
+        //this.user.addToCookware('spoon')                                                                  // THIS WORKS
+        //this.user.removeFromCookware('spoon');                                                            // THIS WORKS
+
+
+        //this.user.getExclusionList(exlcude=> this.setState({morten:JSON.stringify(exlcude)}))             // THIS WORKS
+        //this.user.addToExclusionList('corn')                                                              // THIS WORKS
+        //this.user.removeFromExclusionList('corn')                                                         // THIS WORKS
+        
+
+        //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
+        //this.user.addToShoppingList('milk')                                                               // THIS WORKS
+        //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
+
+    }
+
     render() {
         return (
             <div onClick={this.closeAllDropdowns}>
             <div className="jumbotron">
                 <h1>Search</h1>
+            </div>
+            <div>
+                <h3>{this.state.morten}</h3>
+                <button onClick={this.mortensButton}>Mortens Button</button> 
             </div>
             <div className="container-fluid">
                 <div id='searchbar-toolbar-container'>

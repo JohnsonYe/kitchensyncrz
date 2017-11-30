@@ -170,9 +170,9 @@ const UNAUTH_NAME = 'GUEST'
 
     buildStringSetAppendUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+                expr: 'ADD #attr :item',
                 names:{"#attr":attrName},
-                values:{":item":value,":empty_set":{SS:[]}}
+                values:{":item":value}
             }
     }
 
@@ -184,6 +184,16 @@ const UNAUTH_NAME = 'GUEST'
             values:undefined
         }
     }
+
+    buildRemoveSetElementUpdateExpression(attrName,elemName){
+        return {
+            expr: 'DELETE '+attrName+" :v",
+            names:undefined,
+            values:{":v": {"SS": [elemName]}}
+        }
+    }
+
+
 
     buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
