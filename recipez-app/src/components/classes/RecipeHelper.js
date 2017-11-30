@@ -18,6 +18,7 @@ import User from '../classes/User';
 
         this.createRecipe = this.createRecipe.bind(this);
         this.loadRecipe     = this.loadRecipe.bind(this);
+        this.loadRecipeBatch = this.loadRecipeBatch.bind(this);
         this.receiveRecipe  = this.receiveRecipe.bind(this);
         this.updateReview   = this.updateReview.bind(this);
         this.testUnpack = this.testUnpack.bind(this);
@@ -110,6 +111,15 @@ import User from '../classes/User';
         }
     }
 
+    loadRecipeBatch(batch,callback){
+        this.client.getDBItems('Recipes','Name',batch,
+            (response)=>callback(response.payload.map(
+                (recipe)=>this.client.unpackItem(recipe,RecipeHelper.RecipePrototype)
+                )
+            )
+        )
+    }
+
     receiveRecipe(response,callback) {
         if(!response.status){
             //the call failed, should we try again?
@@ -182,8 +192,8 @@ RecipeHelper.unpackRecipe = function(recipeResponse){
 RecipeHelper.packRecipe = function(r){
     return {
         Name:{S:r.Name},
-        Ingredients:{L:r.Ingredients.map((ingredient)=>{S:ingredient})},
-        Directions:{L:r.Directions.map((step)=>{S:step})},
+        Ingredients:{L:r.Ingredients.map((ingredient)=>({S:ingredient}))},
+        Directions:{L:r.Directions.map((step)=>({S:step}))},
         Reviews:RecipeHelper.packReview(r.Reviews)
     }
 
