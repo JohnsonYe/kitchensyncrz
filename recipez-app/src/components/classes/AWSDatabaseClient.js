@@ -23,6 +23,7 @@ const UNAUTH_NAME = 'GUEST'
  class DBClient {
     constructor(){
         this.getDBItems = this.getDBItems.bind(this);
+        this.getDBItemPromise = this.getDBItemPromise.bind(this);
         this.registerPrototype = this.registerPrototype.bind(this);
         this.getPrototype = this.getPrototype.bind(this);
         this.unpackItem = this.unpackItem.bind(this);
@@ -75,6 +76,26 @@ const UNAUTH_NAME = 'GUEST'
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
+    }
+
+    /**
+     * [get a Promise object containing the database items requested]
+     * @param  {[String]} tableName [name of table to get items from]
+     * @param  {[String]} keyField  [name of field used as database key]
+     * @param  {[JSON]} keys      [keys to fetch items with]
+     * @return {[Promise]}           [Promise object with pending DB response]
+     */
+    getDBItemPromise(tableName,keyField,keys){
+        return new Promise((pass,fail)=>{
+            this.getDBItems(tableName,keyField,keys,(response)=>{
+                if(response.status){//call succeeded, pass
+                    // alert('got here')
+                    pass(response.payload)
+                } else { //call failed, fail
+                    fail(response.payload)
+                }
+            });
+        });
     }
 
     /*
@@ -149,9 +170,9 @@ const UNAUTH_NAME = 'GUEST'
 
     buildStringSetAppendUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+                expr: 'ADD #attr :item',
                 names:{"#attr":attrName},
-                values:{":item":value,":empty_set":{SS:[]}}
+                values:{":item":value}
             }
     }
 
@@ -163,6 +184,16 @@ const UNAUTH_NAME = 'GUEST'
             values:undefined
         }
     }
+
+    buildRemoveSetElementUpdateExpression(attrName,elemName){
+        return {
+            expr: 'DELETE '+attrName+" :v",
+            names:undefined,
+            values:{":v": {"SS": [elemName]}}
+        }
+    }
+
+
 
     buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
@@ -289,6 +320,11 @@ const UNAUTH_NAME = 'GUEST'
      */
     alertResponseCallback(response){
         alert(JSON.stringify(response))
+    }
+
+    alertAndPass(object){
+        alert('got here');
+        return object
     }
 
  }

@@ -182,8 +182,8 @@ RecipeHelper.unpackRecipe = function(recipeResponse){
 RecipeHelper.packRecipe = function(r){
     return {
         Name:{S:r.Name},
-        Ingredients:{L:r.Ingredients.map((ingredient)=>{S:ingredient})},
-        Directions:{L:r.Directions.map((step)=>{S:step})},
+        Ingredients:{L:r.Ingredients.map((ingredient)=>({S:ingredient}))},
+        Directions:{L:r.Directions.map((step)=>({S:step}))},
         Reviews:RecipeHelper.packReview(r.Reviews)
     }
 
