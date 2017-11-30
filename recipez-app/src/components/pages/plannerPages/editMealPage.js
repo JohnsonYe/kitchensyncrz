@@ -153,7 +153,7 @@ class MealEditor extends Component {
         return (
             <div>
                 <a
-                    className="card-link"
+                    className="card-link text-white"
                     onClick={this.open}>Recipe Title
                 </a>
 

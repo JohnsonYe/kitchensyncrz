@@ -16,20 +16,15 @@ class PlannerHelper{
         this.user = User.getUser(this.client.getUsername());
 
         //Access Meal Data data[dayOfWeek][mealIndex]
-        this.mealData = []
+        this.mealData = [];
         this.getMealData( (mealData) => this.mealData = mealData);
 
-        //Methods
-        this.addMeal = this.addMeal.bind(this);
-        this.removeMeal = this.removeMeal.bind(this);
     }
 
-    addMeal(day, recipe, hr, min) {
-
-    }
-
-    removeMeal(day,recipe){
-        //this.mealData[day].
+    removeMeal(day, startHr, startMin){
+        this.mealData.days[day].mealData.splice(0,1);
+        alert(JSON.stringify(this.mealData));
+        this.pushMealData();
     }
 
      /**
@@ -39,8 +34,6 @@ class PlannerHelper{
       * @return {recipe: *, startTime: *, endTime: *} a.k.a meal object
       */
      createMeal(day, recipe, startHr, startMin) {
-         /**TODO Anything that has to do with recipes is subject to change since I'm not sure how define recipe objects
-          */
 
          var hr = 0,
              endMin = 0,
@@ -48,15 +41,11 @@ class PlannerHelper{
              total = 0,
              recipes = [];
 
-
-
          this.recipes.loadRecipe(recipe, (recipeData)=>{
+
              recipes.push(recipe);
-
              total = startMin + 0; //recipeData.TimeCost;
-
              hr = Math.floor(total/60);
-
              endMin = total - (hr)*(60);
              endHr = startHr + hr;
 
@@ -65,6 +54,7 @@ class PlannerHelper{
                  endHr = (24 - endHr) * (-1);  //converts to correct time
              }
 
+             //create meal object
              var meal = {
                  recipes: recipes,
                  startHr: startHr ,
@@ -75,11 +65,8 @@ class PlannerHelper{
 
              //create a meal
              this.mealData.days[day].mealData.push(meal);
-             alert(JSON.stringify(this.mealData))
-             //push that meal into the correct spot in mealData
+             alert(JSON.stringify(this.mealData));
              this.pushMealData();
-             //call pushMealData
-
          });
      }
 
