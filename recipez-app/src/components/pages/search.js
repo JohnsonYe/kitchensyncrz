@@ -196,7 +196,7 @@ class Search extends Component {
                             </div>
                         </div>
                     </form>
-                    <div className="container-fluio">
+                    <div className="container-fluid">
                         <div className="row">
                         {this.state.sorted.map((recipe)=>(
                             /*<div className="container-fluid">
