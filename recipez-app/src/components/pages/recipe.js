@@ -7,8 +7,8 @@
 import React,{ Component } from 'react';
 import RecipeHelper from '../classes/RecipeHelper';
 import '../../css/recipes.css';
-
 import User from '../classes/User'
+
 
 class Recipe extends Component {
     constructor(props){
@@ -42,7 +42,10 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item"><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)
+        /*var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item"><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)*/
+        var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item"><span>
+            <button type="button" class="btn btn btn-circle"><i class="glyphicon glyphicon-shopping-cart"></i></button>
+            {ingredient}</span></li>)
         var directions = this.state.data.Directions.map((step) => <li class="list-group-item">{step}</li>)
         var timecost
         var difficulty
@@ -65,37 +68,36 @@ class Recipe extends Component {
                     <div class="row">
                         <div class="col-sm-6">
                             <div id="myCarousel" class="carousel slide" date-ride="carousel">
-                                {/*<!-- Indicators -->*/}
                                 <ol class="carousel-indicators">
-                                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                                    <li data-target="#myCarousel" data-slide-to="1"></li>
-                                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                                    <li data-target="#myCarousel" data-slide-to="0" class="active"/>
+                                    <li data-target="#myCarousel" data-slide-to="1"/>
+                                    <li data-target="#myCarousel" data-slide-to="2"/>
                                 </ol>
 
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
-                                        <img class="d-block img-fluid" src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" alt="First slide"></img>
+                                        <img class="d-block img-fluid" src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" alt="First slide"/>
                                     </div>
 
                                     <div class="carousel-item">
-                                        <img class="d-block img-fluid" src="http://images.media-allrecipes.com/userphotos/600x600/4228736.jpg" alt="Second slide"></img>
+                                        <img class="d-block img-fluid" src="http://images.media-allrecipes.com/userphotos/600x600/4228736.jpg" alt="Second slide"/>
                                     </div>
 
                                     <div class="carousel-item">
-                                        <img class="d-block img-fluid" src="http://images.media-allrecipes.com/userphotos/600x600/2126904.jpg" alt="Third slide"></img>
+                                        <img class="d-block img-fluid" src="http://images.media-allrecipes.com/userphotos/600x600/2126904.jpg" alt="Third slide"/>
                                     </div>
                                 </div>
 
-                                {/*<!-- Left and right controls -->*/}
                                 <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"/>
                                     <span class="sr-only">Previous</span>
                                 </a>
                                 <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="carousel-control-next-icon" aria-hidden="true"/>
                                     <span class="sr-only">Next</span>
                                 </a>
                             </div>
+
                             {/*<img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" class="img-fluid " alt=""></img>*/}
 
                             <div class="btn=group btn-group-sm">
