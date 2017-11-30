@@ -8,6 +8,7 @@ import React,{ Component } from 'react';
 import RecipeHelper from '../classes/RecipeHelper';
 import '../../css/recipes.css';
 import User from '../classes/User'
+import '../../css/review.css';
 
 
 class Recipe extends Component {
@@ -44,7 +45,7 @@ class Recipe extends Component {
         }
         /*var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item"><span color={this.state.mousedOver === ingredient ? 'red' : 'black'}>{ingredient}</span></li>)*/
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item"><span>
-            <button type="button" class="btn btn btn-circle"><i class="glyphicon glyphicon-shopping-cart"></i></button>
+            <button type="button" class="btn btn btn-circle" id="shoppoing_cart"><i class="glyphicon glyphicon-shopping-cart"/></button>
             {ingredient}</span></li>)
         var directions = this.state.data.Directions.map((step) => <li class="list-group-item">{step}</li>)
         var timecost
@@ -115,12 +116,55 @@ class Recipe extends Component {
                     </div>
                     <h2>Directions:</h2>
                     <ol>{directions}</ol>
-                    <h2>Reviews:</h2>
-                    <ul>{reviews}</ul>
+                    {/*<h2>Reviews:</h2>*/}
+                    {/*<ul>{reviews}</ul>*/}
                     {/*<h2>JSON:</h2>
                             <p>{JSON.stringify(this.state.data)}</p>*/}
                 </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="page-header">
+                            <h3 class="reviews">Leave your comment</h3>
+
+                            <div class="comment-tabs">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="active"><a href="#comments-logout" role="tab" data-toggle="tab"><h4 class="reviews text-capitalize">Comments</h4></a></li>
+                                    <li><a href="#add-comment" role="tab" data-toggle="tab"><h4 class="reviews text-capitalize">Add comment</h4></a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="comments-logout">
+                                        <ul>{reviews}</ul>
+                                    </div>
+                                    <div class="tab-pane active" id="add-comment">
+                                        <form action="#" method="post" class="form-horizontal" id="commentForm" role="form">
+                                            {/*<div class="form-group">
+                                                <label for="email" class="col-sm-2 control-label">Comment</label>
+                                                <div class="col-sm-10">
+                                                    <textarea class="form-control" name="addComment" id="addComment" rows="5"/>
+                                                </div>
+                                            </div>*/}
+                                            <div class="form-group">
+                                                <label for="comment" >Comment:</label>
+                                                <textarea class="form-control" name="comment" rows="5" id="comment"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-2 col-sm-10">
+                                                    <button class="btn btn-success btn-circle text-uppercase" type="submit" id="submitComment"><span class="glyphicon glyphicon-send"></span> Summit comment</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
+
+
             )
     }
 
