@@ -23,6 +23,7 @@ const UNAUTH_NAME = 'GUEST'
  class DBClient {
     constructor(){
         this.getDBItems = this.getDBItems.bind(this);
+        this.getDBItemPromise = this.getDBItemPromise.bind(this);
         this.registerPrototype = this.registerPrototype.bind(this);
         this.getPrototype = this.getPrototype.bind(this);
         this.unpackItem = this.unpackItem.bind(this);
@@ -52,7 +53,7 @@ const UNAUTH_NAME = 'GUEST'
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':ss}),
-            'N': (n,p)=>({'N':n}),
+            'N': (n,p)=>({'N':n+''}),
         }
     }
 
@@ -75,6 +76,26 @@ const UNAUTH_NAME = 'GUEST'
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
+    }
+
+    /**
+     * [get a Promise object containing the database items requested]
+     * @param  {[String]} tableName [name of table to get items from]
+     * @param  {[String]} keyField  [name of field used as database key]
+     * @param  {[JSON]} keys      [keys to fetch items with]
+     * @return {[Promise]}           [Promise object with pending DB response]
+     */
+    getDBItemPromise(tableName,keyField,keys){
+        return new Promise((pass,fail)=>{
+            this.getDBItems(tableName,keyField,keys,(response)=>{
+                if(response.status){//call succeeded, pass
+                    // alert('got here')
+                    pass(response.payload)
+                } else { //call failed, fail
+                    fail(response.payload)
+                }
+            });
+        });
     }
 
     /*
@@ -149,9 +170,9 @@ const UNAUTH_NAME = 'GUEST'
 
     buildStringSetAppendUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+                expr: 'ADD #attr :item',
                 names:{"#attr":attrName},
-                values:{":item":value,":empty_set":{SS:[]}}
+                values:{":item":value}
             }
     }
 
@@ -163,6 +184,16 @@ const UNAUTH_NAME = 'GUEST'
             values:undefined
         }
     }
+
+    buildRemoveSetElementUpdateExpression(attrName,elemName){
+        return {
+            expr: 'DELETE '+attrName+" :v",
+            names:undefined,
+            values:{":v": {"SS": [elemName]}}
+        }
+    }
+
+
 
     buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
@@ -227,6 +258,8 @@ const UNAUTH_NAME = 'GUEST'
         }
         this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
         this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
+
+        console.log("Registered prototype: "+proto._NAME)
     }
 
     getPrototype(key,object){
@@ -247,7 +280,7 @@ const UNAUTH_NAME = 'GUEST'
                 //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                 //function's execution in code not being developed for database interaction
                 //for now, developers working with the database must be careful with adding new fields
-                unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                unpacked[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
@@ -274,7 +307,7 @@ const UNAUTH_NAME = 'GUEST'
                     //function's execution in code not being developed for database interaction
                     //for now, developers working with the database must be careful with adding new fields
                     alert(e+':'+prototype[key])
-                    prev[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                    prev[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                         ' SPECIFICATION IS CORRECT';
                     // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
                 }
@@ -291,8 +324,12 @@ const UNAUTH_NAME = 'GUEST'
         alert(JSON.stringify(response))
     }
 
- }
+    alertAndPass(object){
+        alert('got here');
+        return object
+    }
 
+ }
 
  var static_client = new DBClient();
 
