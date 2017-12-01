@@ -5,6 +5,7 @@
  * Description: modular searchbar component that provides autocomplete in a dropdown menu
  */
 import React, {Component} from 'react';
+import Autocomplete from '../classes/Autocomplete'
 
 class SearchBar extends Component{
     constructor(props){
@@ -32,6 +33,7 @@ class SearchBar extends Component{
 
         this.getCounter = this.getCounter.bind(this);
     }
+
 
     focusHiddenForm(e){
         this.hiddenForm.focus()
@@ -149,6 +151,16 @@ class SearchBar extends Component{
             );
     }
 
+}
+
+SearchBar.InternalClient = class{
+    constructor(keyList){
+        this.autocomplete = new Autocomplete().loadList(keyList);
+    }
+
+    autocomplete(base,callback){
+        callback(this.autocomplete.getCompletion(base));
+    }
 }
 
 export default SearchBar;
