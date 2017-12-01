@@ -30,6 +30,7 @@ class Search extends Component {
         this.removeIngredient = this.removeIngredient.bind(this);
 
         this.mortensButton = this.mortensButton.bind(this);
+        this.mortensButton2 = this.mortensButton2.bind(this);
 
         this.planner = new PlannerHelper();
 
@@ -207,9 +208,14 @@ class Search extends Component {
         this.setState({filter:filter})
     }
 
+    mortensButton2(){
+        User.getUser('user001').addToPantry('fish','none',1)
+    }
+
     mortensButton(){
         this.setState({morten: this.user.client.getUsername()});       
-        console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)                           
+        User.getUser('user001').removeFromPantry('fish')
+        // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)                           
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
         
         
@@ -262,6 +268,7 @@ class Search extends Component {
             <div>
                 <h3>{this.state.morten}</h3>
                 <button onClick={this.mortensButton}>Mortens Button</button> 
+                <button onClick={this.mortensButton2}>Mortens Button2</button> 
             </div>
             <div className="container-fluid">
                 <div id='searchbar-toolbar-container'>
