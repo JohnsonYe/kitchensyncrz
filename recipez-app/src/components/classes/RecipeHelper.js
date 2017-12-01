@@ -13,10 +13,6 @@ import User from '../classes/User';
  class RecipeHelper{
     constructor(){
         this.client = DBClient.getClient();
-        this.client.registerPrototype(RecipeHelper.RecipePrototype)
-        this.client.registerPrototype(RecipeHelper.ReviewPrototype)
-        this.client.registerPrototype(RecipeHelper.RecipeReferencePrototype)
-        this.client.registerPrototype(RecipeHelper.IngredientPrototype)
 
         this.createRecipe = this.createRecipe.bind(this);
         this.loadRecipe     = this.loadRecipe.bind(this);
@@ -24,6 +20,7 @@ import User from '../classes/User';
         this.receiveRecipe  = this.receiveRecipe.bind(this);
         this.updateReview   = this.updateReview.bind(this);
         this.testUnpack = this.testUnpack.bind(this);
+        this.maxRating = 5;
     }
 
      /**
@@ -113,13 +110,16 @@ import User from '../classes/User';
         }
     }
 
-    loadRecipeBatch(batch,callback){
+    loadRecipeBatch(batch,success,failure){
         this.client.getDBItems('Recipes','Name',batch,
-            (response)=>callback(response.payload.map(
-                (recipe)=>this.client.unpackItem(recipe,RecipeHelper.RecipePrototype)
-                )
-            )
-        )
+            (response)=>{
+                if(response.status){
+                    success(response.payload.map((recipe)=>this.client.unpackItem(recipe,RecipeHelper.RecipePrototype)))
+                } else {
+                    console.error(response.payload)
+                    failure(response.payload)
+                }
+            })
     }
 
     receiveRecipe(response,callback) {
@@ -135,18 +135,43 @@ import User from '../classes/User';
         // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
         // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
+
+
+
+
  }
+
+RecipeHelper.getAvgRating = function(recipe){
+    if(!recipe.Reviews){
+        return 0;
+    }
+    let reviews = Object.entries(recipe.Reviews).map((review)=>review[1]);
+    return reviews.reduce((prev,next)=>prev+next.Rating,0)/reviews.length;
+}
+
+RecipeHelper.getPrepTime = function(recipe){
+    if(!recipe.TimeCost ||recipe.TimeCost==='Undefined'){
+        return 360000;//600 hours to force these results to the bottom
+    }
+    let total = 0, tokens = recipe.TimeCost.split(/\s+/); //tokenize the string for parsing
+    //do nothing unless the previous token was a time unit specifier
+    tokens.reverse().reduce((prev,next)=>{total+=(prev==='m'?+next:(prev==='h'?+next*60:0));return next},0)
+    return total;
+}
+
  RecipeHelper.RecipeReferencePrototype = {
     _NAME:'RECIPE_REFERENCE',
     Name:{type:'S'},
     Importance:{type:'N'}
  }
+DBClient.getClient().registerPrototype(RecipeHelper.RecipeReferencePrototype)
 
  RecipeHelper.IngredientPrototype = {
     _NAME:'INGREDIENT_BASE',
     Name:{type:'S'},
     recipes:{type:'L',inner:{'type':RecipeHelper.RecipeReferencePrototype._NAME}}
  }
+DBClient.getClient().registerPrototype(RecipeHelper.IngredientPrototype)
 
  RecipeHelper.ReviewPrototype = {
     _NAME:'REVIEW',
@@ -155,6 +180,7 @@ import User from '../classes/User';
     Rating:{type:'N'},
     timestamp:{type:'N'}
  }
+DBClient.getClient().registerPrototype(RecipeHelper.ReviewPrototype)
 
  RecipeHelper.RecipePrototype = {
     _NAME:'RECIPE',
@@ -163,9 +189,10 @@ import User from '../classes/User';
     Directions:{type:'L',inner:{type:'S'}},
     Reviews:{type:'M',inner:{type:RecipeHelper.ReviewPrototype._NAME}},
     Author:{type:'S'},
-    Difficulty:{type:'N'},
-    TimeCost:{type:'N'}
+    Difficulty:{type:'S'},
+    TimeCost:{type:'S'}
  }
+DBClient.getClient().registerPrototype(RecipeHelper.RecipePrototype)
 
  //============================================================================================
  /*

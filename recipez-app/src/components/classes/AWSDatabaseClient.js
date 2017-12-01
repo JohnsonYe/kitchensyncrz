@@ -19,6 +19,7 @@ var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
 
+var MAX_REQUEST_LENGTH = 100;
 
  class DBClient {
     constructor(){
@@ -67,6 +68,26 @@ const UNAUTH_NAME = 'GUEST'
      * handle target: function handle to send items to
      */
     getDBItems(tableName,keyField,keys,target){
+        if(keys.length > MAX_REQUEST_LENGTH){
+            console.log('Recieved request with more than 100 keys!')
+            Promise.all((()=>{ //create a promise group out of max size batch requests
+                let pos = 0,requests = [];
+                while(pos < keys.length){ //split key array into size 100 chunks
+                    requests.push(keys.slice(pos,pos+MAX_REQUEST_LENGTH));
+                    pos+=MAX_REQUEST_LENGTH
+                }
+                console.log('Split request into '+requests.length+' sub-requests')
+                //map the chunk array to a promise array, containing a DBItemPromise for each chunk
+                return requests.map((request)=>this.getDBItemPromise(tableName,keyField,request)) 
+            })())
+            .catch((err)=>target({status:false,payload:err})) //abort if any request fails
+            //-->|we shouldn't expect a very large request to fail because the user will not be directly
+            //-->|creating 100+ item batch requests
+            //flatten (reduce) the payload array to a single array and pass it to the callback
+            .then((payload)=>target({status:true,payload:payload.reduce((prev,next)=>prev.concat(next),[])}))
+
+            return;
+        }
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
             if(err){
                 target({status:false, payload: err});
@@ -86,6 +107,9 @@ const UNAUTH_NAME = 'GUEST'
      * @return {[Promise]}           [Promise object with pending DB response]
      */
     getDBItemPromise(tableName,keyField,keys){
+        if(keys.length > MAX_REQUEST_LENGTH){
+            console.error('Recieved request with more than 100 keys!')
+        }
         return new Promise((pass,fail)=>{
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
@@ -306,7 +330,8 @@ const UNAUTH_NAME = 'GUEST'
                     //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                     //function's execution in code not being developed for database interaction
                     //for now, developers working with the database must be careful with adding new fields
-                    alert(e+':'+prototype[key])
+                    // alert(e+':'+prototype[key])
+                    console.error('Error packing item: '+e+' :: '+key)
                     prev[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                         ' SPECIFICATION IS CORRECT';
                     // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')

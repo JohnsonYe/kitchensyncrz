@@ -42,16 +42,24 @@ class Search extends Component {
         this.setFilter = this.setFilter.bind(this);
         this.getFilterButton = this.getFilterButton.bind(this);
 
+        this.updateLoader = this.updateLoader.bind(this);
+
+
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
         let query = this.parseQueryString(this.props.history.location.search)
+        console.log('query parse: '+JSON.stringify(query))
 		this.state = {  ingredients:new Set(query.ingredients?query.ingredients:[]),
                         excluded: new Set(query.excluded?query.excluded:[]),
-                        filter:query.filter?query.filter:'least_additional',
+                        filter:query.filter?query.filter[0]:'least_additional',
                         morten:"Do something cool?",
                         completions:[],
                         dropdown:{ingredients:false,filters:false},
                         sorted:[],
+                        loadedRecipes:new Map(),
                     };
+
+        this.recipeLoader = Promise.resolve(query.ingredients?query.ingredients:[]) //set up an async chain for loading recipe info
+
 
 
 	}
@@ -72,11 +80,24 @@ class Search extends Component {
                 //have search manager skip sorting after each update to improve speed
                 this.massUpdateSearch(this.state.ingredients,1),this.massUpdateSearch(this.state.excluded,0)
             )
-            .catch((err)=>alert(err))
+            .catch((err)=>console.error(err))
             //do one sort once everything is done loading
-            .then((result)=>{this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted}))})
+            .then((result)=>{ //get the loaded recipes and load them in one batch, then pass the result
+                this.recipeLoader = new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch(this.client.getRecipeList().map((entry)=>entry[0]),pass,fail))
+                    .then((recipeList)=>new Map(recipeList.map((recipe)=>[recipe.Name,recipe]))); //convert list of named objects to a map
+                this.recipeLoader //attach clause to the loader that sets the state and logs it once loaded
+                    .then((recipes)=>{
+                        this.setState({loadedRecipes:recipes},
+                            (done)=>console.log(this.state.loadedRecipes));
+                        return recipes
+                    })
+                    // .then((recipes)=>{console.log(JSON.stringify(this.state.loadedRecipes));return recipes})
+                this.client.setRecipeLoaderSource(()=>this.recipeLoader); //pass the client an anonymous function that gives it the most recent loader
+                this.setFilter(this.state.filter) //set the helper's filter method, based on whatever we parsed 
+                return result //pass the result to the next link
+            }) 
+            .then((result)=>this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted})))
         }
-        this.setFilter(this.state.filter)
     }
     componentWillUnmount(){
         window.removeEventListener('click', this.closeAllDropdowns);
@@ -113,8 +134,24 @@ class Search extends Component {
     dropdownState(id,base){
         return (base + (this.state.dropdown[id]?' open':''))
     }
+    updateLoader(ingredient){
+        // console.log('Loading info for: ' + ingredient)
+        this.recipeLoader = this.recipeLoader.then((recipes)=>{
+            let recipeNames =  Array.from(new Set(ingredient.recipes.map((recipe)=>recipe.Name))); //remove duplicates
+            console.log('Loading new ingredient data: ' + ingredient.Name)
+            // return (new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch([ingredient],pass,fail))
+            return (new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch(recipeNames,pass,fail))
+                .then((recipeList)=>{
+                    console.log(JSON.stringify(recipeList));
+                    return recipeList.reduce((prev,next)=>prev.set(next.Name,next),recipes);
+                })
+                .catch((err)=>{console.error(err);return recipes}))
+        });
+        this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
+    }
     updateIngredientState(value,status){
-        if(status == 1){
+        if(status == 1){ //adding an ingredient to search -- we should load the data too
+            // this.updateLoader(value);
             return {ingredients:this.state.ingredients.add(value)};
         } else if(status==-1){
             return {ingredients:(()=>{this.state.ingredients.delete(value);return this.state.ingredients})()};
@@ -130,18 +167,18 @@ class Search extends Component {
         return ((sorted)=>this.searchUpdate(sorted,value,status));
     }
     searchUpdate(sorted,value,status){
-        console.log('Updated search results: ' + JSON.stringify([value,status]))
         this.updateState(sorted,value,status);
         if(this.searchbar){
             this.searchbar.reset();
         }
+        console.log('Updated search results: ' + JSON.stringify([value,status]))
     }
     handleSubmit(e){
         e.preventDefault();
 
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,status,this.searchUpdateWrapper(value,status))
+        this.client.updateIngredient(value,status,this.searchUpdateWrapper(value,status),this.updateLoader)
         
     }
     updateURI(){
@@ -153,10 +190,7 @@ class Search extends Component {
     handleReject(e){
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,0,(sorted)=>{
-            this.updateState(sorted,value,status);
-            this.searchbar.reset();
-        })   
+        this.client.updateIngredient(value,0,this.searchUpdateWrapper(value,status))   
              
     }
     parseQueryString(search){
@@ -174,7 +208,8 @@ class Search extends Component {
     }
 
     mortensButton(){
-        this.setState({morten: this.user.client.getUsername()});                                  
+        this.setState({morten: this.user.client.getUsername()});       
+        console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)                           
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
         
         
@@ -203,6 +238,10 @@ class Search extends Component {
         //this.user.addToShoppingList('milk')                                                               // THIS WORKS
         //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
 
+    }
+
+    getGlyph(name){
+        return (<span className={"glyphicon glyphicon-"+name}></span>);
     }
 
     getFilterButton(message,icon,filter,largest){
@@ -267,7 +306,7 @@ class Search extends Component {
                                 <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')}>
                                     <span className="glyphicon glyphicon-filter"></span>
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right">
+                                <div className="dropdown-menu dropdown-menu-right">
                                     {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
                                     {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
                                     {this.getFilterButton('Filter by Best Match','signal','best_match')}
@@ -285,6 +324,24 @@ class Search extends Component {
                             <li className="list-group-item">
                                 <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
                                 <span className='pull-right'>{'Score: '+JSON.stringify(recipe[1].map((n)=>n.toFixed(2)))}</span>
+                                {(()=>{ //voodoo magic (IIFE) --> conditionally display recipe info, if it is loaded
+                                    let data = this.state.loadedRecipes.get(recipe[0]);
+                                    if(data){
+                                        return ([
+                                            <div>Difficulty: {data.Difficulty}</div>,
+                                            <div>Rating: 
+                                                {(()=>{ //more voodoo magic
+                                                    let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
+                                                    for(let i=0;i<this.recipeHelper.maxRating;i++){
+                                                        result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);
+                                                    }
+                                                    return result;
+                                                })()}
+                                            </div>,
+                                            <div>{this.getGlyph('time')} <span>{data.TimeCost}</span></div>,
+                                        ])
+                                    }
+                                })()}
                             </li>
                         ))}
                         {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}

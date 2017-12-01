@@ -16,7 +16,6 @@
  class User {
     constructor(){
         this.client = DBClient.getClient()
-        this.client.registerPrototype(User.PantryItemPrototype)
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -435,6 +434,7 @@
     amount:{type:'N'},
     unit:{type:'S'}
  }
+ DBClient.getClient().registerPrototype(User.PantryItemPrototype)
 
 
  User.UserDataPrototype = {
@@ -447,6 +447,7 @@
     planner:{},
     exclude:{type:'SS'}
  }
+ DBClient.getClient().registerPrototype(User.UserDataPrototype)
 
  var static_user = new User();
 

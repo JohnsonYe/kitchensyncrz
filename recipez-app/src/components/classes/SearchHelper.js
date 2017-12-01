@@ -18,6 +18,10 @@ import JSZip from 'jszip'
         this.updateIngredient = this.updateIngredient.bind(this);
         this.sortRecipeMap = this.sortRecipeMap.bind(this);
         // this.getCompletions = this.getCompletions.bind(this);
+        // 
+        this.timeFilter = this.timeFilter.bind(this);
+        this.difficultyFilter = this.difficultyFilter.bind(this);
+        this.ratingFilter = this.ratingFilter.bind(this);
 
         this.shouldReset = false
         this.recipeMap = new Map()
@@ -33,6 +37,10 @@ import JSZip from 'jszip'
             .then((json)=>new Autocomplete().loadJSON(json))
             .then((autocomplete)=>{console.log('Finished loading autocomplete in searchbar: ');return autocomplete})
             // .catch((err)=>err)
+    }
+
+    hasIngredient(ingredient){
+        return this.ingredientMap.then((map)=>map.get(ingredient))
     }
 
     batchLoadIngredients(ingredients){
@@ -71,6 +79,7 @@ import JSZip from 'jszip'
                         //              3 -- unused
                         .then((payload)=>this.client.unpackItem(payload[0],RecipeHelper.IngredientPrototype))
                         // .then((ingredientObject)=>{alert(JSON.stringify(ingredientObject));return ingredientObject})
+                        .then((ingredientObject)=>{if(escape)escape(ingredientObject);return ingredientObject})
                         .then((ingredientObject)=>map.set(ingredientObject.Name,[search,ingredientObject,3]))//put the retrieved info in the map
                         .then((map2)=>this.updateResultList(map2,ingredient,callback,nosort))
                         .catch((err)=>{console.error(err);return map})//invalid DB key? fail quietly so the chain stays alive
@@ -143,12 +152,25 @@ import JSZip from 'jszip'
         return map //keep the chain alive
     }
 
+    getRecipeList(){
+        return Array.from(this.recipeMap.entries());
+    }
+
     sortRecipeMap(callback){
         console.log('Sorting recipe map . . .')
-        callback(this.sorted = Array.from(this.recipeMap.entries())
-            .sort(this.currentFilter) //sort by selected filter
-            .filter((entry)=>(entry[1][0]==0)&&(entry[1][1]!=0)) //remove rejected items (items with positive rejection score)
-        )
+        this.sorted = this.getRecipeList();
+        return Promise.resolve(this.sorted) //use a promise to account for potential asynchronous sort
+            .then((sorted)=>sorted.filter((entry)=>(entry[1][0]==0)&&(entry[1][1]!=0))) //filter rejected items
+            .then(this.currentFilter) //apply filter -- may be asynchronous --> promise chain handles this gracefully
+            .then(callback);
+    }
+
+    /**
+     * set this helper's "loader", which is a promise containing recipe information for more intensive searching
+     * @param {[type]} loader [description]
+     */
+    setRecipeLoaderSource(loaderSource){
+        this.recipeLoaderSource = loaderSource;
     }
 
     setFilter(filter,callback,nosort){
@@ -159,26 +181,79 @@ import JSZip from 'jszip'
         this.sortRecipeMap(callback);
     }
 
+    useAsyncLoader(filter,method){
+        if(this.recipeLoaderSource){
+            return ((unsorted)=>{
+                return this.recipeLoaderSource().then((recipes)=>method(unsorted,recipes))
+            })
+        } else {
+            console.error('Loader not set when setting filter: ' + filter)
+            return this.useSynchronous((a,b)=>true); //return a no-sort object so we dont crash and burn
+        }
+    }
+
+    useSynchronous(syncSorter){
+        return ((unsorted)=>unsorted.sort(syncSorter))
+    }
+
+    /*
+     * recipe map organization:
+     * [
+     *     0: recipe name,
+     *     1: [
+     *             0: rejection score,
+     *             1: raw score,
+     *             2: importance score,
+     *        ]
+     * ]
+     * 
+     */
     getFilter(filter){
         switch(filter){
             case 'least_additional':
                 console.log('Set filter type to: ' + filter)
-                return ((a,b)=>(b[1][2]-a[1][2])); //compare importance scores
+                return this.useSynchronous((a,b)=>(b[1][2]-a[1][2])); //compare importance scores
             case 'best_match':
                 console.log('Set filter type to: ' + filter)
-                return ((a,b)=>(b[1][1]-a[1][1])); //compare raw scores
-            //THESE NEED INFO FROM A RECIPE OBJECT -- HOW SHOULD WE GET IT (efficiently)?
-            case 'time_filter':
-            case 'cost_filter':
-            case 'rating_filter':
+                return this.useSynchronous((a,b)=>(b[1][1]-a[1][1])); //compare raw scores
+            //THESE NEED INFO FROM A RECIPE OBJECT -- HOW SHOULD WE GET IT (efficiently)? --> promise chains
             case 'difficulty_filter':
+                console.log('Set filter type to: ' + filter)
+                return this.useAsyncLoader(filter,this.difficultyFilter)                
+            case 'time_filter':
+                console.log('Set filter type to: ' + filter)
+                return this.useAsyncLoader(filter,this.timeFilter) 
+            case 'rating_filter':
+                console.log('Set filter type to: ' + filter)
+                return this.useAsyncLoader(filter,this.ratingFilter) 
+            case 'cost_filter':
             case 'cookware_filter':
             case 'custom':
             default:
-                console.log('Set filter type to: none')
-                return ((a,b)=>true);
+                console.log('Set filter type to: default (given: ' + filter + ')')
+                return this.useSynchronous((a,b)=>0); //this should probably be some combination of raw and importance scores
         }
     }
+
+    ratingFilter(unsorted,recipes){
+        return unsorted.sort((a,b)=>(RecipeHelper.getAvgRating(recipes.get(b[0])) - RecipeHelper.getAvgRating(recipes.get(a[0]))));        
+    }
+
+    timeFilter(unsorted,recipes){
+        return unsorted.sort((a,b)=>(RecipeHelper.getPrepTime(recipes.get(a[0])) - RecipeHelper.getPrepTime(recipes.get(b[0]))));
+    }
+
+    difficultyFilter(unsorted,recipes){
+        return unsorted.sort((a,b)=>{
+            // console.log(this.evaluateDifficulty(recipes[a[0]]) + ' :: ' + this.evaluateDifficulty(recipes[b[0]]))
+            return this.evaluateDifficulty(recipes.get(b[0]))-this.evaluateDifficulty(recipes.get(a[0]))
+        });
+    }
+
+    evaluateDifficulty(recipe){
+        return recipe?(recipe.Difficulty==='Easy'?1:(recipe.Difficulty==='Hard'?0:-1)):-2;
+    }
+
 
     autocomplete(base,callback){
         this.asyncCompletions.then((auto)=>callback(auto.getCompletion(base))).catch((err)=>'Error when loading autocomplete')
