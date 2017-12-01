@@ -201,7 +201,7 @@ class Search extends Component {
                         {this.state.sorted.map((recipe)=>(
                             /*<div className="container-fluid">
                                 <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>*/
-                                <SearchThumbnail link={recipe[0]}/>
+                                <SearchThumbnail link={recipe[0]} score={recipe[1]}/>
                                 /*<span className='pull-right'>{'Score: '+JSON.stringify(recipe[1].map((n)=>n.toFixed(2)))}</span>*/
                             /*</div>*/
                         ))}
