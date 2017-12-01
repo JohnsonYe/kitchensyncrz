@@ -2,7 +2,7 @@
  * Title: Planner.js
  * Authors: Alexander Haggart, Andrew Sanchez(backend implementation)
  * Date Created: 11/13/2017
- * Description: This file will assist in database transactions involving the planner feature
+ * Description: This file will assist in database transactions involving the planner feature.
  */
 import DBClient from "./AWSDatabaseClient";
 import User from './User';
@@ -15,25 +15,62 @@ class PlannerHelper{
         this.recipes = new RecipeHelper();
         this.user = User.getUser(this.client.getUsername());
 
-        //Access Meal Data data[dayOfWeek][mealIndex]
-        this.mealData = [];
-        this.getMealData( (mealData) => this.mealData = mealData);
+        //Access Meal Data data.days[dayOfTheWeek].mealData[mealIndex]
+        this.data = null;
+        this.getMealData( (data) => this.data = data);
 
     }
 
-    removeMeal(day, startHr, startMin){
-        this.mealData.days[day].mealData.splice(0,1);
-        alert(JSON.stringify(this.mealData));
+    removeMeal(day, mealIndex){
+        this.data.days[day].mealData.splice(0,mealIndex);
+        //push change to database
         this.pushMealData();
     }
 
+    /** Insert meal into planner
+     * @param day - tells what day to insert meal into
+     * @param meal - meal object to be inserted
+     * @return pass/fail 1 pass, -1 fail
+     */
+    insertMeal( day, meal) {
+        // create an array of just the current days meals for easy access
+        var meals = this.getDayMealList(day),
+            mealIndex = 0;
+
+        // Go through meals looking at each end times to ensure that this meals
+        // start time is greater than meal before's end time.
+        while (meal.startHr > meals[mealIndex].endHr &&
+                meal.startMin > meals[mealIndex].endMin) {
+            mealIndex++;
+        }
+
+        //if mealIndex is out of bound then add to the end
+        if(mealIndex == meals.length) {
+            this.data.days[day].mealData.push(meal);
+            alert(JSON.stringify(this.data));
+            //push change to database
+            this.pushMealData();
+            return 1;
+        }
+        // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
+        else if ( meal.endHr < meal[mealIndex + 1].startHr &&
+            meal.endMin < meal[mealIndex + 1].endMin ) {
+            //insertMeal (index, remove, object to add)
+            this.data.days[day].mealData.splice(mealIndex,0,meal);
+            alert(JSON.stringify(this.data));
+            //push change to database
+            this.pushMealData();
+            return 1;
+        }
+        else return -1;  //overlap
+    }
      /**
       * This function creates a meal object that could be added to one of the entries in mealData.
-      * @param recipe - passing a in a recipe object will give us recipe name, duration, img link, and description (or index)
-      * @param start - the time you plan to start cooking this meal
-      * @return {recipe: *, startTime: *, endTime: *} a.k.a meal object
+      * @param recipe - name of recipe for meal
+      * @param startHr - start time of meal
+      * @param startMin - start min of meal
       */
-     createMeal(day, recipe, startHr, startMin) {
+     createMeal(recipe, startHr, startMin) {
 
          var hr = 0,
              endMin = 0,
@@ -42,9 +79,8 @@ class PlannerHelper{
              recipes = [];
 
          this.recipes.loadRecipe(recipe, (recipeData)=>{
-
              recipes.push(recipe);
-             total = startMin + 0; //recipeData.TimeCost;
+             total = startMin + recipeData.TimeCost;
              hr = Math.floor(total/60);
              endMin = total - (hr)*(60);
              endHr = startHr + hr;
@@ -63,11 +99,40 @@ class PlannerHelper{
                  endMin: endMin
              };
 
-             //create a meal
-             this.mealData.days[day].mealData.push(meal);
-             alert(JSON.stringify(this.mealData));
-             this.pushMealData();
+             return meal;
          });
+     }
+     /** Gives the an array of meals for that day
+      * @param day - day you want the meal list of*/
+     static getDayMealList(day) {
+         return this.data.days[day];
+     }
+
+     /** Give an meal object
+      * @param day - day the meal wanted is in
+      * @param mealIndex - index of the meal you want
+      */
+     static getMeal( day, mealIndex) {
+         return this.data.days[day].mealData[mealIndex];
+     }
+     static getMealRecipeName( day, mealIndex){
+         return this.data.days[day].mealData[mealIndex].recipes[0];
+     }
+
+     /** Gives meals start time startHr: startMin
+      * @param day - day the meal wanted is in
+      * @param mealIndex - index of the meal you want
+      */
+     static getMealStartTime(day, mealIndex) {
+         return this.data.days[day].mealData[mealIndex].startHr + ": " + data.days[day].mealData[mealIndex].startMin;
+     }
+
+    /** Gives meals end time startHr: startMin
+     * @param day - day the meal wanted is in
+     * @param mealIndex - index of the meal you want
+     */
+     static getMealEndTime(day, mealIndex) {
+         return this.data.days[day].mealData[mealIndex].endHr + ": " + data.days[day].mealData[mealIndex].endMin;
      }
 
      /**
@@ -85,7 +150,7 @@ class PlannerHelper{
          this.client.updateItem(
              this.client.buildUpdateRequest(
                  'User','username',this.client.getUsername(),
-                 this.client.buildSetUpdateExpression('planner', {M:DBClient.getClient().packItem(this.mealData, User.PlannerPrototype)})),
+                 this.client.buildSetUpdateExpression('planner', {M:DBClient.getClient().packItem(this.data, User.PlannerPrototype)})),
              (response)=>{alert(JSON.stringify(response.payload))})
      }
 }
