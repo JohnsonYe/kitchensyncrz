@@ -5,32 +5,40 @@
  * Description: This file will serve as the Kitchen page
  */
 import React, { Component } from 'react';
-import { Jumbotron, Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
+import { Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
 import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
 
 import User from '../classes/User'
 
+
+//Creates the well and button object that shows up on the screen
 const AddItem = ({item, remove, addOut}) => {
 
     return (
 
         <form>
-            <div className="well well-sm" id="del">
+            <div className="well well-sm" id="pantry-node">
                 {item}
                 <button className = "btn btn-danger"
-                        id = "delBtn"
+                        id = "btn-r"
                         type = "button"
                         onClick = {()=> remove(item)}
-                        style = {{float:'right', display:'block'}}>
+                        style = {{float:'right', display:'block',
+                                  fontSize:'10px', marginTop:'-10.5px',
+                                  marginRight:'-9px'}}>
 
-                    <i className = "glyphicon glyphicon-trash" />
+                    <span className = "glyphicon glyphicon-trash"
+                          style={{fontSize:'1.5em'}}/>
                 </button>
                 <button className = "btn btn-warning"
-                        id = "delBtn"
+                        id = "btn-d"
                         type = "button"
                         onClick = {()=> addOut(item) }
-                        style={{float:'right', display:'block'}}>
-                    <i className = "glyphicon glyphicon-ban-circle" />
+                        style={{float:'right', display:'block',
+                                fontSize:'10px', marginTop:'-10.5px',
+                                marginLeft:'-7px'}}>
+                    <span className = "glyphicon glyphicon-warning-sign"
+                       style={{fontSize:'1.5em'}}/>
                 </button>
             </div>
 
@@ -46,10 +54,11 @@ const AddExcludeCookware = ({item, remove}) => {
             <div className="well well-sm" id="del">
                 {item}
                 <button className = "btn btn-danger"
-                        id = "delBtn"
+                        id = "btn-one"
                         type = "button"
                         onClick = {()=> remove(item)}
-                        style = {{float:'right', display:'block'}}>
+                        style = {{float:'right', display:'block', fontSize:'12px',
+                                  marginTop:'-10px', marginRight:'-10px'}}>
 
                     <i className = "glyphicon glyphicon-trash" />
                 </button>
@@ -67,19 +76,23 @@ const AddRestock = ({item, remove, addBack}) => {
             <div className="well well-sm" id="del">
                 {item}
                 <button className = "btn btn-danger btn-lg"
-                        id = "delBtn"
                         type = "button"
                         onClick = {()=> remove(item.id)}
-                        style = {{float:'right', display:'block'}}>
+                        style = {{float:'right', display:'block',
+                                  fontSize:'10px', marginTop:'-10.5px',
+                                  marginRight:'-9px'}}>
 
-                    <i className = "glyphicon glyphicon-trash" />
+                    <span className = "glyphicon glyphicon-trash"
+                          style={{fontSize:'1.5em'}}/>
                 </button>
                 <button className = "btn btn-success btn-lg"
-                        id = "delBtn"
                         type = "button"
                         onClick = {()=> addBack(item) }
-                        style={{float:'right', display:'block'}}>
-                    <i className = "glyphicon glyphicon-plus" />
+                        style = {{float:'right', display:'block',
+                                 fontSize:'10px', marginTop:'-10.5px',
+                                 marginRight:'-9px'}}>
+                    <span className = "glyphicon glyphicon-plus"
+                          style={{fontSize:'1.5em'}}/>/>
                 </button>
             </div>
 
@@ -87,6 +100,8 @@ const AddRestock = ({item, remove, addBack}) => {
     );
 }
 
+
+// Maps each item into a node
 const ItemList = ( {items, remove, addOut} ) => {
 
     // Map through nodes
@@ -100,6 +115,7 @@ const ItemList = ( {items, remove, addOut} ) => {
     return (<div> {itemNode}  </div>);
 }
 
+// Maps each item into a node
 const ExcludeCookwareList = ( {items, remove} ) => {
 
     // Map through nodes
@@ -112,6 +128,7 @@ const ExcludeCookwareList = ( {items, remove} ) => {
     return (<div> {itemNode}  </div>);
 }
 
+// Maps each item into a node
 const RestockList = ( {items, remove, addBack} ) => {
     const itemNode = items.map( (item) =>
         (<AddRestock item = {item}
@@ -122,6 +139,8 @@ const RestockList = ( {items, remove, addBack} ) => {
     return (<div> {itemNode}  </div>);
 }
 
+
+// Actually calls the add function to update state
 const ItemForm = ( {addProtein,
                       addDairy,
                       addVegetable,
@@ -174,14 +193,14 @@ const ItemForm = ( {addProtein,
             <div className="input-group">
                 <input className="form-control" type= "text" id = "enter"
                        autocomplete="off"
-                       placeholder="Add to Pantry"
+                       placeholder="Pick a category and add food items!"
                        ref={node => { input = node; }} />
 
                 <span className = "input-group-btn">
                         <button className="btn btn-success"
                                 type="submit"
                                 onClick = {() => addToPantry(input.value, getKey, 1)}>
-                            <i className = "glyphicon glyphicon-plus" />
+                            <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>
             </div>
@@ -221,7 +240,7 @@ const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
 
                 <span className = "input-group-btn">
                         <button className="btn btn-success" type="submit">
-                            <i className = "glyphicon glyphicon-plus" />
+                            <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>
             </div>
@@ -333,25 +352,42 @@ class kitchen extends Component {
         this.renderCookware = this.renderCookware.bind(this);
 
         this.loadData = this.loadData.bind(this);
+        this.processData = this.processData.bind(this);
     }
 
     // Read the json file
     loadData(){
-        this.user.getPantry(this.processData);
+        this.user.getPantry(this.processData.bind(this));
     }
 
     processData(data){
-        var none = [];
-        Object.keys(data).forEach((key, value)=> {
-            alert(value.unit);
-            if(value.unit == "none" ){
-                none.concat(key);
-            }()=>{
-                alert("HEREE")
+
+        Object.entries(data).forEach((key)=> {
+
+            switch (key[1].unit) {
+                case("Protein"):
+                    this.addProtein(key[0]);
+                    break;
+                case("Dairy"):
+                    this.addDairy(key[0]);
+                    break;
+                case("Vegetable"):
+                    this.addVegetable(key[0]);
+                    break;
+                case("Fruit"):
+                    this.addFruit(key[0]);
+                    break;
+                case("Grain"):
+                    this.addFruit(key[0]);
+                    break;
+                case("Other"):
+                    this.addOther(key[0]);
+                    break;
+                default:
+                    break;
             }
+
         })
-
-
     }
 
     getKey(){
@@ -366,8 +402,6 @@ class kitchen extends Component {
 
     handleSelect( key ){
         this.setState({key: key });
-        this.loadData();
-
     }
 
     //Protein functions
@@ -604,6 +638,7 @@ class kitchen extends Component {
             default:
                 break;
         }
+        //this.user.addToPantry(val, "Restock", 1);
     }
 
     returnOut(e){
@@ -696,7 +731,7 @@ class kitchen extends Component {
 
                         <Button
                             bsStyle="primary"
-                            bsSize="large"
+                            id="btn-one"
                             onClick={this.openExclude}
                         >
                             Preferences: {this.state.numExclude}
@@ -739,7 +774,7 @@ class kitchen extends Component {
 
                         <Button
                             bsStyle="info"
-                            bsSize="large"
+                            id = "btn-one"
                             onClick={this.openCookware}
                         >
                             Cookware: {this.state.cookware.length}
@@ -755,6 +790,7 @@ class kitchen extends Component {
                                     addCookware = {this.addCookware.bind(this)}
                                     getModalKey = {this.getModalKey()}
                                 />
+                                <br />
                                 {this.renderCookware()}
                             </Modal.Body>
                             <Modal.Footer>
@@ -860,7 +896,10 @@ class kitchen extends Component {
 
                         <div className = "col-md-4" >
                             <div className = "container-fluid mg-3">
-                                <h3> Needs Restock: </h3>
+                                <h3>
+                                    <span className="glyphicon glyphicon-warning-sign"></span>
+                                    &nbsp; Needs Restock:
+                                </h3>
                                 {this.renderOut()}
                             </div>
                         </div>
