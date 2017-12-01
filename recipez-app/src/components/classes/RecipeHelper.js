@@ -15,9 +15,12 @@ import User from '../classes/User';
         this.client = DBClient.getClient();
         this.client.registerPrototype(RecipeHelper.RecipePrototype)
         this.client.registerPrototype(RecipeHelper.ReviewPrototype)
+        this.client.registerPrototype(RecipeHelper.RecipeReferencePrototype)
+        this.client.registerPrototype(RecipeHelper.IngredientPrototype)
 
         this.createRecipe = this.createRecipe.bind(this);
         this.loadRecipe     = this.loadRecipe.bind(this);
+        this.loadRecipeBatch = this.loadRecipeBatch.bind(this);
         this.receiveRecipe  = this.receiveRecipe.bind(this);
         this.updateReview   = this.updateReview.bind(this);
         this.testUnpack = this.testUnpack.bind(this);
@@ -110,6 +113,15 @@ import User from '../classes/User';
         }
     }
 
+    loadRecipeBatch(batch,callback){
+        this.client.getDBItems('Recipes','Name',batch,
+            (response)=>callback(response.payload.map(
+                (recipe)=>this.client.unpackItem(recipe,RecipeHelper.RecipePrototype)
+                )
+            )
+        )
+    }
+
     receiveRecipe(response,callback) {
         if(!response.status){
             //the call failed, should we try again?
@@ -123,6 +135,17 @@ import User from '../classes/User';
         // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
         // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
+ }
+ RecipeHelper.RecipeReferencePrototype = {
+    _NAME:'RECIPE_REFERENCE',
+    Name:{type:'S'},
+    Importance:{type:'N'}
+ }
+
+ RecipeHelper.IngredientPrototype = {
+    _NAME:'INGREDIENT_BASE',
+    Name:{type:'S'},
+    recipes:{type:'L',inner:{'type':RecipeHelper.RecipeReferencePrototype._NAME}}
  }
 
  RecipeHelper.ReviewPrototype = {
@@ -182,8 +205,8 @@ RecipeHelper.unpackRecipe = function(recipeResponse){
 RecipeHelper.packRecipe = function(r){
     return {
         Name:{S:r.Name},
-        Ingredients:{L:r.Ingredients.map((ingredient)=>{S:ingredient})},
-        Directions:{L:r.Directions.map((step)=>{S:step})},
+        Ingredients:{L:r.Ingredients.map((ingredient)=>({S:ingredient}))},
+        Directions:{L:r.Directions.map((step)=>({S:step}))},
         Reviews:RecipeHelper.packReview(r.Reviews)
     }
 
