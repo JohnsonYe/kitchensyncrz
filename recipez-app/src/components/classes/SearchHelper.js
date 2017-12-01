@@ -52,7 +52,7 @@ import JSZip from 'jszip'
                     .then((payload)=>{
                         payload.map((ingredient)=>this.client.unpackItem(ingredient,RecipeHelper.IngredientPrototype))
                         .forEach((ingredient)=>{
-                            map.set(ingredient.Name,[5,ingredient,3]);
+                            map.set(ingredient.Name,[5,ingredient,UNUSED_STATUS]);
                             // alert(JSON.stringify(map));
                         });
                         return map
@@ -80,7 +80,7 @@ import JSZip from 'jszip'
                         .then((payload)=>this.client.unpackItem(payload[0],RecipeHelper.IngredientPrototype))
                         // .then((ingredientObject)=>{alert(JSON.stringify(ingredientObject));return ingredientObject})
                         .then((ingredientObject)=>{if(escape)escape(ingredientObject);return ingredientObject})
-                        .then((ingredientObject)=>map.set(ingredientObject.Name,[search,ingredientObject,3]))//put the retrieved info in the map
+                        .then((ingredientObject)=>map.set(ingredientObject.Name,[search,ingredientObject,UNUSED_STATUS]))//put the retrieved info in the map
                         .then((map2)=>this.updateResultList(map2,ingredient,callback,nosort))
                         .catch((err)=>{console.error(err);return map})//invalid DB key? fail quietly so the chain stays alive
                     )
@@ -102,11 +102,11 @@ import JSZip from 'jszip'
     updateResultList(map,ingredient,callback,nosort){
         let updateType = map.get(ingredient)[0];
         let status = map.get(ingredient)[2];
-        if(updateType==1||updateType==-1){ //use ingredient in search
-            if((updateType==1&&status!=3)||(updateType==-1&&status!=1)){ //query doesn't fit the current status, reject it and do nothing
+        if(updateType==ADD_TO_SEARCH||updateType==REMOVE_FROM_SEARCH){ //use ingredient in search
+            if((updateType==ADD_TO_SEARCH&&status!=UNUSED_STATUS)||(updateType==REMOVE_FROM_SEARCH&&status!=INCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
                 return map;
             }
-            map.get(ingredient)[2] = updateType==1?1:3;
+            map.get(ingredient)[2] = updateType==ADD_TO_SEARCH?INCLUDED_STATUS:UNUSED_STATUS;
             let recipeTracker = new Set()
             map.get(ingredient)[1].recipes.forEach((recipe)=>{
                 let recipeName = recipe.Name
@@ -127,11 +127,11 @@ import JSZip from 'jszip'
             } else {
                 callback(ingredient)
             }
-        } else if(updateType==0||updateType==2){ //reject or un-reject ingredient from search
-            if((updateType==0&&status!=3)||(updateType==2&&status!=0)){ //query doesn't fit the current status, reject it and do nothing
+        } else if(updateType==ADD_TO_EXCLUDE||updateType==REMOVE_FROM_EXCLUDE){ //reject or un-reject ingredient from search
+            if((updateType==ADD_TO_EXCLUDE&&status!=UNUSED_STATUS)||(updateType==REMOVE_FROM_EXCLUDE&&status!=EXCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
                 return map;
             }
-            map.get(ingredient)[2] = updateType==2?3:0;
+            map.get(ingredient)[2] = updateType==REMOVE_FROM_EXCLUDE?UNUSED_STATUS:EXCLUDED_STATUS;
             let adjustment = (updateType==0)?1:-1;
             map.get(ingredient)[1].recipes.forEach((recipe)=>{
                 let prevEntry = this.recipeMap.has(recipe.Name)?this.recipeMap.get(recipe.Name):[0,0,0]; //set base values to 0 if no entry exists
@@ -163,6 +163,19 @@ import JSZip from 'jszip'
             .then((sorted)=>sorted.filter((entry)=>(entry[1][0]==0)&&(entry[1][1]!=0))) //filter rejected items
             .then(this.currentFilter) //apply filter -- may be asynchronous --> promise chain handles this gracefully
             .then(callback);
+    }
+
+    clear(callback){ //zero out the ingredient map and recipe map (without clearing it) 
+        this.ingredientMap = this.ingredientMap.then((ingredients)=>{
+            ingredients.forEach((value,key,map)=>{
+                map.get(key)[2] = UNUSED_STATUS;
+            })
+            return ingredients;
+        })
+        this.recipeMap.forEach((value,key,map)=>{
+            map.set(key,[0,0,0])
+        });
+        this.sortRecipeMap(callback)
     }
 
     /**
@@ -259,5 +272,14 @@ import JSZip from 'jszip'
         this.asyncCompletions.then((auto)=>callback(auto.getCompletion(base))).catch((err)=>'Error when loading autocomplete')
     }
  }
+
+ const ADD_TO_SEARCH = SearchHelper.ADD_TO_SEARCH = 1;
+ const REMOVE_FROM_SEARCH = SearchHelper.REMOVE_FROM_SEARCH = -1;
+ const ADD_TO_EXCLUDE = SearchHelper.ADD_TO_EXCLUDE = 0;
+ const REMOVE_FROM_EXCLUDE = SearchHelper.REMOVE_FROM_EXCLUDE = 2;
+
+ const UNUSED_STATUS = SearchHelper.UNUSED_STATUS = 3;
+ const INCLUDED_STATUS = SearchHelper.INCLUDED_STATUS = 1;
+ const EXCLUDED_STATUS = SearchHelper.EXCLUDED_STATUS = 0;
 
  export default SearchHelper;

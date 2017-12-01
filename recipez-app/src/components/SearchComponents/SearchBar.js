@@ -29,6 +29,7 @@ class SearchBar extends Component{
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.reset = this.reset.bind(this);
+        this.selectCompletion = this.selectCompletion.bind(this);
 
         this.getSearchHighlight = this.getSearchHighlight.bind(this);
 
@@ -59,6 +60,14 @@ class SearchBar extends Component{
         this.setState({completions:[],query:''})
     }
 
+    selectCompletion(completion){
+        this.setState({
+            value:completion,
+            selection:-1,
+        // },e=>this.props.form.submit())
+        })
+    }
+
     handleChange(e){
         // alert(e.target.value)
         // this.props.callback(e.target.value)
@@ -76,6 +85,9 @@ class SearchBar extends Component{
                 this.setState({shiftDown:true})
                 break;
             case 13/*ENTER*/:
+                if(this.state.selection >= 0)
+                    e.stopPropagation();
+                    this.selectCompletion(this.state.completions[this.state.selection])
                 break;
             case 40/*DOWN*/:
                 this.setState({selection:this.state.selection+1})
@@ -148,7 +160,10 @@ class SearchBar extends Component{
                     // style={{'z-index':1,'position':'relative'}}
                     />
                 <div className="dropdown-menu">
-                    {this.state.completions.map((key)=>(<div className={'dropdown-item'+(counter()==this.state.selection?' active':'')}>{key}</div>))}
+                    {this.state.completions.map((key)=>(
+                        <div className={'dropdown-item'+(counter()==this.state.selection?' active':'')} onClick={(e)=>{}}>
+                            {key}
+                        </div>))}
                 </div>
             </div>
             );
