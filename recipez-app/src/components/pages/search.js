@@ -16,6 +16,7 @@ import User from '../classes/User';
 import SearchBar from '../SearchComponents/SearchBar';
 
 const CLEAR_SEARCH = 99;
+const ADD_MULTIPLE = 98;
 
 class Search extends Component {
 	constructor(props)  {
@@ -48,6 +49,10 @@ class Search extends Component {
 
         this.updateLoader = this.updateLoader.bind(this);
 
+        this.addFromPantry = this.addFromPantry.bind(this);
+
+        this.getRecipeLoader = this.getRecipeLoader.bind(this);
+
 
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
         let query = this.parseQueryString(this.props.history.location.search)
@@ -62,20 +67,31 @@ class Search extends Component {
                         loadedRecipes:new Map(),
                     };
 
-        this.recipeLoader = Promise.resolve(query.ingredients?query.ingredients:new Map()) //set up an async chain for loading recipe info
+        this.recipeLoader = Promise.resolve(new Map()) //set up an async chain for loading recipe info
 
 
 
 	}
+    getRecipeLoader(){
+        return this.recipeLoader;
+    }
     massUpdateSearch(items,action){
+        let getCallbacks = (item,pass,fail)=>{
+            return ({
+                successCallback: ()=>{pass(item)},
+                failureCallback: ()=>{fail(item)},
+            });
+        };
+
         return Array.from(items).map((item)=>{
                 return new Promise((pass,fail)=>{
-                    this.client.updateIngredient(item,action,()=>{pass(item)},()=>{fail(item)},true)
+                    this.client.updateIngredient(item,action,getCallbacks(item,pass,fail),true)
             })
         })
     }
     componentWillMount(){
         window.addEventListener('click', this.closeAllDropdowns);
+        this.client.setRecipeLoaderSource(this.getRecipeLoader); //pass the client an anonymous function that gives it the most recent loader
         if(this.state.ingredients.size||this.state.excluded.size){
             //batch load all the ingredients from the URI
             this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
@@ -92,11 +108,10 @@ class Search extends Component {
                 this.recipeLoader //attach clause to the loader that sets the state and logs it once loaded
                     .then((recipes)=>{
                         this.setState({loadedRecipes:recipes},
-                            (done)=>console.log('batch loaded: '+this.state.loadedRecipes.toString()));
+                            (done)=>console.log('batch loaded: '+this.state.loadedRecipes));
                         return recipes
                     })
                     // .then((recipes)=>{console.log(JSON.stringify(this.state.loadedRecipes));return recipes})
-                this.client.setRecipeLoaderSource(()=>this.recipeLoader); //pass the client an anonymous function that gives it the most recent loader
                 this.setFilter(this.state.filter) //set the helper's filter method, based on whatever we parsed 
                 return result //pass the result to the next link
             }) 
@@ -118,12 +133,14 @@ class Search extends Component {
     }
     removeIngredient(value,status){
         // e.preventDefault();
-        this.client.updateIngredient(value,status,(sorted)=>{
+        let update_state_and_close_dropdowns_fn = (sorted)=>{
             this.updateState(sorted,value,status);
             if(this.state.ingredients.size == 0){
                 this.closeAllDropdowns()
             }
-        }) 
+        };
+
+        this.client.updateIngredient(value,status,{successCallback:update_state_and_close_dropdowns_fn}) 
 
     }
     toggleDropdown(event,id){
@@ -166,6 +183,8 @@ class Search extends Component {
             return {excluded:(()=>{this.state.excluded.delete(value);return this.state.excluded})()};
         } else if(status==CLEAR_SEARCH){
             return {excluded:new Set(),ingredients:new Set()};
+        } else if(status==ADD_MULTIPLE){
+            return {ingredients:(()=>value.reduce((prev,next)=>prev.add(next),this.state.ingredients))()}
         } else {
             return {};
         }
@@ -185,7 +204,11 @@ class Search extends Component {
 
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,status,this.searchUpdateWrapper(value,status),this.updateLoader)
+        let callbacks = {
+            successCallback: this.searchUpdateWrapper(value,status),
+            outputCallback: this.updateLoader,
+        }
+        this.client.updateIngredient(value,status,callbacks)
         
     }
     updateURI(){
@@ -197,7 +220,7 @@ class Search extends Component {
     handleReject(e){
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,0,this.searchUpdateWrapper(value,status))   
+        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})   
              
     }
     parseQueryString(search){
@@ -252,6 +275,36 @@ class Search extends Component {
 
     }
 
+    addFromPantry(e){
+        console.log("Adding from user pantry . . .")
+        
+        let update_failed_fn = (item)=>{
+            //this item couldn't be updated -- probably not found in database
+            //return null: the promise.all doesn't care what values we get
+            return null;
+        };
+
+        let filter_failed_results_fn = (items)=>{
+            return items.filter((item)=>!!item); //check if the item is valid
+        };
+
+        let sort_results_and_update_fn = (items)=>{
+            this.client.sortRecipeMap(this.searchUpdateWrapper(items,ADD_MULTIPLE))
+        };
+
+        User.getUser('user001').getUserData('pantry').then((data)=>{
+            Promise.all(
+                //get an array of update promises
+                this.massUpdateSearch(Object.keys(data),1/* ADD */)
+                //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
+                .map((updatePromise)=>updatePromise.catch(update_failed_fn))
+            )
+            .then( filter_failed_results_fn )
+            .then( sort_results_and_update_fn )
+            .catch((err)=>console.error(err))
+        })
+    }
+
     getGlyph(name){
         return (<span className={"glyphicon glyphicon-"+name}></span>);
     }
@@ -261,7 +314,7 @@ class Search extends Component {
         if(!largest){
             glyph = (<span className="pull-right">{glyph}</span>);
         }
-        return (<div className='dropdown-item' onClick={(e)=>this.setFilter(filter)}>{message}{glyph}</div>);
+        return (<div className={'dropdown-item'+(filter===this.state.filter?' disabled':'')} onClick={(e)=>this.setFilter(filter)}>{message}{glyph}</div>);
 
     }
 
@@ -291,7 +344,7 @@ class Search extends Component {
                                     <span className="glyphicon glyphicon-list"></span>
                                 </button>
                                 <div className="dropdown-menu">
-                                    <div className='dropdown-item'>Add From Pantry<span className="pull-right"><span className="glyphicon glyphicon-download-alt"></span></span></div>
+                                    <div className='dropdown-item' onClick={this.addFromPantry}>Add From Pantry<span className="pull-right"><span className="glyphicon glyphicon-download-alt"></span></span></div>
                                     <div role="separator" className="dropdown-divider"></div>                                    
                                     <div className='dropdown-item' onClick={this.clearSearch}>Clear All<span className="pull-right"><span className="glyphicon glyphicon-trash"></span></span></div>
                                     <div role="separator" className="dropdown-divider"></div>
@@ -310,7 +363,7 @@ class Search extends Component {
 
                                 </div>
                             </div>
-                            <SearchBar form={this.refs.form} client={this.client} callback={this.addIngredient} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
+                            <SearchBar form={this.refs.form} client={this.client} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
                             <span className='input-group-btn'>
                                 <button className='btn btn-success' type='button submit'>
                                     <span className="glyphicon glyphicon-plus-sign"></span>

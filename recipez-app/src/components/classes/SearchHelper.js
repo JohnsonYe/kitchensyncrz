@@ -67,10 +67,43 @@ import JSZip from 'jszip'
      * @param {[type]}   search     [description]
      * @param {Function} callback   [description]
      */
-    updateIngredient(ingredient,search,callback,escape,nosort){
+    updateIngredient(ingredient,search,callbacks,nosort){
+        let {successCallback,outputCallback,failureCallback} = {...callbacks};
+        
+        let process_ingredient_fn = (ingredientObject)=>{
+            if(outputCallback){
+                outputCallback(ingredientObject);
+            }
+            return ingredientObject; // pass the object along to the next link
+        };
+
+        let add_to_map_fn = (ingredientObject,ingredientMap)=>{
+            return ingredientMap.set(ingredientObject.Name,[search,ingredientObject,UNUSED_STATUS]);
+        };
+
+        let get_add_to_map_fn = (ingredientMap)=>{
+            return ((ingredientObj)=>add_to_map_fn(ingredientObj,ingredientMap));
+        };
+
+        let update_result_list_fn = (recipeMap)=>{
+            return this.updateResultList(recipeMap,ingredient,successCallback,nosort);
+        };
+
+        let failed_to_load_fn = (err,ingredientMap)=>{
+            console.error('Error loading ingredient: '+ err)
+            if(failureCallback){
+                failureCallback(ingredient);
+            }
+            return ingredientMap;
+        };
+
+        let get_failed_to_load_fn = (ingredientMap)=>{
+            return (err)=>failed_to_load_fn(err,ingredientMap);
+        };
+
         this.ingredientMap = //push another link to the chain to update the status of the ingredient map
-            this.ingredientMap.then((map)=>{ //load the new ingredient if necessary
-                if(!map.has(ingredient)){ //update the map if the ingredient isnt in it or we are removing it
+            this.ingredientMap.then((ingredientMap)=>{ //load the new ingredient if necessary
+                if(!ingredientMap.has(ingredient)){ //update the map if the ingredient isnt in it or we are removing it
                     console.log('Loading ingredient: '+ingredient)
                     return (this.client.getDBItemPromise('Ingredients','Name',[ingredient])
                         //info format: [query type,object,status]
@@ -79,17 +112,17 @@ import JSZip from 'jszip'
                         //              3 -- unused
                         .then((payload)=>this.client.unpackItem(payload[0],RecipeHelper.IngredientPrototype))
                         // .then((ingredientObject)=>{alert(JSON.stringify(ingredientObject));return ingredientObject})
-                        .then((ingredientObject)=>{if(escape)escape(ingredientObject);return ingredientObject})
-                        .then((ingredientObject)=>map.set(ingredientObject.Name,[search,ingredientObject,UNUSED_STATUS]))//put the retrieved info in the map
-                        .then((map2)=>this.updateResultList(map2,ingredient,callback,nosort))
-                        .catch((err)=>{console.error(err);return map})//invalid DB key? fail quietly so the chain stays alive
+                        .then( process_ingredient_fn )
+                        .then( get_add_to_map_fn(ingredientMap) )//put the retrieved info in the map
+                        .then( update_result_list_fn )
+                        .catch( get_failed_to_load_fn(ingredientMap) )//invalid DB key? fail quietly so the chain stays alive
                     )
                 } else {
-                    return this.updateResultList(map.set(ingredient,[search,map.get(ingredient)[1],map.get(ingredient)[2]]),ingredient,callback,nosort) 
+                    return this.updateResultList(ingredientMap.set(ingredient,[search,ingredientMap.get(ingredient)[1],ingredientMap.get(ingredient)[2]]),ingredient,successCallback,nosort) 
                 }                   
                 //since this ingredient is already in the map, dont modify the map or fire the callback
                 //callers should not rely on this method to use the callback for any given set of arguments
-                return map
+                return ingredientMap
             })
 
     }
@@ -229,7 +262,6 @@ import JSZip from 'jszip'
             case 'best_match':
                 console.log('Set filter type to: ' + filter)
                 return this.useSynchronous((a,b)=>(b[1][1]-a[1][1])); //compare raw scores
-            //THESE NEED INFO FROM A RECIPE OBJECT -- HOW SHOULD WE GET IT (efficiently)? --> promise chains
             case 'difficulty_filter':
                 console.log('Set filter type to: ' + filter)
                 return this.useAsyncLoader(filter,this.difficultyFilter)                

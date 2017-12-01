@@ -85,9 +85,12 @@ class SearchBar extends Component{
                 this.setState({shiftDown:true})
                 break;
             case 13/*ENTER*/:
-                if(this.state.selection >= 0)
-                    e.stopPropagation();
-                    this.selectCompletion(this.state.completions[this.state.selection])
+                this.query = (this.state.selection >= 0)?this.state.completions[this.state.selection]:this.state.value;
+                //     e.stopPropagation();
+                //     this.selectCompletion(this.state.completions[this.state.selection])
+                break;
+            case 8/*DELETE*/:
+                this.setState({selection:-1,value:this.state.completions[this.state.selection]})
                 break;
             case 40/*DOWN*/:
                 this.setState({selection:this.state.selection+1})
@@ -108,7 +111,7 @@ class SearchBar extends Component{
     }
 
     reset(){
-        this.setState({value:'',completions:[],shiftDown:false})
+        this.setState({value:'',completions:[],shiftDown:false,selection:-1})
     }
 
     /**
@@ -121,7 +124,7 @@ class SearchBar extends Component{
     }
 
     getValue(){
-        return this.state.value
+        return this.query;
     }
 
     getStatus(){
@@ -159,11 +162,29 @@ class SearchBar extends Component{
                     value={(this.state.selection>=0?this.state.completions[this.state.selection]:this.state.value)}
                     // style={{'z-index':1,'position':'relative'}}
                     />
-                <div className="dropdown-menu">
-                    {this.state.completions.map((key)=>(
-                        <div className={'dropdown-item'+(counter()==this.state.selection?' active':'')} onClick={(e)=>{}}>
-                            {key}
-                        </div>))}
+                <div className="dropdown-menu" onMouseOut={(e)=>{this.setState({selection:-1})}}>
+                    {this.state.completions.map((key)=>{
+                        let count = counter();
+                        return (
+                        <div className={'dropdown-item'+(count==this.state.selection?' active':'')} 
+                             onMouseOver={(e)=>{this.query=key;this.setState({selection:count})}}>
+                            <p>
+                                {key}
+                                <span className='pull-right'>
+                                    <div className='btn-group' role='group'>
+                                        <button type='submit' className='btn btn-success btn-sm'>
+                                            <span className='glyphicon glyphicon-plus-sign'></span>
+                                        </button>
+                                        <button type='submit' 
+                                                className='btn btn-danger btn-sm' 
+                                                onMouseOver={(e)=>this.setState({shiftDown:true})}
+                                                onMouseOut={(e)=>this.setState({shiftDown:false})}>
+                                            <span className='glyphicon glyphicon-ban-circle'></span>
+                                        </button> 
+                                    </div>                           
+                                </span>
+                            </p>
+                        </div>)})}
                 </div>
             </div>
             );

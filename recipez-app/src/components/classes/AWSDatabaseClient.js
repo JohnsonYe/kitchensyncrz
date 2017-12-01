@@ -69,7 +69,7 @@ var MAX_REQUEST_LENGTH = 100;
      */
     getDBItems(tableName,keyField,keys,target){
         if(keys.length > MAX_REQUEST_LENGTH){
-            console.log('Recieved request with more than 100 keys!')
+            console.log('Recieved request with more than 100 keys! ('+keys.length+')')
             Promise.all((()=>{ //create a promise group out of max size batch requests
                 let pos = 0,requests = [];
                 while(pos < keys.length){ //split key array into size 100 chunks
@@ -89,11 +89,11 @@ var MAX_REQUEST_LENGTH = 100;
             return;
         }
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
-            if(err){
-                target({status:false, payload: err});
-            } else if(data.Responses[tableName].length == 0) {
-                target({status:false, payload: 'Item not found!'});
-            } else {
+            if(err){ //the call failed for some reason --> probably invalid keys (not strings)
+                target({status:false, payload: err + ' --> make sure your query keys are strings!' });
+            } else if(data.Responses[tableName].length == 0) { //no results, but the call went through
+                target({status:false, payload: 'Item: ' + JSON.stringify(keys) + ' not found!'});
+            } else { //everythng looks good, index into the response
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
@@ -108,12 +108,11 @@ var MAX_REQUEST_LENGTH = 100;
      */
     getDBItemPromise(tableName,keyField,keys){
         if(keys.length > MAX_REQUEST_LENGTH){
-            console.error('Recieved request with more than 100 keys!')
+            console.error('Recieved request with more than 100 keys!('+keys.length+')')
         }
         return new Promise((pass,fail)=>{
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
-                    // alert('got here')
                     pass(response.payload)
                 } else { //call failed, fail
                     fail(response.payload)
