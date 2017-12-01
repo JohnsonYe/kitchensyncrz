@@ -39,7 +39,9 @@ class SavedRecipes extends Component{
                 }
             }
 
+            console.log(this.savedRecipeNames);
             this.recipeHelper.loadRecipeBatch(this.savedRecipeNames,(recipeObjects)=>{
+
                 console.log(recipeObjects);
                 this.setState({
                     recipeList:recipeObjects,
@@ -50,11 +52,9 @@ class SavedRecipes extends Component{
     }
 
     removeRecipe = (recipeName) => {
-
         this.userInstance.deleteRecipe(recipeName);
-        this.getRecipeObjects();
 
-    };
+    }
 
     render(){
 

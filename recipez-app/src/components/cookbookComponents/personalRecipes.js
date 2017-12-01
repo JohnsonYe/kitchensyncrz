@@ -58,7 +58,7 @@ class PersonalRecipes extends Component{
 
     createNewBlankRecipe(recipeName){
 
-        let newRecipe = this.recipeHelper.createRecipe(recipeName,[],[]);
+        let newRecipe = this.recipeHelper.createRecipe(recipeName,["cabbage"],["Icky sticky cabbage bubbleboi"]);
         console.log(this.userInstance.saveCustomRecipe(newRecipe));
         this.getRecipeNamesAndObjects();
         this.close();

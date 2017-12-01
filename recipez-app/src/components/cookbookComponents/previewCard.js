@@ -73,7 +73,7 @@ class PreviewCard extends Component{
         return (
             <div className={"col-md-2"}>
                 <div className="card recipes">
-                    <Link to={'/Recipes/'+this.state.name}>
+                    <Link to={this.props.personal ? '/Recipes/'+this.state.author+'/'+this.state.name : '/Recipes/'+this.state.name}>
 
                         <img className="card-img-top" src={this.noImg} alt="Food"/>
                     </Link>
