@@ -17,7 +17,7 @@ class Recipe extends Component {
         this.state = {
             loaded:false,
             data:'Loading . . . ',
-            value:'write a comment'
+            value:'write a comment...'
         }
         this.setRecipeData = this.setRecipeData.bind(this);
         this.updateReviews = this.updateReviews.bind(this);
@@ -68,16 +68,16 @@ class Recipe extends Component {
                 </span>
             </li>)
 
-        var directions = this.state.data.Directions.map((step) => <li class="list-group-item">{step}</li>)
+        var directions = this.state.data.Directions.map((step) => <li class="list-group-item"><i class="fa fa-cutlery"/>{step}</li>)
 
         // alert(JSON.stringify(this.state.data))
         var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) =>
             <li>
-                <h5 style={{float:'left'}}>{review[1].username}</h5>
+                <h4 style={{float:'left'}}>{review[1].username}</h4>
                 <img src={'/star.jpg'} height='21' width='21'/>
                 <p>{review[1].Comment}</p>
             </li>)
-        var dummyReviewObject = {username:'user001',Comment:'new hello world',Rating:'5',timestamp:'-1'}
+
         var updateComment = {username:'Johnson',Comment:this.state.value,Rating:'5',timestamp:'-1'}
 
         return (
@@ -93,9 +93,12 @@ class Recipe extends Component {
 
                             <div class="btn=group btn-group-sm">
                                 {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
-                                <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">  check  </button>
-                                <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">  add to cookbook  </button>
-                                <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">  remove from cookbook  </button>
+                                <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">
+                                    <i class="glyphicon glyphicon-check"/>  check  </button>
+                                <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
+                                    <i class="glyphicon glyphicon-book"/>  add to cookbook  </button>
+                                <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
+                                    <i class="glyphicon glyphicon-trash"/>  remove from cookbook  </button>
                             </div>
                         </div>
                         <div class="col-sm-6">
