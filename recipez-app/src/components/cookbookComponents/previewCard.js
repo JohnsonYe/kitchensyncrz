@@ -50,9 +50,26 @@ class PreviewCard extends Component{
     }
 
     removeThis(){
+        this.close();
+        this.props.removeFunc(this.state.name);
     }
 
     render() {
+
+        let personalAddendum;
+        if(this.props.personal) {
+            personalAddendum =
+                <p>
+                    Once you delete a personal recipe, it cannot be undone.
+                </p>;
+        }
+        let editButton;
+        if(this.props.personal){
+            editButton =
+                <div className="btn btn-primary">
+                    Edit
+                </div>
+        }
         return (
             <div className={"col-md-2"}>
                 <div className="card recipes">
@@ -71,11 +88,9 @@ class PreviewCard extends Component{
                         {/*TODO: Reviews display*/}
                         <p>
                         </p>
-                        <div className="btn btn-primary">
-                            Edit
-                        </div>
-                        <div className={"btn btn-warning"} onClick={this.open}>
-                            Delete
+                        {editButton}
+                        <div className={"btn btn-danger"} onClick={this.open}>
+                            {this.props.personal ? 'Delete' : 'Remove'}
                         </div>
                     </div>
 
@@ -88,20 +103,20 @@ class PreviewCard extends Component{
                         </Modal.Title>
                     </Modal.Header>
 
-                    <Modal.body>
+                    <Modal.Body>
                         <p>
-                            Are you sure you want to delete this personal recipe?
+                            Are you sure you want to {this.props.personal ? 'delete' : 'remove'} this { this.props.personal ? 'personal' : 'saved' } recipe?
                         </p>
-                        <p>
-                            Once you delete a personal recipe, it cannot be undone.
-                        </p>
-                    </Modal.body>
+                        {personalAddendum}
+                    </Modal.Body>
                     <Modal.Footer>
-                        <div className={"btn btn-danger"} onClick={this.close}>
-                            Delete
-                        </div>
-                        <div className={"btn"} onClick={this.close}>
-                            Cancel
+                        <div>
+                            <div className={"btn btn-danger"} onClick={this.removeThis}>
+                                {this.props.personal ? 'Delete' : 'Remove'}
+                            </div>
+                            <div className={"btn btn-light"} onClick={this.close}>
+                                Cancel
+                            </div>
                         </div>
                     </Modal.Footer>
 

@@ -16,18 +16,21 @@ class SavedRecipes extends Component{
     constructor(props){
         super(props);
 
-
+        this.getRecipeObjects = this.getRecipeObjects.bind(this);
         this.state = {
             recipeList: [],
+
         };
 
         this.userInstance = props.userInstance;
-        console.log('Below is the personal recipes user instance');
-        console.log(this.userInstance);
         this.savedRecipeNames = [];
         this.recipeHelper = new RecipeHelper();
+        this.getRecipeObjects();
 
+    }
 
+    getRecipeObjects() {
+        this.savedRecipeNames =[];
         this.userInstance.getCookbook((cookbook_contents) => {
             this.cookbook = cookbook_contents;
             for (let [recipeName, source] of Object.entries(this.cookbook)) {
@@ -44,15 +47,14 @@ class SavedRecipes extends Component{
             });
 
         });
-
     }
 
-    // Method to add a recipe to this.state.recipes, dynamically adding to the recipe display
-    removeRecipe(){
+    removeRecipe = (recipeName) => {
 
+        this.userInstance.deleteRecipe(recipeName);
+        this.getRecipeObjects();
 
-
-    }
+    };
 
     render(){
 
@@ -64,7 +66,7 @@ class SavedRecipes extends Component{
         });
 
          for( let recipe of this.state.recipeList){
-             recipeCards.push(<PreviewCard src={recipe}/>);
+             recipeCards.push(<PreviewCard src={recipe} removeFunc={this.removeRecipe} personal={0}/>);
         }
 
         return(
