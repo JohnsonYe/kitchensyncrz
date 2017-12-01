@@ -2,24 +2,69 @@ import React, { Component } from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
 import SavedRecipes from "../cookbookComponents/savedRecipes";
 import PersonalRecipes from "../cookbookComponents/personalRecipes";
-import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
-import { Button, Grid, Row, Col, FormGroup, FormControl, Form, ControlLabel } from 'react-bootstrap';
 import User from "../classes/User.js";
 import '../../css/Cookbook.css';
+import {Modal} from 'react-bootstrap';
 
 
 class Cookbook extends Component {
 
     constructor(props){
         super(props);
-
+        this.state={
+            modal:false,
+        }
         this.userInstance = User.getUser('user001');
         console.log(this.userInstance);
+        this.open = this.open.bind(this);
+        this.close = this.open.bind(this);
+    }
+
+    open(){
+
+        console.log('About to open the modal, nuking:');
+        this.setState({
+            modal:true,
+        });
+    }
+    close(){
+        this.setState({
+            modal:false,
+        });
     }
 
     render() {
         return (
             <div>
+                <div className={"btn"} onClick={this.open}>
+                    Modal
+                </div>
+
+                <Modal show={this.state.modal} onHide={this.close}>
+                    <Modal.Header>
+                        <Modal.Title>
+                            {this.state.name}
+                        </Modal.Title>
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        <p>
+                            Are you sure you want to delete this personal recipe?
+                        </p>
+                        <p>
+                            Once you delete a personal recipe, it cannot be undone.
+                        </p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className={"btn btn-danger"} onClick={this.close}>
+                            Delete
+                        </div>
+                        <div className={"btn"} onClick={this.close}>
+                            Cancel
+                        </div>
+                    </Modal.Footer>
+
+                </Modal>
                 <div className="jumbotron">
                     <h1>Cookbook</h1>
                 </div>
@@ -35,7 +80,7 @@ class Cookbook extends Component {
                         <div>
 
                             {/* Nav bar content here */}
-                            <div className="row">
+                            <div className="container">
                                 <Tabs defaultActiveKey={1}>
                                     <Tab eventKey={1} title={"Saved Recipes"}>
                                         Saved Recipes here

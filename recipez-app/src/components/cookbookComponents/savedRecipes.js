@@ -6,27 +6,44 @@
  */
 
 import React, {Component} from 'react';
-import PreviewCard from '../cookbookComponents/previewCard';
+import PreviewCard from './previewCard.js';
+import RecipeHelper from '../classes/RecipeHelper.js'
+import AndrewPreviewCard from './andrew_previewCard.js';
 
 //TODO: Make some sort of function to automatically add and display preview cards
 class SavedRecipes extends Component{
+
     constructor(props){
         super(props);
+
+
         this.state = {
-            imgSrc:"http://cdn-image.foodandwine.com/sites/default/files/styles/4_3_horizontal_inbody_900x506/public/1502824044/royal-farms-best-gas-station-food-FT-SS0817.jpg?itok=ig79fdSU",
-            recipes: [],
+            recipeList: [],
+        };
 
-        }
+        this.userInstance = props.userInstance;
+        console.log('Below is the personal recipes user instance');
+        console.log(this.userInstance);
+        this.savedRecipeNames = [];
+        this.recipeHelper = new RecipeHelper();
 
-        this.state.recipes = [
-                <PreviewCard src={this.state.imgSrc}/>,
-                <PreviewCard src={this.state.imgSrc}/>,
-                <PreviewCard src={this.state.imgSrc}/>,
-                <PreviewCard src={this.state.imgSrc}/>,
-                <PreviewCard src={this.state.imgSrc}/>,
-                <PreviewCard src={this.state.imgSrc}/>,
-                <PreviewCard src={this.state.imgSrc}/>,
-        ];
+
+        this.userInstance.getCookbook((cookbook_contents) => {
+            this.cookbook = cookbook_contents;
+            for (let [recipeName, source] of Object.entries(this.cookbook)) {
+                if (source === "none") {
+                    this.savedRecipeNames.push(recipeName);
+                }
+            }
+
+            this.recipeHelper.loadRecipeBatch(this.savedRecipeNames,(recipeObjects)=>{
+                console.log(recipeObjects);
+                this.setState({
+                    recipeList:recipeObjects,
+                });
+            });
+
+        });
 
     }
 
@@ -38,10 +55,22 @@ class SavedRecipes extends Component{
     }
 
     render(){
+
+        let recipeCards = [];
+        this.state.recipeList.sort(function(a,b){
+           if(a.Name < b.Name) return -1;
+           if(a.Name > b.Name) return 1;
+           return 0;
+        });
+
+         for( let recipe of this.state.recipeList){
+             recipeCards.push(<PreviewCard src={recipe}/>);
+        }
+
         return(
             <div>
                 <div className={"row"}>
-                    {this.state.recipes}
+                    {recipeCards}
                 </div>
             </div>);
     }

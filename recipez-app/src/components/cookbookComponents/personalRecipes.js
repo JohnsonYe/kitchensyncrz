@@ -17,84 +17,64 @@ class PersonalRecipes extends Component{
 
         this.state = {
             recipeList: [],
-            cur_key: 0,
         };
 
-        this.addRecipe = this.addRecipe.bind(this);
         this.userInstance = props.userInstance;
         console.log('Below is the personal recipes user instance');
         console.log(this.userInstance);
         this.personalRecipeNames = [];
-        this.personalRecipeObjects = [];
         this.recipeHelper = new RecipeHelper();
 
-        var doRecipeThings = new Promise((pass,fail)=>{
 
-            this.userInstance.getCookbook((cookbook_contents) => {
-                this.cookbook = cookbook_contents;
-                for( let [recipeName,source] of Object.entries(this.cookbook)){
-                    if(source !=="none"){
-                        this.personalRecipeNames.push(recipeName);
-                        this.recipeHelper.loadRecipe(recipeName,(recipeObject) => {
-                            this.personalRecipeObjects.push(recipeObject);
-                        }, 'user001');
-                    }
+        this.userInstance.getCookbook((cookbook_contents) => {
+            this.cookbook = cookbook_contents;
+            for (let [recipeName, source] of Object.entries(this.cookbook)) {
+                if (source !== "none") {
+                    this.personalRecipeNames.push(recipeName);
                 }
-            })
-        });
+            }
 
-        Promise.all([doRecipeThings]).then((recipeList) => {
-            this.setState({recipeList: recipeList})
-        },
-            (recipeList) =>{
-
+            this.recipeHelper.loadRecipeBatch(this.personalRecipeNames,(recipeObjects)=>{
+                console.log(recipeObjects);
+                this.setState({
+                   recipeList:recipeObjects,
+                });
             });
 
+        });
+
+        this.createNewBlankRecipe = this.createNewBlankRecipe.bind(this);
     }
 
-    addRecipe(){
-        let cur_key_new = this.state.cur_key;
-        let updatedRecipeMap = this.state.recipeMap;
-        let updatedRecipeList = this.state.recipeList;
+    createNewBlankRecipe(recipeName){
 
-        cur_key_new += 1;
-        console.log('the new key is');
-        console.log(cur_key_new);
-
-        let newRecipe = <PreviewCard removeFunc={this.removeRecipe} card_key={cur_key_new}/>;
-
-        updatedRecipeMap.set(cur_key_new, newRecipe);
-        updatedRecipeList.push(newRecipe);
-        this.setState({recipeList: updatedRecipeList, recipeMap: updatedRecipeMap, cur_key: cur_key_new})
     }
 
     // Had to change to arrow func to get it to bind properly... should work?
-    removeRecipe = (card_key) => {
-
-        card_key = parseInt(card_key);
-        console.log(card_key);
-        let updatedRecipes = this.state.recipeMap;
-
+    removeRecipe = (recipeName) => {
         let updatedRecipeList = [];
-
-        updatedRecipes.delete(card_key);
-        console.log(updatedRecipes);
-        for( let [key, value] of updatedRecipes) {
-            updatedRecipeList.push(value);
-        }
-        this.setState({recipeMap: updatedRecipes, recipeList: updatedRecipeList});
 
     };
 
     render(){
+
+        let recipeCards = [];
+        for( let recipe of this.state.recipeList){
+            recipeCards.push(<PreviewCard src={recipe}/>);
+            recipeCards.push(<PreviewCard src={recipe}/>);
+        }
+
+
         return(
             <div>
 
                 <div className={"btn btn-success"} onClick={this.addRecipe}>
                     Create Recipe
                 </div>
+                <div className={"container-fluid"}>
                 <div className={"row"}>
-                    {this.state.recipeList}
+                    {recipeCards}
+                </div>
                 </div>
             </div>
         );
