@@ -16,6 +16,7 @@ class SearchBar extends Component{
             completions:[],
             listOpen:false,
             value:'',
+            selection:-1,
         }
 
         this.shouldClear = this.props.clear;
@@ -77,8 +78,10 @@ class SearchBar extends Component{
             case 13/*ENTER*/:
                 break;
             case 40/*DOWN*/:
+                this.setState({selection:this.state.selection+1})
                 break;
             case 38/*UP*/:
+                this.setState({selection:Math.max(this.state.selection-1,-1)})
                 break;
 
         }
@@ -141,11 +144,11 @@ class SearchBar extends Component{
                     onKeyUp={this.handleKeyUp}
                     autoComplete="off"
                     autoFocus="on"
-                    value={this.state.value}
+                    value={(this.state.selection>=0?this.state.completions[this.state.selection]:this.state.value)}
                     // style={{'z-index':1,'position':'relative'}}
                     />
                 <div className="dropdown-menu">
-                    {this.state.completions.map((key)=>(<div className='dropdown-item' key={counter()+""}>{key}</div>))}
+                    {this.state.completions.map((key)=>(<div className={'dropdown-item'+(counter()==this.state.selection?' active':'')}>{key}</div>))}
                 </div>
             </div>
             );
