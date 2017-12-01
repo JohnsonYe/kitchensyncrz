@@ -180,7 +180,7 @@ const ItemForm = ( {addProtein,
                 <span className = "input-group-btn">
                         <button className="btn btn-success"
                                 type="submit"
-                                onClick = {addToPantry('turkey', 'none', 1)}>
+                                onClick = {() => addToPantry(input.value, getKey, 1)}>
                             <i className = "glyphicon glyphicon-plus" />
                         </button>
                 </span>
@@ -233,8 +233,8 @@ class kitchen extends Component {
 
     constructor( props ){
         super( props );
-
         this.user = new User();
+        this.loadData();
 
         var
             proteinData = [],
@@ -331,6 +331,27 @@ class kitchen extends Component {
         this.addCookware = this.addCookware.bind(this);
         this.removeCookware = this.removeCookware.bind(this);
         this.renderCookware = this.renderCookware.bind(this);
+
+        this.loadData = this.loadData.bind(this);
+    }
+
+    // Read the json file
+    loadData(){
+        this.user.getPantry(this.processData);
+    }
+
+    processData(data){
+        var none = [];
+        Object.keys(data).forEach((key, value)=> {
+            alert(value.unit);
+            if(value.unit == "none" ){
+                none.concat(key);
+            }()=>{
+                alert("HEREE")
+            }
+        })
+
+
     }
 
     getKey(){
@@ -344,7 +365,9 @@ class kitchen extends Component {
     /* Functionality methods */
 
     handleSelect( key ){
-        this.setState({key: key });;
+        this.setState({key: key });
+        this.loadData();
+
     }
 
     //Protein functions
@@ -353,12 +376,14 @@ class kitchen extends Component {
         this.setState({numItems: (++this.state.numItems)});
     }
 
-    removeProtein(e){
+    removeProtein(val){
+
 
         if( this.state.protein.length > 0 ){
-            this.state.protein.splice( this.state.protein.indexOf(e), 1);
+            this.state.protein.splice( this.state.protein.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
-            this.user.removeFromPantry('turkey');
+            this.user.removeFromPantry(val,
+            ()=>this.user.getPantry(()=>{}));
 
         }
     }
