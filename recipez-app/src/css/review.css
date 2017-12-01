@@ -84,8 +84,10 @@ input[type="file"]{
     cursor: pointer;
 }
 
-textarea {
-    max-width: 280px;
+#comment {
+    height: 50%;
+    width: 300%;
 }
+
 
 .custom-input-file:hover .uploadPhoto { display: block; }

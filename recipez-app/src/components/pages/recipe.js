@@ -16,12 +16,15 @@ class Recipe extends Component {
         super(props)
         this.state = {
             loaded:false,
-            data:'Loading . . . '
+            data:'Loading . . . ',
+            value:'write a comment'
         }
         this.setRecipeData = this.setRecipeData.bind(this);
         this.updateReviews = this.updateReviews.bind(this);
         this.client = new RecipeHelper();
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     setRecipeData(recipeObject,err){
@@ -37,6 +40,15 @@ class Recipe extends Component {
 
     updateReviews(response){
         this.setState({data:this.state.data})
+    }
+
+    handleChange(event) {
+        this.setState({value: event.target.value});
+    }
+
+    handleSubmit(event) {
+        alert('A comment was submitted: ' + this.state.value);
+        event.preventDefault();
     }
 
     render() {
@@ -59,7 +71,7 @@ class Recipe extends Component {
                 <p>{review[1].Comment}</p>
             </li>)
         var dummyReviewObject = {username:'user001',Comment:'new hello world',Rating:'5',timestamp:'-1'}
-
+        var updateComment = {username:'Johnson',Comment:this.state.value,Rating:'0',timestamp:'-1'}
         return (
             <div>
                 <div className="jumbotron">
@@ -68,7 +80,7 @@ class Recipe extends Component {
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-6">
-                            <div id="myCarousel" class="carousel slide" date-ride="carousel">
+                           {/* <div id="myCarousel" class="carousel slide" date-ride="carousel">
                                 <ol class="carousel-indicators">
                                     <li data-target="#myCarousel" data-slide-to="0" class="active"/>
                                     <li data-target="#myCarousel" data-slide-to="1"/>
@@ -97,9 +109,9 @@ class Recipe extends Component {
                                     <span class="carousel-control-next-icon" aria-hidden="true"/>
                                     <span class="sr-only">Next</span>
                                 </a>
-                            </div>
+                            </div>*/}
 
-                            {/*<img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" class="img-fluid " alt=""></img>*/}
+                            <img src="https://images-gmi-pmc.edge-generalmills.com/f48f767c-5e82-4826-a5ca-85e9cfb15920.jpg" class="img-fluid " alt=""></img>
 
                             <div class="btn=group btn-group-sm">
                                 <button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>
@@ -124,40 +136,22 @@ class Recipe extends Component {
 
                 <div class="container">
                     <div class="row">
-                        <div class="page-header">
-                            <h3 class="reviews">Leave your comment</h3>
+                        <ul>{reviews}</ul>
+                    </div>
 
-                            <div class="comment-tabs">
-                                <ul class="nav nav-tabs" role="tablist">
-                                    <li class="active"><a href="#comments-logout" role="tab" data-toggle="tab"><h4 class="reviews text-capitalize">Comments</h4></a></li>
-                                    <li><a href="#add-comment" role="tab" data-toggle="tab"><h4 class="reviews text-capitalize">Add comment</h4></a></li>
-                                </ul>
-                                <div class="tab-content">
-                                    <div class="tab-pane" id="comments-logout">
-                                        <ul>{reviews}</ul>
-                                    </div>
-                                    <div class="tab-pane active" id="add-comment">
-                                        <form action="#" method="post" class="form-horizontal" id="commentForm" role="form">
-                                            {/*<div class="form-group">
-                                                <label for="email" class="col-sm-2 control-label">Comment</label>
-                                                <div class="col-sm-10">
-                                                    <textarea class="form-control" name="addComment" id="addComment" rows="5"/>
-                                                </div>
-                                            </div>*/}
-                                            <div class="form-group">
-                                                <label for="comment" >Comment:</label>
-                                                <textarea class="form-control" name="comment" rows="5" id="comment"/>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-2 col-sm-10">
-                                                    <button class="btn btn-success btn-circle text-uppercase" type="submit" id="submitComment"><span class="glyphicon glyphicon-send"></span> Summit comment</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row">
+                        <form onSubmit={this.handleSubmit}>
+                            <label>Leave your comment:</label>
+                            <textarea class="form-control" name="comment" rows="8" id="comment" value={this.state.value} onChange={this.handleChange}/>
+
+                            {/*<div class="form-group">
+                                <div class="col-sm-offset-10 col-sm-10">*/}
+                                    <button onClick={(e)=>this.client.updateReview(this.state.data.Name,updateComment,this.updateReviews)}
+                                            class="btn btn-success btn-circle text-uppercase" type="submit" id="submitComment">
+                                        <span class="glyphicon glyphicon-send"/> Summit comment</button>
+                                {/*</div>
+                            </div>*/}
+                        </form>
                     </div>
                 </div>
 
