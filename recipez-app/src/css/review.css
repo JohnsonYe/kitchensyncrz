@@ -89,5 +89,8 @@ input[type="file"]{
     width: 300%;
 }
 
+#listreview{
+    width: 500%;
+}
 
 .custom-input-file:hover .uploadPhoto { display: block; }

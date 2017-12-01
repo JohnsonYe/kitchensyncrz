@@ -16,4 +16,21 @@ h2 {
     font-size: 12px;
     line-height: 1.428571429;
     border-radius: 15px;
+
+}
+.btn-circle:active{
+    background: #007299;
+    box-shadow: none;
+}
+.btn-circle:focus, .btn-circle:active:focus, .btn-circle.active:focus {
+    outline: 0 none;
+}
+
+.btn-circle:hover, .btn-circle:focus, .btn-circle:active, .btn-circle.active, .open > .dropdown-toggle.btn-circle {
+    background: forestgreen;
+}
+
+#reviewContainer{
+    widht:100%;
+    margin: auto;
 }

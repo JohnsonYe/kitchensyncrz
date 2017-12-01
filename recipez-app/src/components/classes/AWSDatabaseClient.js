@@ -4,15 +4,15 @@
  * Date Created: 11/7/2017
  * Description: This file will serve as the database access client
  */
- import AWS from 'aws-sdk';
+import AWS from 'aws-sdk';
 
- /**
-  * THIS IS A SINGLETON CLASS.
-  * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
-  */
+/**
+ * THIS IS A SINGLETON CLASS.
+ * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
+ */
 
 var creds = new AWS.CognitoIdentityCredentials({
-  IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
+    IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
 });
 AWS.config.update({region:'us-east-2',credentials:creds});
 var db = new AWS.DynamoDB();
@@ -20,9 +20,10 @@ var db = new AWS.DynamoDB();
 const UNAUTH_NAME = 'GUEST'
 
 
- class DBClient {
+class DBClient {
     constructor(){
         this.getDBItems = this.getDBItems.bind(this);
+        this.getDBItemPromise = this.getDBItemPromise.bind(this);
         this.registerPrototype = this.registerPrototype.bind(this);
         this.getPrototype = this.getPrototype.bind(this);
         this.unpackItem = this.unpackItem.bind(this);
@@ -77,10 +78,30 @@ const UNAUTH_NAME = 'GUEST'
         })
     }
 
+    /**
+     * [get a Promise object containing the database items requested]
+     * @param  {[String]} tableName [name of table to get items from]
+     * @param  {[String]} keyField  [name of field used as database key]
+     * @param  {[JSON]} keys      [keys to fetch items with]
+     * @return {[Promise]}           [Promise object with pending DB response]
+     */
+    getDBItemPromise(tableName,keyField,keys){
+        return new Promise((pass,fail)=>{
+            this.getDBItems(tableName,keyField,keys,(response)=>{
+                if(response.status){//call succeeded, pass
+                    // alert('got here')
+                    pass(response.payload)
+                } else { //call failed, fail
+                    fail(response.payload)
+                }
+            });
+        });
+    }
+
     /*
      * Construct an SQS object to retrieve a list of keys from a table
-     * 
-     * string tableName: name of table to retrieve keys from 
+     *
+     * string tableName: name of table to retrieve keys from
      * [string] keys: DB keys to retrieve
      *
      * return: JSON object set up as SQS query
@@ -109,10 +130,10 @@ const UNAUTH_NAME = 'GUEST'
     buildMapUpdateExpression(mapName,key,value){
         let xkey = key.replace(/\s/g, '_')
         return {
-                expr: 'SET #'+xkey+'.#' + xkey + '2 = :'+xkey+'_value',
-                names:{["#"+xkey]:mapName,['#'+xkey+'2']:key},
-                values:{[":"+xkey+'_value']:value}
-            }
+            expr: 'SET #'+xkey+'.#' + xkey + '2 = :'+xkey+'_value',
+            names:{["#"+xkey]:mapName,['#'+xkey+'2']:key},
+            values:{[":"+xkey+'_value']:value}
+        }
     }
 
     buildFieldCreateExpression(fieldName,base){
@@ -133,30 +154,30 @@ const UNAUTH_NAME = 'GUEST'
 
     buildSetUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = :item',
-                names:{"#attr":attrName},
-                values:{":item":value}
-            }
+            expr: 'SET #attr = :item',
+            names:{"#attr":attrName},
+            values:{":item":value}
+        }
     }
 
     buildListAppendUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
-                names:{"#attr":attrName},
-                values:{":item":value,":empty_list":{L:[]}}
-            }
+            expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
+            names:{"#attr":attrName},
+            values:{":item":value,":empty_list":{L:[]}}
+        }
     }
 
     buildStringSetAppendUpdateExpression(attrName,value){
         return {
-                expr: 'SET #attr = list_append(if_not_exists(#attr,:empty_list),:item)',
-                names:{"#attr":attrName},
-                values:{":item":value,":empty_set":{SS:[]}}
-            }
+            expr: 'ADD #attr :item',
+            names:{"#attr":attrName},
+            values:{":item":value}
+        }
     }
 
     buildRemoveElementUpdateExpression(attr,key){
-        let xattr = attr.replace(/\s/g, '_')       
+        let xattr = attr.replace(/\s/g, '_')
         return {
             expr: 'REMOVE #'+xattr+'.#'+xattr+'_value',
             names:{['#'+xattr]:attr,['#'+xattr+'_value']:key},
@@ -164,16 +185,26 @@ const UNAUTH_NAME = 'GUEST'
         }
     }
 
+    buildRemoveSetElementUpdateExpression(attrName,elemName){
+        return {
+            expr: 'DELETE '+attrName+" :v",
+            names:undefined,
+            values:{":v": {"SS": [elemName]}}
+        }
+    }
+
+
+
     buildUpdateDeleteRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
-                "TableName":tableName,
-                "Key":{[keyField]:{S:key}}
-            }
+            "TableName":tableName,
+            "Key":{[keyField]:{S:key}}
+        }
     }
 
     /**
      * params object builder for AWS update transactions
-     * 
+     *
      * @param  {[type]} tableName        [description]
      * @param  {[type]} keyField         [description]
      * @param  {[type]} key              [description]
@@ -182,11 +213,11 @@ const UNAUTH_NAME = 'GUEST'
      */
     buildUpdateRequest(tableName,keyField,key,updateExpression){
         return {"UpdateExpression": updateExpression.expr,
-                "ExpressionAttributeNames":updateExpression.names,
-                "ExpressionAttributeValues":updateExpression.values,
-                "TableName":tableName,
-                "Key":{[keyField]:{S:key}}
-            }
+            "ExpressionAttributeNames":updateExpression.names,
+            "ExpressionAttributeValues":updateExpression.values,
+            "TableName":tableName,
+            "Key":{[keyField]:{S:key}}
+        }
 
     }
 
@@ -252,7 +283,7 @@ const UNAUTH_NAME = 'GUEST'
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })
-        
+
         // alert(JSON.stringify(unpacked))
         return unpacked
 
@@ -291,11 +322,16 @@ const UNAUTH_NAME = 'GUEST'
         alert(JSON.stringify(response))
     }
 
- }
+    alertAndPass(object){
+        alert('got here');
+        return object
+    }
+
+}
 
 
- var static_client = new DBClient();
+var static_client = new DBClient();
 
- DBClient.getClient = () => static_client;
+DBClient.getClient = () => static_client;
 
- export default DBClient;
+export default DBClient;
