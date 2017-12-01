@@ -75,6 +75,7 @@ class App extends Component {
         this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
+        this.client.username = 'user001';
         //alert(this.client.isLoggedIn());
     }
 

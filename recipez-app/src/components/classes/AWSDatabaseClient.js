@@ -19,7 +19,9 @@ import {
 
 const up = {
     USER_POOL_ID: "us-east-2_SHrX2V3xU",
-    APP_CLIENT_ID: "5ome294mpcicna669ebfieplfi"
+    APP_CLIENT_ID: "5ome294mpcicna669ebfieplfi",
+    REGION: "us-east-2",
+    IDENTITY_POOL_ID: "us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa",
 };
 
 var creds = new AWS.CognitoIdentityCredentials({
@@ -48,6 +50,7 @@ const UNAUTH_NAME = 'GUEST'
         this.register = this.register.bind(this);
         this.confirmUser = this.confirmUser.bind(this);
         this.authenticateUser = this.authenticateUser.bind(this);
+        this.getAwsCredentials = this.getAwsCredentials.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false;
@@ -277,13 +280,22 @@ const UNAUTH_NAME = 'GUEST'
 
 
      async authUser() {
+         if (
+             AWS.config.credentials &&
+             Date.now() < AWS.config.credentials.expireTime - 60000
+         ) {
+             return true;
+         }
+
          const currentUser = this.getCurrentUser();
 
          if (currentUser === null) {
              return false;
          }
 
-         await this.getUserToken(currentUser);
+         const userToken = await this.getUserToken(currentUser);
+
+         await this.getAwsCredentials(userToken);
 
          return true;
      }
@@ -369,6 +381,21 @@ const UNAUTH_NAME = 'GUEST'
                  onFailure: err => reject(err)
              })
          );
+     }
+
+     getAwsCredentials(userToken) {
+         const authenticator = `cognito-idp.${up.REGION}.amazonaws.com/${up.USER_POOL_ID}`;
+
+         AWS.config.update({ region: up.REGION });
+
+         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+             IdentityPoolId: up.IDENTITY_POOL_ID,
+             Logins: {
+                 [authenticator]: userToken
+             }
+         });
+
+         return AWS.config.credentials.getPromise();
      }
 
 
