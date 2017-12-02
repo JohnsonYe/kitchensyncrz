@@ -99,6 +99,17 @@ export const AddRestock = ({item, remove, addBack}) => {
                     <span className = "glyphicon glyphicon-plus-sign"
                           style={{fontSize:'1.5em'}}/>
                 </button>
+                <button className = "btn btn-info"
+                        type = "button"
+                        onClick = {()=> {} }
+                        title = "Add to Shopping List"
+                        style = {{float:'right', display:'block',
+                            fontSize:'12px', marginTop:'-10.5px',
+                            marginRight:'7px'}}>
+                    <span className = "glyphicon glyphicon-shopping-cart"
+                          style={{fontSize:'1.5em'}}/>
+                </button>
+
             </div>
 
         </form>

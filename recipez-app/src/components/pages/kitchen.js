@@ -9,9 +9,13 @@ import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Modal } from 'react-bootstrap';
 import { Checkbox, CheckboxGroup } from 'react-checkbox-group';
 
+import Footer from '../footerComponent/footer'
+
 import User from '../classes/User'
 import Autocomplete from '../classes/Autocomplete'
+
 //call loadlist, list , get completion
+
 
 import {ItemForm, ItemList, ExcludeCookwareForm, ExcludeCookwareList, RestockList } from "../kitchenComponents/constants";
 
@@ -250,7 +254,6 @@ class kitchen extends Component {
     }
 
     removeProtein(val){
-
 
         if( this.state.protein.length > 0 ){
             this.state.protein.splice( this.state.protein.indexOf(val), 1);
@@ -777,13 +780,11 @@ class kitchen extends Component {
                                 {this.renderOut()}
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
-
         );
+        <Footer />
     }
 }
 
