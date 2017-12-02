@@ -6,258 +6,14 @@
  */
 
 import React, { Component } from 'react';
-import { Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
-import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
+import { Tab, Nav, NavItem, Modal } from 'react-bootstrap';
+import { Checkbox, CheckboxGroup } from 'react-checkbox-group';
 
 import User from '../classes/User'
 import Autocomplete from '../classes/Autocomplete'
 //call loadlist, list , get completion
 
-//Creates the well and button object that shows up on the screen
-const AddItem = ({item, remove, addOut}) => {
-
-    return (
-
-        <form>
-            <div className="well well-sm" id="pantry-node">
-                {item}
-                <button className = "btn btn-danger"
-                        id = "btn-r"
-                        type = "button"
-                        onClick = {()=> remove(item)}
-                        title = "Remove"
-                        style = {{float:'right', display:'block',
-                                  fontSize:'10px', marginTop:'-10.5px',
-                                  marginRight:'-9px'}}>
-
-                    <span className = "glyphicon glyphicon-trash"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-                <button className = "btn btn-warning"
-                        id = "btn-d"
-                        type = "button"
-                        onClick = {()=> addOut(item) }
-                        title = "Add to Restock"
-                        style={{float:'right', display:'block',
-                                fontSize:'10px', marginTop:'-10.5px',
-                                marginLeft:'-7px'}}>
-                    <span className = "glyphicon glyphicon-alert"
-                       style={{fontSize:'1.5em'}}/>
-                </button>
-            </div>
-
-        </form>
-    );
-}
-
-const AddExcludeCookware = ({item, remove}) => {
-
-    return (
-
-        <form>
-            <div className="well well-sm" id="pantry-node">
-                {item}
-                <button className = "btn btn-danger"
-                        id = "btn-one"
-                        type = "button"
-                        onClick = {()=> remove(item)}
-                        title = "Remove"
-                        style = {{float:'right', display:'block', fontSize:'10px',
-                                  marginTop:'-10px', marginRight:'-10px'}}>
-
-                    <span className = "glyphicon glyphicon-trash"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-            </div>
-
-        </form>
-    );
-}
-
-const AddRestock = ({item, remove, addBack}) => {
-
-    return (
-
-        <form>
-            <div className="well well-sm" id="pantry-node">
-                {item}
-                <button className = "btn btn-danger"
-                        type = "button"
-                        onClick = {()=> remove(item)}
-                        title = "Remove"
-                        style = {{float:'right', display:'block',
-                                  fontSize:'12px', marginTop:'-10.5px',
-                                  marginRight:'-9px'}}>
-
-                    <span className = "glyphicon glyphicon-trash"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-                <button className = "btn btn-success"
-                        type = "button"
-                        onClick = {()=> addBack(item) }
-                        title = "Add back to list"
-                        style = {{float:'right', display:'block',
-                                 fontSize:'12px', marginTop:'-10.5px',
-                                 marginLeft:'-7px'}}>
-                    <span className = "glyphicon glyphicon-plus-sign"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-            </div>
-
-        </form>
-    );
-}
-
-
-// Maps each item into a node
-const ItemList = ( {items, remove, addOut} ) => {
-
-    // Map through nodes
-    const itemNode = items.map((item)=>
-        (<AddItem item = {item}
-                  key={item.id}
-                  remove={remove}
-                  addOut={addOut}
-         />));
-
-    return (<div> {itemNode}  </div>);
-}
-
-// Maps each item into a node
-const ExcludeCookwareList = ( {items, remove} ) => {
-
-    // Map through nodes
-    const itemNode = items.map((item)=>
-        (<AddExcludeCookware item = {item}
-                  key={item.id}
-                  remove={remove}
-        />));
-
-    return (<div> {itemNode}  </div>);
-}
-
-// Maps each item into a node
-const RestockList = ( {items, remove, addBack} ) => {
-    const itemNode = items.map( (item) =>
-        (<AddRestock item = {item}
-                     key={item.id}
-                     remove={remove}
-                     addBack = {addBack} />));
-
-    return (<div> {itemNode}  </div>);
-}
-
-
-// Actually calls the add function to update state
-const ItemForm = ( {addProtein,
-                      addDairy,
-                      addVegetable,
-                      addFruit,
-                      addGrain,
-                      addOther,
-                      getKey,
-                      handleChange} ) => {
-
-    // Input Tracker
-    let input;
-
-    return (
-        // Add to the form
-        <form onSubmit={(e) => {
-            e.preventDefault();
-
-            // Preventing empty answers
-            if( input.value !== '') {
-
-                // Call the add function for each group
-                switch( getKey ){
-                    case "Protein":
-                        addProtein(input.value);
-                        break;
-                    case "Dairy":
-                        addDairy(input.value);
-                        break;
-                    case "Vegetable":
-                        addVegetable(input.value);
-                        break;
-                    case "Fruit":
-                        addFruit(input.value);
-                        break;
-                    case "Grain":
-                        addGrain(input.value);
-                        break;
-                    case "Other":
-                        addOther(input.value);
-                        break;
-                    default:
-                        break;
-                }
-
-                // Clearing
-                input.value = '';
-            }
-        }}>
-
-            <div className = "input-group">
-                <input className = "form-control" type = "text" id = "enter"
-                       autocomplete = "off"
-                       placeholder = "Pick a category and enter food items . . ."
-                       ref = { node => { input = node; }}
-                       onChange = {handleChange}
-                />
-                <span className = "input-group-btn">
-                        <button className = "btn btn-success"
-                                type = "submit"
-                                title = "Add to list">
-                            <i className = "glyphicon glyphicon-plus-sign" />
-                        </button>
-                </span>
-            </div>
-        </form>
-    );
-};
-
-const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
-
-    // Input Tracker
-    let input;
-
-    return (
-        // Add to the form
-        <form onSubmit={(e) => {
-            e.preventDefault();
-
-            // Preventing empty answers
-            if( input.value !== '') {
-
-                if( getModalKey == "Exclude" ) {
-                    addExclude(input.value);
-                }else if( getModalKey == "Cookware"){
-                    addCookware(input.value);
-                }
-
-                // Clearing
-                input.value = '';
-            }
-        }}>
-
-            <div className="input-group">
-                <input className="form-control" type= "text" id = "enter"
-                       autocomplete="off"
-                       placeholder="Add"
-                       ref={node => { input = node; }} />
-
-                <span className = "input-group-btn">
-                        <button className="btn btn-success"
-                                type="submit"
-                                title="Add to list">
-                            <i className = "glyphicon glyphicon-plus-sign" />
-                        </button>
-                </span>
-            </div>
-        </form>
-    );
-}
+import {ItemForm, ItemList, ExcludeCookwareForm, ExcludeCookwareList, RestockList } from "../kitchenComponents/constants";
 
 class kitchen extends Component {
 
@@ -393,14 +149,13 @@ class kitchen extends Component {
 
         if(e.target.value.length > 0) {
             //this.setState({list: this.autocomplete.getCompletion(e.target.value)})
-            alert(this.autocomplete.getCompletion(e.target.value));
+            //alert(this.autocomplete.getCompletion(e.target.value));
             //this.autocomplete.getCompletion(e.target.value);
             //this.autocomplete.loadList(this.state.list);
         }
 
         //alert( this.state.list );
     }
-
 
     // Read the json file
     loadPantry(){
@@ -930,7 +685,7 @@ class kitchen extends Component {
 
                         <div className = "col-md-3 col-sm-5 col-xs-5" >
                             <div className = "card mg-3 card-bg-light text-center"
-                                 style={{background: 'yellow'}}>
+                                 style={{background: 'lightyellow'}}>
                                 <div className = "card-title"><h1>{this.state.numRestock}</h1></div>
                                 <div className = "card-body"> Restock: </div>
                             </div>
