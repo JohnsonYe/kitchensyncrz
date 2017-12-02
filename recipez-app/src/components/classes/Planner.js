@@ -10,15 +10,23 @@ import RecipeHelper from './RecipeHelper';
 
 class PlannerHelper{
 
-    constructor(){
+    constructor(updateCallback){
         this.client = DBClient.getClient();
         this.recipes = new RecipeHelper();
         this.user = User.getUser(this.client.getUsername());
 
         //Access Meal Data data.days[dayOfTheWeek].mealData[mealIndex]
-        this.data = null;
-        this.getMealData( (data) => this.data = data);
+        this.data = undefined;
+        this.getMealData( (data) => {
+            this.data = data;
+            this.loaded = true;
+            updateCallback();
+        });
+    }
 
+
+    isLoaded() {
+        return this.loaded;
     }
 
     removeMeal(day, mealIndex){
@@ -32,10 +40,20 @@ class PlannerHelper{
      * @param meal - meal object to be inserted
      * @return pass/fail 1 pass, -1 fail
      */
-    insertMeal( day, meal) {
+    insertMeal(meal, day) {
         // create an array of just the current days meals for easy access
         var meals = this.getDayMealList(day),
             mealIndex = 0;
+        //if empty
+        alert(JSON.stringify(meals));
+        alert(JSON.stringify(meal));
+
+        //if meals has not been instantiated
+        if(meals.length == 0) {
+            this.data.days[day].mealData.push(meal);
+            this.pushMealData();
+            return 1;
+        }
 
         // Go through meals looking at each end times to ensure that this meals
         // start time is greater than meal before's end time.
@@ -43,11 +61,9 @@ class PlannerHelper{
                 meal.startMin > meals[mealIndex].endMin) {
             mealIndex++;
         }
-
         //if mealIndex is out of bound then add to the end
         if(mealIndex == meals.length) {
             this.data.days[day].mealData.push(meal);
-            alert(JSON.stringify(this.data));
             //push change to database
             this.pushMealData();
             return 1;
@@ -57,7 +73,6 @@ class PlannerHelper{
             meal.endMin < meal[mealIndex + 1].endMin ) {
             //insertMeal (index, remove, object to add)
             this.data.days[day].mealData.splice(mealIndex,0,meal);
-            alert(JSON.stringify(this.data));
             //push change to database
             this.pushMealData();
             return 1;
@@ -70,7 +85,7 @@ class PlannerHelper{
       * @param startHr - start time of meal
       * @param startMin - start min of meal
       */
-     createMeal(recipe, startHr, startMin) {
+     createMeal(recipe, startHr, startMin, mealCallback) {
 
          var hr = 0,
              endMin = 0,
@@ -78,9 +93,13 @@ class PlannerHelper{
              total = 0,
              recipes = [];
 
-         this.recipes.loadRecipe(recipe, (recipeData)=>{
+         this.recipes.loadRecipe(recipe, (recipeData,err)=>{
+             if(!recipeData){
+                 alert(err);
+                 return;
+             }
              recipes.push(recipe);
-             total = startMin + recipeData.TimeCost;
+             total = startMin + parseInt(recipeData.TimeCost);
              hr = Math.floor(total/60);
              endMin = total - (hr)*(60);
              endHr = startHr + hr;
@@ -99,40 +118,74 @@ class PlannerHelper{
                  endMin: endMin
              };
 
-             return meal;
+             mealCallback(meal);
          });
      }
      /** Gives the an array of meals for that day
       * @param day - day you want the meal list of*/
-     static getDayMealList(day) {
-         return this.data.days[day];
+     getDayMealList(day) {
+         //alert(JSON.stringify(this.data));
+         return this.data.days[day].mealData;
      }
 
      /** Give an meal object
       * @param day - day the meal wanted is in
       * @param mealIndex - index of the meal you want
       */
-     static getMeal( day, mealIndex) {
+     getMeal(day, mealIndex) {
          return this.data.days[day].mealData[mealIndex];
      }
-     static getMealRecipeName( day, mealIndex){
-         return this.data.days[day].mealData[mealIndex].recipes[0];
+
+
+     getMealRecipeName(day, mealIndex){
+         //alert(JSON.stringify(this.data.days));
+         if(this.data.days[day].mealData[mealIndex].recipes) {
+             return this.data.days[day].mealData[mealIndex].recipes[0];
+
+         }else return "Unavailable";
      }
 
      /** Gives meals start time startHr: startMin
       * @param day - day the meal wanted is in
       * @param mealIndex - index of the meal you want
       */
-     static getMealStartTime(day, mealIndex) {
-         return this.data.days[day].mealData[mealIndex].startHr + ": " + data.days[day].mealData[mealIndex].startMin;
+     getMealStartTime(day, mealIndex) {
+
+         var hour = this.data.days[day].mealData[mealIndex].startHr,
+             min = this.data.days[day].mealData[mealIndex].startMin,
+             noon = "am";
+         if(hour && min) {
+             if(hour == 12) {
+                 noon = "pm";
+             }
+             if(hour > 12) {
+                 hour = (12 - hour)*(-1);
+                 noon = "pm"
+             }
+             return hour + ":" + min + " " + noon ;
+         }
+         else return "Unavailable";
      }
 
     /** Gives meals end time startHr: startMin
      * @param day - day the meal wanted is in
      * @param mealIndex - index of the meal you want
      */
-     static getMealEndTime(day, mealIndex) {
-         return this.data.days[day].mealData[mealIndex].endHr + ": " + data.days[day].mealData[mealIndex].endMin;
+     getMealEndTime(day, mealIndex) {
+        var hour = this.data.days[day].mealData[mealIndex].endHr,
+            min = this.data.days[day].mealData[mealIndex].endMin,
+            noon = "am";
+        if(hour && min) {
+            if(hour == 12) {
+                noon = "pm";
+            }
+            if(hour > 12) {
+                hour = (12 - hour)*(-1);
+                noon = "pm"
+            }
+            return hour + ":" + min + " " + noon ;
+        }
+        else return "Unavailable";
      }
 
      /**

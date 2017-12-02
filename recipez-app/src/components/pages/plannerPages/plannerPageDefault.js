@@ -16,6 +16,7 @@ import {Button} from 'react-bootstrap';
 import DynamicList from "../../dynamicList"
 import MealEditor from "./editMealPage"
 import PlannerHelper from "../../classes/Planner";
+import RecipeHelper from "../../classes/RecipeHelper";
 
 /**Lets the user know what recipe is up next to cook will be placed in Daily Meal Planner*/
 function UpNextCard(props){
@@ -24,15 +25,12 @@ function UpNextCard(props){
     const img2 = "https://static1.squarespace.com/static/533dbfc0e4b0a3ebd0e44c92/t/552f072de4b0b098cbb115b6/1429145391117/Chris+Sanchez+Food+photo";
     return (
         <div className="card m-3">
-            <div className="view overlay hm-zoom">
+            <div className="view overlay">
                 <img
                     className="img-fluid "
                     src={img2}
                     alt="Food Porn"
                 />
-                <div className="mask flex-center waves-effect waves-light">
-                    <p className="white-text">Get Started</p>
-                </div>
             </div>
             <div className="card-img-overlay">
                 <h3 className="card-title text-white">Up next ...</h3>
@@ -43,11 +41,16 @@ function UpNextCard(props){
 
 function DailyPlannerItem(props) {
     return (
-        <div className="card m-3 hoverable blue-grey darken-4">
-            <div className="card transparent">
+        <div className="card m-3">
+            <div className="card">
                 <div className="card-body">
-                    <MealEditor />
-                    <p className="text-white">{props.start} to {props.end} - {props.duration}</p>
+                    <MealEditor data={props.data}
+                                recipe={props.recipe}
+                                day={props.day}
+                                mealIndex={props.mealIndex}
+                                edit={true}
+                    />
+                    <p className="">{props.start} to {props.end} - {0}</p>
                 </div>
             </div>
         </div>
@@ -63,28 +66,28 @@ function ShoppingListItem(props) {
 class Planner extends Component {
     constructor(props) {
         super(props);
-        var
-            now = new Date(),
-            //Days of the Week String References
-            days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            date = days[now.getDay()] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString(),
-            data = new PlannerHelper();
+        this.update = this.update.bind(this);
+        var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            data = new PlannerHelper(this.update),
+            recipes = new RecipeHelper();
         this.state = {
-            day: now.getDate(),
-            date: date,
+            days: days,
             numMeals: 0,
             numShopItems: 0,
             numMealsPrepared: 0,
-            meals: [],
             items: [],
-            mealData: data
+            mealData: data,
+            mealCards: [[],[],[],[],[],[],[]],
+            recipes: recipes
         };
 
         this.addMeal = this.addMeal.bind(this);
         this.removeMeal = this.removeMeal.bind(this);
+        //this.update = this.update.bind(this);
         this.addItem = this.addItem.bind(this);
         this.removeItem = this.removeItem.bind(this);
         this.renderMeal = this.renderMeal.bind(this);
+        this.renderMealCards = this.renderMealCards.bind(this);
         this.renderItem = this.renderItem.bind(this);
         this.renderDayPlanner = this.renderDayPlanner.bind(this);
         this.renderShoppingList = this.renderShoppingList.bind(this);
@@ -98,19 +101,23 @@ class Planner extends Component {
      * Adds a meal to the list
      */
     addMeal() {
-        this.state.meals[this.state.numMeals] = "Meal-" + this.state.numMeals;
-        this.setState({ meals : this.state.meals });
-        this.setState({ numMeals: (++this.state.numMeals) });
-        this.state.mealData.createMeal( 0, "Split Pea Soup", 5, 30);
+        this.state.mealData.createMeal("Marinade for Chicken",
+                                                    5,
+                                                    30,
+                                                    (meal) => this.state.mealData.insertMeal(meal,0));
     }
+
+
     /** TODO Removes card from Daily Meal Planner*/
     removeMeal() {
         if( this.state.numMeals > 0) {
-            this.state.meals.splice((this.state.numMeals - 1), 1);
-            this.setState({meals: this.state.meals});
-            this.setState({numMeals: (--this.state.numMeals)});
-            this.state.mealData.removeMeal(0,0,0);
+            this.state.mealData.removeMeal(0,0);
         }
+    }
+
+    /** Pass to modal and call after they save or remove something*/
+    update() {
+        this.setState( {mealData: this.state.mealData} )
     }
     /**
      * Adds a item to the list
@@ -136,23 +143,37 @@ class Planner extends Component {
     /**===============================================================================================================*/
 
     /** Render Items Start **/
+    renderMeal(recipe, day, mealIndex) {
+        return (
+            <DailyPlannerItem
+                data = {this.state.mealData}
+                recipe = {recipe}
+                start = {this.state.mealData.getMealStartTime(day, mealIndex)}
+                end = {this.state.mealData.getMealEndTime(day, mealIndex)}
+                day = {day}
+                mealIndex = {mealIndex}
+            />
+        );
+    }
 
+    renderMealCards(day) {
+        var temp = undefined;
+        if(this.state.mealData.isLoaded())
+            var meals = this.state.mealData.getDayMealList(day);
+        else return (<div>Loading ...</div>);
+
+        return (
+            Object.keys(meals).map((key) => {
+                return this.renderMeal(this.state.mealData.getMealRecipeName(day, key), day, key);
+            })
+        );
+    }
 
     renderWeekCol(day) {
         return (
             <div className="col-md col-sm-12">
-                <p>{day}</p>
-                <Button
-                    bsSize="small"
-                    bsStyle="secondary"
-                    onClick={this.addMeal}>Test</Button>
-                <button
-                    className="btn btn-danger btn-sm"
-                    onClick={this.removeMeal}>Remove Test</button>
-                <DynamicList
-                    renderLI={this.renderMeal("start", "end", "Duration", "Meal")}
-                    list={this.state.meals}
-                />
+                <p>{this.state.days[day]}</p>
+                {this.renderMealCards(day)}
             </div>
         );
     }
@@ -172,19 +193,24 @@ class Planner extends Component {
                     </div>
                 </div>
                 <div className="row">
-                {this.renderWeekCol("Sunday")}
-                {this.renderWeekCol("Monday")}
-                {this.renderWeekCol("Tuesday")}
-                {this.renderWeekCol("Wednesday")}
-                {this.renderWeekCol("Thursday")}
-                {this.renderWeekCol("Friday")}
-                {this.renderWeekCol("Saturday")}
+                {this.renderWeekCol(0)}
+                {this.renderWeekCol(1)}
+                {this.renderWeekCol(2)}
+                {this.renderWeekCol(3)}
+                {this.renderWeekCol(4)}
+                {this.renderWeekCol(5)}
+                {this.renderWeekCol(6)}
                 </div>
             </div>
         );
     }
 
     renderDayPlanner() {
+
+        var now = new Date(),
+            today = now.getDay(),
+            date = this.state.days[today] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString();
+
         return(
                 <div className="row">
                     <div className="col-3
@@ -195,8 +221,12 @@ class Planner extends Component {
                                             border-dark">
                         <div className="mx-auto">
                             <h2>Daily Meal Planner</h2>
-                            <p>{this.state.date}</p>
-                            <h3>{this.state.numMeals}</h3>
+                            <p>{date}</p>
+                            <h3>{(()=>{
+                                if(this.state.mealData.isLoaded()) {
+                                    this.state.mealData.getDayMealList(today);
+                                    }
+                                })()}</h3>
                             <p>Meals</p>
                             <h3>{this.state.numMealsPrepared}</h3>
                             <p>Prepared</p>
@@ -211,26 +241,12 @@ class Planner extends Component {
                             className="btn btn-danger btn-sm"
                             onClick={this.removeMeal}>Remove Test</button>
                         <UpNextCard/>
-                        <DynamicList
-                            renderLI={this.renderMeal("start", "end", "Duration", "Meal")}
-                            list={this.state.meals}
-                        />
+                        {this.renderMealCards(today)}
                     </div>
                 </div>
         );
     }
 
-
-    renderMeal(start, end, duration, name) {
-        return (
-            <DailyPlannerItem
-                name={name}
-                start={start}
-                end={end}
-                duration={duration}
-            />
-        );
-    }
 
     renderItem(name) {
         return (

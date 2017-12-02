@@ -67,7 +67,7 @@
                     cookbook:   response.payload[0].cookbook.M,
                     cookware:   new Set(response.payload[0].cookware.SS),
                     pantry:     this.client.unpackMap(response.payload[0].pantry.M),
-                    planner:{}
+                    planner:    {}
                 }
                 // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
                 resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))

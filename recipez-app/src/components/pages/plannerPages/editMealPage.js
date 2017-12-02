@@ -10,6 +10,7 @@
  */
 import React, { Component } from 'react';
 import {Button, Modal, DropdownButton, MenuItem, ButtonToolbar} from 'react-bootstrap';
+import RecipeHelper from "../../classes/RecipeHelper";
 
 
 function Duration(props) {
@@ -110,30 +111,59 @@ class MealEditor extends Component {
 
     constructor(props) {
         super(props);
+
+        var strStartTime = props.data.getMealStartTime(this.props.day, this.props.mealIndex),
+            startHr = "12",
+            startMin = "00",
+            noon = "pm",
+            endTime = "calculating ...",
+            days =  ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+
+        if(strStartTime != "Unavailable" ) {
+            var colon = strStartTime.indexOf(":");
+            startHr = strStartTime.substring(0,colon);
+            startMin = strStartTime.substring(colon + 1, colon + 3);
+            endTime = props.data.getMealEndTime(this.props.day, this.props.mealIndex);
+        }
+
         this.state = {
-            days: ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"],
+            mealData: props.data,
+            days: days,
             showEditor: false,
-            dayOnBtn: "Day",
-            hourOnBtn: "12",
-            minOnBtn: "00",
-            noonOnBtn: "pm",
-            endtime: "calculating ..."
+            dayOnBtn: days[this.props.day],
+            hourOnBtn: startHr,
+            minOnBtn: startMin,
+            noonOnBtn: noon,
+            endtime: endTime
         };
 
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
+        this.save = this.save.bind(this);
         this.handleDaySelection = this.handleDaySelection.bind(this);
         this.handleHourSelection = this.handleHourSelection.bind(this);
+        this.handleMinSelection = this.handleMinSelection.bind(this);
+        this.handleNoonSelection = this.handleNoonSelection.bind(this);
     }
 
-    /** Updates the day the meal will be planned */
+    /** Updates day on button */
     handleDaySelection(evt) {
         this.setState({ dayOnBtn: this.state.days[evt] });
     }
 
-    /**TODO Implement this*/
+    /**Updates hour on button*/
     handleHourSelection(evt) {
-        this.setState( { hourOnBtn: evt});
+        this.setState( {hourOnBtn: evt} );
+    }
+
+    /**Updates min on button*/
+    handleMinSelection(evt) {
+        this.setState( {minOnBtn: evt} );
+    }
+
+    /** Updates noon on button */
+    handleNoonSelection(evt) {
+        this.setState( {noonOnBtn: evt} );
     }
 
 
@@ -147,18 +177,43 @@ class MealEditor extends Component {
         this.setState( {showEditor: false} );
     }
 
+    /** creates/overwrites meal to the meal */
+    save() {
+
+    }
 
     render() {
 
+        var editButton = (
+                <a
+                    className="card-link"
+                    onClick={this.open}>{this.props.recipe}
+                </a>
+            ),
+            createButton = (
+                <a className="btn btn-light"
+                    onClick={this.open}>
+                    <img alt="planner"
+                         width="18"
+                         height="18"
+                         src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
+                    Plan Meal
+                </a>
+            ),
+            button;
+
+        if(this.props.edit == true) {
+            button = editButton;
+        }
+        else {
+            button = createButton;
+        }
+
         return (
             <div>
-                <a
-                    className="card-link text-white"
-                    onClick={this.open}>Recipe Title
-                </a>
-
+                {button}
             <Modal show={this.state.showEditor} onHide={this.close}>
-                <Modal.Header>Recipe Title</Modal.Header>
+                <Modal.Header>{this.props.recipe}</Modal.Header>
                 <Modal.Body>
                     <figure>
                         <img
@@ -166,16 +221,9 @@ class MealEditor extends Component {
                             src="http://twolovesstudio.com/wp-content/uploads/sites/5/2017/05/99-Best-Food-Photography-Tips-5-1.jpg"
                             alt="No Image"
                         />
-                        <figcaption>His palms are sweaty, knees weak, arms are heavy
-                            There's vomit on his sweater already, mom's spaghetti
-                            He's nervous, but on the surface he looks calm and ready
-                            To drop bombs, but he keeps on forgettin'
-                            What he wrote down, the whole crowd goes so loud
-                            He opens his mouth, but the words won't come out
-                            He's chokin', how, everybody's jokin' now</figcaption>
                     </figure>
 
-                    <Duration/>
+                    <Duration />
                     <div className="border
                                     border-dark
                                     border-top-0
@@ -189,9 +237,9 @@ class MealEditor extends Component {
                         btnTitle={this.state.dayOnBtn}
                     />
                     <TimeSelector
-                        handleHour={null}
-                        handleMin={null}
-                        handleNoon={null}
+                        handleHour={this.handleHourSelection}
+                        handleMin={this.handleMinSelection}
+                        handleNoon={this.handleNoonSelection}
                         hour={this.state.hourOnBtn}
                         min={this.state.minOnBtn}
                         noon={this.state.noonOnBtn}
@@ -203,7 +251,7 @@ class MealEditor extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <ButtonToolbar>
-                        <Button onClick={null}>Save</Button>
+                        <Button onClick={this.save}>Save</Button>
                         <Button bsStyle="danger" onClick={null}>Delete</Button>
                         <Button onClick={this.close}>Close</Button>
                     </ButtonToolbar>
