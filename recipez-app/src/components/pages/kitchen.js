@@ -51,16 +51,17 @@ const AddExcludeCookware = ({item, remove}) => {
     return (
 
         <form>
-            <div className="well well-sm" id="del">
+            <div className="well well-sm" id="pantry-node">
                 {item}
                 <button className = "btn btn-danger"
                         id = "btn-one"
                         type = "button"
                         onClick = {()=> remove(item)}
-                        style = {{float:'right', display:'block', fontSize:'12px',
+                        style = {{float:'right', display:'block', fontSize:'10px',
                                   marginTop:'-10px', marginRight:'-10px'}}>
 
-                    <i className = "glyphicon glyphicon-trash" />
+                    <span className = "glyphicon glyphicon-trash"
+                          style={{fontSize:'1.5em'}}/>
                 </button>
             </div>
 
@@ -73,26 +74,26 @@ const AddRestock = ({item, remove, addBack}) => {
     return (
 
         <form>
-            <div className="well well-sm" id="del">
+            <div className="well well-sm" id="pantry-node">
                 {item}
-                <button className = "btn btn-danger btn-lg"
+                <button className = "btn btn-danger"
                         type = "button"
-                        onClick = {()=> remove(item.id)}
+                        onClick = {()=> remove(item)}
                         style = {{float:'right', display:'block',
-                                  fontSize:'10px', marginTop:'-10.5px',
+                                  fontSize:'12px', marginTop:'-10.5px',
                                   marginRight:'-9px'}}>
 
                     <span className = "glyphicon glyphicon-trash"
                           style={{fontSize:'1.5em'}}/>
                 </button>
-                <button className = "btn btn-success btn-lg"
+                <button className = "btn btn-success"
                         type = "button"
                         onClick = {()=> addBack(item) }
                         style = {{float:'right', display:'block',
-                                 fontSize:'10px', marginTop:'-10.5px',
-                                 marginRight:'-9px'}}>
-                    <span className = "glyphicon glyphicon-plus"
-                          style={{fontSize:'1.5em'}}/>/>
+                                 fontSize:'12px', marginTop:'-10.5px',
+                                 marginLeft:'-7px'}}>
+                    <span className = "glyphicon glyphicon-plus-sign"
+                          style={{fontSize:'1.5em'}}/>
                 </button>
             </div>
 
@@ -198,8 +199,7 @@ const ItemForm = ( {addProtein,
 
                 <span className = "input-group-btn">
                         <button className="btn btn-success"
-                                type="submit"
-                                onClick = {() => addToPantry(input.value, getKey, 1)}>
+                                type="submit">
                             <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>
@@ -253,7 +253,9 @@ class kitchen extends Component {
     constructor( props ){
         super( props );
         this.user = new User();
-        this.loadData();
+        this.loadPantry();
+        this.loadPreference();
+        this.loadCookware();
 
         var
             proteinData = [],
@@ -351,16 +353,22 @@ class kitchen extends Component {
         this.removeCookware = this.removeCookware.bind(this);
         this.renderCookware = this.renderCookware.bind(this);
 
-        this.loadData = this.loadData.bind(this);
-        this.processData = this.processData.bind(this);
+        this.loadPantry = this.loadPantry.bind(this);
+        this.processPantry = this.processPantry.bind(this);
+
+        this.loadPreference = this.loadPreference.bind(this);
+        this.processPreference = this.processPreference.bind(this);
+
+        this.loadCookware = this.loadCookware.bind(this);
+        this.processCookware = this.processCookware.bind(this);
     }
 
     // Read the json file
-    loadData(){
-        this.user.getPantry(this.processData.bind(this));
+    loadPantry(){
+        this.user.getPantry(this.processPantry.bind(this));
     }
 
-    processData(data){
+    processPantry(data){
 
         Object.entries(data).forEach((key)=> {
 
@@ -383,10 +391,33 @@ class kitchen extends Component {
                 case("Other"):
                     this.addOther(key[0]);
                     break;
+                case("Restock"):
+                    this.addOut(key[0]);
+                    break;
                 default:
                     break;
             }
 
+        })
+    }
+
+    loadPreference(){
+        this.user.getExclusionList(this.processPreference.bind(this));
+    }
+
+    processPreference(data){
+        Object.entries(data).forEach((key) => {
+            this.addExclude(key[1]);
+        })
+    }
+
+    loadCookware(){
+        this.user.getCookware(this.processCookware.bind(this));
+    }
+
+    processCookware(data){
+        Object.entries(data).forEach((key) => {
+            this.addCookware(key[1]);
         })
     }
 
@@ -408,6 +439,7 @@ class kitchen extends Component {
     addProtein(val){
         this.setState({protein: this.state.protein.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
+        this.user.addToPantry(val, "Protein", 1);
     }
 
     removeProtein(val){
@@ -416,9 +448,7 @@ class kitchen extends Component {
         if( this.state.protein.length > 0 ){
             this.state.protein.splice( this.state.protein.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
-            this.user.removeFromPantry(val,
-            ()=>this.user.getPantry(()=>{}));
-
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -439,12 +469,14 @@ class kitchen extends Component {
     addDairy(val){
         this.setState({dairy: this.state.dairy.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
+        this.user.addToPantry(val, "Dairy", 1);
     }
 
-    removeDairy(e){
+    removeDairy(val){
         if( this.state.dairy.length > 0 ){
-            this.state.dairy.splice( this.state.dairy.indexOf(e), 1);
+            this.state.dairy.splice( this.state.dairy.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -464,12 +496,14 @@ class kitchen extends Component {
     addVegetable(val){
         this.setState({vegetable: this.state.vegetable.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
+        this.user.addToPantry(val, "Vegetable", 1);
     }
 
-    removeVegetable(e){
+    removeVegetable(val){
         if( this.state.vegetable.length > 0 ){
-            this.state.vegetable.splice( this.state.vegetable.indexOf(e), 1);
+            this.state.vegetable.splice( this.state.vegetable.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -489,12 +523,14 @@ class kitchen extends Component {
     addFruit(val){
         this.setState({fruit: this.state.fruit.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
+        this.user.addToPantry(val, "Fruit", 1);
     }
 
-    removeFruit(e){
+    removeFruit(val){
         if( this.state.fruit.length > 0 ){
-            this.state.fruit.splice( this.state.fruit.indexOf(e), 1);
+            this.state.fruit.splice( this.state.fruit.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -514,12 +550,14 @@ class kitchen extends Component {
     addGrain(val){
         this.setState({grain: this.state.grain.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
+        this.user.addToPantry(val, "Grain", 1);
     }
 
-    removeGrain(e){
+    removeGrain(val){
         if( this.state.grain.length > 0 ){
-            this.state.grain.splice( this.state.grain.indexOf(e), 1);
+            this.state.grain.splice( this.state.grain.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -539,12 +577,14 @@ class kitchen extends Component {
     addOther(val){
         this.setState({other: this.state.other.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
+        this.user.addToPantry(val, "Other", 1);
     }
 
-    removeOther(e){
+    removeOther(val){
         if( this.state.other.length > 0 ){
-            this.state.other.splice( this.state.other.indexOf(e), 1);
+            this.state.other.splice( this.state.other.indexOf(val), 1);
             this.setState({numItems: (--this.state.numItems)});
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -568,12 +608,14 @@ class kitchen extends Component {
     addExclude(val){
         this.setState({exclude: this.state.exclude.concat(val)});
         this.setState({numExclude: (++this.state.numExclude)});
+        this.user.addToExclusionList(val);
     }
 
-    removeExclude(e){
+    removeExclude(val){
         if( this.state.exclude.length > 0 ){
-            this.state.exclude.splice( this.state.exclude.indexOf(e), 1);
+            this.state.exclude.splice( this.state.exclude.indexOf(val), 1);
             this.setState({numExclude: (--this.state.numExclude)});
+            this.user.removeFromExclusionList(val);
         }
     }
 
@@ -592,12 +634,14 @@ class kitchen extends Component {
     addCookware(val){
         this.setState({cookware: this.state.cookware.concat(val)});
         this.setState({numCookware: (++this.state.numCookware)});
+        this.user.addToCookware(val);
     }
 
-    removeCookware(e){
+    removeCookware(val){
         if( this.state.cookware.length > 0 ){
-            this.state.cookware.splice( this.state.cookware.indexOf(e), 1);
+            this.state.cookware.splice( this.state.cookware.indexOf(val), 1);
             this.setState({numCookware: (--this.state.numCookware)});
+            this.user.removeFromCookware(val);
         }
     }
 
@@ -638,31 +682,31 @@ class kitchen extends Component {
             default:
                 break;
         }
-        //this.user.addToPantry(val, "Restock", 1);
+        this.user.addToPantry(val, "Restock", 1);
     }
 
-    returnOut(e){
+    returnOut(val){
         if( this.state.out.length > 0 ){
-            this.state.out.splice( this.state.out.indexOf(e), 1);
+            this.state.out.splice( this.state.out.indexOf(val), 1);
             this.setState({numRestock: (--this.state.numRestock)});
             switch( this.state.key ){
                 case "Protein":
-                    this.addProtein(e);
+                    this.addProtein(val);
                     break;
                 case "Dairy":
-                    this.addDairy(e);
+                    this.addDairy(val);
                     break;
                 case "Vegetable":
-                    this.addVegetable(e);
+                    this.addVegetable(val);
                     break;
                 case "Fruit":
-                    this.addFruit(e);
+                    this.addFruit(val);
                     break;
                 case "Grain":
-                    this.addGrain(e);
+                    this.addGrain(val);
                     break;
                 case "Other":
-                    this.addOther(e);
+                    this.addOther(val);
                     break;
                 default:
                     break;
@@ -672,10 +716,11 @@ class kitchen extends Component {
     }
 
     //Trashing
-    removeOut(e){
+    removeOut(val){
         if( this.state.out.length > 0 ) {
-            this.state.out.splice(this.state.out.indexOf(e), 1);
+            this.state.out.splice(this.state.out.indexOf(val), 1);
             this.setState({numRestock: (--this.state.numRestock)});
+            this.user.removeFromPantry(val);
         }
     }
 
@@ -743,6 +788,8 @@ class kitchen extends Component {
                             </Modal.Header>
                             <Modal.Body>
 
+                                Dietary Preferences:
+                                <br />
                                 <CheckboxGroup
                                     name="pref"
                                     value={this.state.pref}
@@ -753,6 +800,8 @@ class kitchen extends Component {
                                     <label style={{marginRight: '8px'}}><Checkbox value="vegetarian" /> Vegetarian </label>
                                     <label style={{marginRight: '8px'}}><Checkbox value="gluten-free" /> Gluten-Free  </label>
                                 </CheckboxGroup>
+                                <br />
+                                Add more items to exclude:
                                 <br />
                                 <ExcludeCookwareForm
                                     addExclude = {this.addExclude.bind(this)}
