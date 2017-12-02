@@ -6,8 +6,11 @@
   "dependencies": {
     "aws-sdk": "^2.146.0",
     "axios": "^0.17.0",
+    "bootstrap": "^3.3.7",
     "gh-pages": "^1.0.0",
+    "jquery": "^3.2.1",
     "node-sass-chokidar": "0.0.3",
+    "popper.js": "^1.12.9",
     "react": "^16.0.0",
     "react-axios": "^1.0.3",
     "react-bootstrap": "^0.31.5",
@@ -19,7 +22,8 @@
     "react-side-bar": "^0.3.5",
     "react-sidebar": "^2.3.2",
     "react-sidenav": "^2.1.2",
-    "react-tabs-redux": "^2.0.1"
+    "react-tabs-redux": "^2.0.1",
+    "tooltip.js": "^1.1.7"
   },
   "scripts": {
     "start": "react-scripts start",
