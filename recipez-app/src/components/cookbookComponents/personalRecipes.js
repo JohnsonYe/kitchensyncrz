@@ -16,7 +16,7 @@ class PersonalRecipes extends Component{
     constructor(props){
         super(props);
 
-        this.getRecipeNamesAndObjects = this.getRecipeNamesAndObjects.bind(this);
+        this.getRecipeObjects = this.getRecipeObjects.bind(this);
         this.createNewBlankRecipe = this.createNewBlankRecipe.bind(this);
         this.removeRecipe = this.removeRecipe.bind(this);
         this.open = this.open.bind(this);
@@ -28,14 +28,15 @@ class PersonalRecipes extends Component{
             recipeList: [],
             modal: false,
             value: '',
+            validation:'',
         };
 
         this.userInstance = props.userInstance;
         this.recipeHelper = new RecipeHelper();
-        this.getRecipeNamesAndObjects();
+        this.getRecipeObjects();
     }
 
-    getRecipeNamesAndObjects(){
+    getRecipeObjects(){
         this.userInstance.getCookbook((cookbook_contents) => {
             this.state.recipeList = [];
             this.cookbook = cookbook_contents;
@@ -45,10 +46,6 @@ class PersonalRecipes extends Component{
                 }
             }
 
-            console.log('This is the recipeName list after getting them all:');
-            console.log(this.cookbook);
-            console.log('This is the recipe list after attempting to add objects by JSON.parse');
-            console.log(this.state.recipeList);
             this.setState({
                 recipeList: this.state.recipeList,
             });
@@ -59,8 +56,7 @@ class PersonalRecipes extends Component{
     createNewBlankRecipe(recipeName){
 
         let newRecipe = this.recipeHelper.createRecipe(recipeName,["cabbage"],["Icky sticky cabbage bubbleboi"]);
-        console.log(this.userInstance.saveCustomRecipe(newRecipe));
-        this.getRecipeNamesAndObjects();
+        this.userInstance.saveCustomRecipe(newRecipe,this.getRecipeObjects);
         this.close();
 
     }
@@ -68,8 +64,7 @@ class PersonalRecipes extends Component{
     // Had to change to arrow func to get it to bind properly... should work?
     removeRecipe = (recipeName) => {
 
-        this.userInstance.deleteRecipe(recipeName);
-        this.getRecipeNamesAndObjects();
+        this.userInstance.deleteRecipe(recipeName,this.getRecipeObjects);
 
     };
 
@@ -85,9 +80,20 @@ class PersonalRecipes extends Component{
         });
     }
     getValidationState() {
-        const recipeName = this.state.value;
 
-        return null;
+        const recipeName = this.state.value;
+        this.recipeHelper.loadRecipe(recipeName,(recipe)=>{
+            if(recipe){
+                this.setStatus({
+                    validation: 'success',
+                });
+            } else {
+                this.setStatus({
+                    validation: 'error',
+                });
+            }
+        });
+
     }
 
     handleChange(e) {
@@ -130,10 +136,10 @@ class PersonalRecipes extends Component{
                         <form>
                             <FormGroup
                                 controlId="formBasicText"
-                                validationState={this.getValidationState()}
+                                validationState={this.state.validation}
                             >
                                 <FormControl
-                                    type="text"
+                                    componentClass={"textarea"}
                                     value={this.state.value}
                                     placeholder="Title"
                                     onChange={this.handleChange}

@@ -11,7 +11,6 @@ class Cookbook extends Component {
     constructor(props){
         super(props);
         this.userInstance = User.getUser('user001');
-        console.log(this.userInstance);
 
     }
 

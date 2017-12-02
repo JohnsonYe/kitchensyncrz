@@ -23,26 +23,22 @@ class SavedRecipes extends Component{
         };
 
         this.userInstance = props.userInstance;
-        this.savedRecipeNames = [];
         this.recipeHelper = new RecipeHelper();
         this.getRecipeObjects();
 
     }
 
     getRecipeObjects() {
-        this.savedRecipeNames =[];
+        let savedRecipeNames =[];
         this.userInstance.getCookbook((cookbook_contents) => {
             this.cookbook = cookbook_contents;
             for (let [recipeName, source] of Object.entries(this.cookbook)) {
                 if (source === "none") {
-                    this.savedRecipeNames.push(recipeName);
+                    savedRecipeNames.push(recipeName);
                 }
             }
 
-            console.log(this.savedRecipeNames);
-            this.recipeHelper.loadRecipeBatch(this.savedRecipeNames,(recipeObjects)=>{
-
-                console.log(recipeObjects);
+            this.recipeHelper.loadRecipeBatch(savedRecipeNames,(recipeObjects)=>{
                 this.setState({
                     recipeList:recipeObjects,
                 });
@@ -52,7 +48,7 @@ class SavedRecipes extends Component{
     }
 
     removeRecipe = (recipeName) => {
-        this.userInstance.deleteRecipe(recipeName);
+        this.userInstance.deleteRecipe(recipeName,this.getRecipeObjects);
 
     }
 

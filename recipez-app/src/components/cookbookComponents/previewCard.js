@@ -21,13 +21,9 @@ class PreviewCard extends Component{
         this.noImg = require("./no-photo.png");
         this.state={
             modal: false,
-            name: props.src.Name,
-            reviews: props.src.Reviews,
-            author: props.src.Author,
-            difficulty: props.src.Difficulty,
-            time: props.src.TimeCost,
 
-        }
+        };
+
         this.removeThis = this.removeThis.bind(this);
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
@@ -73,17 +69,17 @@ class PreviewCard extends Component{
         return (
             <div className={"col-md-2"}>
                 <div className="card recipes">
-                    <Link to={this.props.personal ? '/Recipes/'+this.state.author+'/'+this.state.name : '/Recipes/'+this.state.name}>
+                    <Link to={this.props.personal ? '/Recipes/'+this.props.src.Author+'/'+this.props.src.Name : '/Recipes/'+this.props.src.Name}>
 
                         <img className="card-img-top" src={this.noImg} alt="Food"/>
                     </Link>
 
                     <div className="card-body">
                         <h6 className="card-title">
-                            {this.state.name}
+                            {this.props.src.Name}
                         </h6>
                         <p className="card-text">
-                            Authored by {(this.state.author) ? this.state.author : 'magic'}
+                            Authored by {(this.props.src.Author) ? this.props.src.Author : 'magic'}
                         </p>
                         {/*TODO: Reviews display*/}
                         <p>
@@ -99,7 +95,7 @@ class PreviewCard extends Component{
                 <Modal show={this.state.modal} onHide={this.close}>
                     <Modal.Header>
                         <Modal.Title>
-                            {this.state.name}
+                            {this.props.Name}
                         </Modal.Title>
                     </Modal.Header>
 

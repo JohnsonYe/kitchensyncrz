@@ -74,7 +74,7 @@
             /*; alert(JSON.stringify(this.userData))*/})
     }
 
-    deleteRecipe(recipeName){
+    deleteRecipe(recipeName,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -85,7 +85,7 @@
                     this.addUserData((data)=>{
                         delete data.cookbook[recipeName];
                         return data
-                    })
+                    },callback)
                 } else {
                     //the request failed, what should we do?
                     alert(response.payload)
@@ -94,7 +94,7 @@
     }
 
 
-    saveCustomRecipe(recipeObject){
+    saveCustomRecipe(recipeObject,callback){
         //pack the recipe into JSON format and add it to the user's recipe map
         this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
             this.client.buildUpdateRequest( //construct the params syntax according to the action we want
@@ -107,7 +107,7 @@
                     this.addUserData((data)=>{
                         data.cookbook[recipeObject.Name]=JSON.stringify(recipeObject);
                         return data;
-                    })
+                    },callback)
                 } else {
                     //the request failed, what should we do?
                     console.log("Hey it didn't go through!");
@@ -210,8 +210,11 @@
     /**
      * apply a function to the user data chain before serving it to future requests
      */
-    addUserData(transform){
+    addUserData(transform,callback){
         this.loadStream = this.loadStream.then(transform);
+        if(callback){
+            callback();
+        }
     }
 
     /**
