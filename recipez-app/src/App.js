@@ -50,7 +50,8 @@ class App extends Component {
                     <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
                         <OffCanvasBody className="navbar-icon">
                             <a href="#" onClick={this.handleClick.bind(this)}>
-                                <img className="ks-icon" src="http://www.free-icons-download.net/images/a-kitchen-icon-80780.png" />
+                                {<img className="ks-icon" src="http://www.free-icons-download.net/images/a-kitchen-icon-80780.png" />}
+                                {/*<img className="ks-icon" src="/images/Peanut-butter-jelly-time.gif" />*/}
                             </a>
                         </OffCanvasBody>
                         <OffCanvasMenu className="navbar-menu">
