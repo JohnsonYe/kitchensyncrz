@@ -156,7 +156,7 @@
      * }
      */
     getPantry(callback){
-         return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
+         return this.getUserData('pantry').then(response=>{callback(response)})
     }
 
 
