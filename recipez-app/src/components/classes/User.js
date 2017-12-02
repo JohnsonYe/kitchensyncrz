@@ -446,7 +446,7 @@
     shoppingList:{type:'SS'},
     planner:{},
     exclude:{type:'SS'},
-    preferences:{type:'L',inner:{'type':'S'}},
+    preferences:{type:'SS'},
  }
  DBClient.getClient().registerPrototype(User.UserDataPrototype)
 
