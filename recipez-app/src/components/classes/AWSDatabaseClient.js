@@ -19,6 +19,7 @@ var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
 
+var MAX_REQUEST_LENGTH = 100;
 
  class DBClient {
     constructor(){
@@ -53,7 +54,7 @@ const UNAUTH_NAME = 'GUEST'
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':ss}),
-            'N': (n,p)=>({'N':n}),
+            'N': (n,p)=>({'N':n+''}),
         }
     }
 
@@ -67,12 +68,32 @@ const UNAUTH_NAME = 'GUEST'
      * handle target: function handle to send items to
      */
     getDBItems(tableName,keyField,keys,target){
+        if(keys.length > MAX_REQUEST_LENGTH){
+            console.log('Recieved request with more than 100 keys! ('+keys.length+')')
+            Promise.all((()=>{ //create a promise group out of max size batch requests
+                let pos = 0,requests = [];
+                while(pos < keys.length){ //split key array into size 100 chunks
+                    requests.push(keys.slice(pos,pos+MAX_REQUEST_LENGTH));
+                    pos+=MAX_REQUEST_LENGTH
+                }
+                console.log('Split request into '+requests.length+' sub-requests')
+                //map the chunk array to a promise array, containing a DBItemPromise for each chunk
+                return requests.map((request)=>this.getDBItemPromise(tableName,keyField,request)) 
+            })())
+            .catch((err)=>target({status:false,payload:err})) //abort if any request fails
+            //-->|we shouldn't expect a very large request to fail because the user will not be directly
+            //-->|creating 100+ item batch requests
+            //flatten (reduce) the payload array to a single array and pass it to the callback
+            .then((payload)=>target({status:true,payload:payload.reduce((prev,next)=>prev.concat(next),[])}))
+
+            return;
+        }
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
-            if(err){
-                target({status:false, payload: err});
-            } else if(data.Responses[tableName].length == 0) {
-                target({status:false, payload: 'Item not found!'});
-            } else {
+            if(err){ //the call failed for some reason --> probably invalid keys (not strings)
+                target({status:false, payload: err + ' --> make sure your query keys are strings!' });
+            } else if(data.Responses[tableName].length == 0) { //no results, but the call went through
+                target({status:false, payload: 'Item: ' + JSON.stringify(keys) + ' not found!'});
+            } else { //everythng looks good, index into the response
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
@@ -86,10 +107,12 @@ const UNAUTH_NAME = 'GUEST'
      * @return {[Promise]}           [Promise object with pending DB response]
      */
     getDBItemPromise(tableName,keyField,keys){
+        if(keys.length > MAX_REQUEST_LENGTH){
+            console.error('Recieved request with more than 100 keys!('+keys.length+')')
+        }
         return new Promise((pass,fail)=>{
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
-                    // alert('got here')
                     pass(response.payload)
                 } else { //call failed, fail
                     fail(response.payload)
@@ -258,6 +281,8 @@ const UNAUTH_NAME = 'GUEST'
         }
         this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
         this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
+
+        console.log("Registered prototype: "+proto._NAME)
     }
 
     getPrototype(key,object){
@@ -278,7 +303,7 @@ const UNAUTH_NAME = 'GUEST'
                 //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                 //function's execution in code not being developed for database interaction
                 //for now, developers working with the database must be careful with adding new fields
-                unpacked[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                unpacked[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
@@ -304,8 +329,9 @@ const UNAUTH_NAME = 'GUEST'
                     //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                     //function's execution in code not being developed for database interaction
                     //for now, developers working with the database must be careful with adding new fields
-                    alert(e+':'+prototype[key])
-                    prev[key] = 'NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                    // alert(e+':'+prototype[key])
+                    console.error('Error packing item: '+e+' :: '+key)
+                    prev[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                         ' SPECIFICATION IS CORRECT';
                     // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
                 }
@@ -328,7 +354,6 @@ const UNAUTH_NAME = 'GUEST'
     }
 
  }
-
 
  var static_client = new DBClient();
 

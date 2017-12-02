@@ -163,6 +163,37 @@ $search-grad-end:#4dad1a;
     background:none;
 }
 
+.pad-icon{
+    padding-left:5px;
+}
+.good-rating{
+    color:goldenrod;
+}
+
+.has-success .dropdown-menu{
+    :active,.active{
+        background-color:#18bc9c;
+    }
+}
+
+.has-error .dropdown-menu{
+    :active,.active{
+        background-color:#e74c3c;
+    }
+}
+// .badge-notify{
+//    background:red;
+//    position:relative;
+//    top: -20px;
+//    left: -35px;
+// }
+
+// #root:hover{
+//     position:relative;
+//     padding-left:5px;
+//     display:none;
+// }
+
 
 
 
