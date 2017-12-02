@@ -153,7 +153,7 @@ class Search extends Component {
     }
 
     mortensButton(){
-        this.setState({morten: this.user.client.getUsername()});                                  
+        this.setState({morten: this.user.client.getUsername()});
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
         
         

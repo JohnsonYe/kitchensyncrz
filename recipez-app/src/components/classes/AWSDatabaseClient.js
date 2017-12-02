@@ -5,6 +5,7 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
+ // import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
 
  /**
   * THIS IS A SINGLETON CLASS.
@@ -32,6 +33,8 @@ AWS.config.update({region:'us-east-2',credentials:creds});
 var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
+
+var appClientID = '1qnpej4u0hul8mq0djs9a5r8me';
 
 
  class DBClient {
@@ -62,9 +65,9 @@ const UNAUTH_NAME = 'GUEST'
             'S': (s,p)=>s.S,
             'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
             'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev),{}),
-            'SS':(ss,p)=>ss.SS,
+            'SS':(ss,p)=>new Set(ss.SS),
             'N': (n,p)=>n.N,
-            'SET':(s,p)=>new Set(s)
+            'SET':(s,p)=>new Set(s),
         }
 
         /**
@@ -74,11 +77,22 @@ const UNAUTH_NAME = 'GUEST'
             'S': (s,p)=>({'S':s}),
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
-            'SS':(ss,p)=>({'SS':ss}),
-            'N': (n,p)=>({'N':n+''}),
+            'SS':(ss,p)=>({'SS':Array.from(ss)}),
+            'N': (n,p)=>({'N':n}),
+            'SET': (n,p)=>{alert('this isnt set up yet')},
         }
 
 
+    }
+
+    putDBItem(tableName,item,errCallback,successCallback){
+        db.putItem({TableName:tableName,Item:item},(err,data)=>{
+            if(err){
+                errCallback({status:false, payload: err});                
+            } else {
+                successCallback({status:true,  payload: data});                
+            }
+        })
     }
 
     /*
@@ -88,16 +102,16 @@ const UNAUTH_NAME = 'GUEST'
      *
      * string tableName: name of the table to retrieve items from
      * [string] keys: list of ingredient names to use as DB keys
-     * handle target: function handle to send items to
+     * handle callback: function handle to send items to
      */
-    getDBItems(tableName,keyField,keys,target){
+    getDBItems(tableName,keyField,keys,callback){
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
             if(err){
-                target({status:false, payload: err});
+                callback({status:false, payload: err});
             } else if(data.Responses[tableName].length == 0) {
-                target({status:false, payload: 'Item not found!'});
+                callback({status:false, payload: 'Item not found!'});
             } else {
-                target({status:true,  payload: data.Responses[tableName]});
+                callback({status:true,  payload: data.Responses[tableName]});
             }
         })
     }
@@ -249,8 +263,6 @@ const UNAUTH_NAME = 'GUEST'
      * log the user in to allow them to upload to DB and view user-specific data
      */
     login(username,password) {
-
-
         const userPool = new CognitoUserPool({
             UserPoolId: up.USER_POOL_ID,
             ClientId: up.APP_CLIENT_ID
@@ -268,6 +280,7 @@ const UNAUTH_NAME = 'GUEST'
             })
 
         );
+
     }
 
     isLoggedIn(){
@@ -296,6 +309,8 @@ const UNAUTH_NAME = 'GUEST'
          const userToken = await this.getUserToken(currentUser);
 
          await this.getAwsCredentials(userToken);
+         this.user = currentUser.getUsername();
+         //alert("getting new creds");
 
          return true;
      }

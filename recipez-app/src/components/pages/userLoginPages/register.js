@@ -14,12 +14,14 @@ import {
     Link,
 } from 'react-router-dom';
 import DBClient from "../../classes/AWSDatabaseClient";
+import User from "../../classes/User";
 
 class Register extends Component{
     constructor(props){
         super(props);
 
         this.client = DBClient.getClient();
+        this.user = User.getUser();
 
         this.state = {
             userName: '',
@@ -32,7 +34,6 @@ class Register extends Component{
     }
 
     handleSubmit = async event => {
-        event.preventDefault();
 
         if(this.state.password == this.state.confirmpassword){
             try {
@@ -41,7 +42,7 @@ class Register extends Component{
                     newUser: newUser
                 });
 
-                alert("Registered!");
+                //alert("Registered!");
             } catch (e) {
                 alert(e);
             }
@@ -64,6 +65,9 @@ class Register extends Component{
             );
 
             this.client.authenticated = true;
+            this.client.user = this.state.userName;
+            this.client.authUser();
+            this.user.createUser(this.state.userName);
             this.props.history.push("/Search");
         } catch (e) {
             alert(e);
