@@ -127,7 +127,6 @@ class MealEditor extends Component {
         }
 
         this.state = {
-            mealData: props.data,
             days: days,
             showEditor: false,
             dayOnBtn: days[this.props.day],
@@ -181,6 +180,7 @@ class MealEditor extends Component {
     save() {
 
     }
+
 
     render() {
 

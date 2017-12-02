@@ -41,8 +41,7 @@ function UpNextCard(props){
 
 function DailyPlannerItem(props) {
     return (
-        <div className="card m-3">
-            <div className="card">
+            <div className="card m-3">
                 <div className="card-body">
                     <MealEditor data={props.data}
                                 recipe={props.recipe}
@@ -53,7 +52,6 @@ function DailyPlannerItem(props) {
                     <p className="">{props.start} to {props.end} - {0}</p>
                 </div>
             </div>
-        </div>
     );
 }
 
@@ -84,6 +82,7 @@ class Planner extends Component {
         this.addMeal = this.addMeal.bind(this);
         this.removeMeal = this.removeMeal.bind(this);
         //this.update = this.update.bind(this);
+        this.loadNumMeals = this.loadNumMeals.bind(this);
         this.addItem = this.addItem.bind(this);
         this.removeItem = this.removeItem.bind(this);
         this.renderMeal = this.renderMeal.bind(this);
@@ -137,7 +136,6 @@ class Planner extends Component {
         }
     }
 
-
     /** Functionality Methods End **/
 
     /**===============================================================================================================*/
@@ -157,7 +155,6 @@ class Planner extends Component {
     }
 
     renderMealCards(day) {
-        var temp = undefined;
         if(this.state.mealData.isLoaded())
             var meals = this.state.mealData.getDayMealList(day);
         else return (<div>Loading ...</div>);
@@ -222,11 +219,7 @@ class Planner extends Component {
                         <div className="mx-auto">
                             <h2>Daily Meal Planner</h2>
                             <p>{date}</p>
-                            <h3>{(()=>{
-                                if(this.state.mealData.isLoaded()) {
-                                    this.state.mealData.getDayMealList(today);
-                                    }
-                                })()}</h3>
+                            <h3>{this.loadNumMeals(today)}</h3>
                             <p>Meals</p>
                             <h3>{this.state.numMealsPrepared}</h3>
                             <p>Prepared</p>
@@ -292,6 +285,16 @@ class Planner extends Component {
     }
 
     /** Render Items End **/
+
+    /**Loads the numbers of Meals*/
+    loadNumMeals(day) {
+        var numMeals = 0;
+        if(this.state.mealData.isLoaded())
+            var numMeals = this.state.mealData.getNumMeals(day);
+        else return (<div>Loading ...</div>);
+
+        return numMeals;
+    }
 
 
     /** Driver */

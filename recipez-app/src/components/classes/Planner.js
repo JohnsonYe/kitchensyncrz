@@ -187,13 +187,20 @@ class PlannerHelper{
         }
         else return "Unavailable";
      }
+     /** This function retrieves the number of meeals for a specified day*/
+     getNumMeals(day){
+         if(this.data.days[day].mealData.length)
+             return this.data.days[day].mealData.length;
+         else return 0;
+     }
 
      /**
       * This function will retrieve the users mealData array that is currently in the DataBase
       * @returns [] Array of meal
       */
      getMealData(callback) {
-         return this.user.getUserData('planner').then((e)=>{alert(JSON.stringify(e));callback(e)});
+         return this.user.getUserData('planner').then((e)=>{//alert(JSON.stringify(e));
+         callback(e)});
      }
 
      /**
@@ -204,7 +211,7 @@ class PlannerHelper{
              this.client.buildUpdateRequest(
                  'User','username',this.client.getUsername(),
                  this.client.buildSetUpdateExpression('planner', {M:DBClient.getClient().packItem(this.data, User.PlannerPrototype)})),
-             (response)=>{alert(JSON.stringify(response.payload))})
+             (response)=>{JSON.stringify(response.payload)})
      }
 }
 
