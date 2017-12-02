@@ -17,6 +17,7 @@ class Homepage extends Component {
             <div className="container-fluid">
                 Homepage content goes here ... Our Website is currently under construction
             </div>
+            
             </div>
         
         );
