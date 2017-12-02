@@ -381,6 +381,25 @@
         this.getUserData('planner').then(callback).catch(console.error)
     }
 
+    setPreferences(planner,callback){
+        let packed = this.client.packItem(planner,undefined);
+        console.log(JSON.stringify(packed));
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User','username',this.client.getUsername(),
+                this.client.buildSetUpdateExpression('planner',packed)),
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.planner = planner;
+                        return data;
+                    })
+                } else {
+                    console.error(response.payload);
+                }
+            })
+    }
+
     getNotes(){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
