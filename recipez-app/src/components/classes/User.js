@@ -217,7 +217,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -236,7 +236,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -261,7 +261,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -280,7 +280,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -305,7 +305,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -325,7 +325,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -349,7 +349,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -365,10 +365,10 @@
                 if(response.status){
                     this.addUserData((data)=>{
                         delete data.shoppingList[item];
-                        return data
+                        return data;
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload);
             }
         })
     }
@@ -391,6 +391,27 @@
 
     }
 
+    getPreferences(callback){
+        this.getUserData('preferences').then(callback);
+    }
+
+    setPreferences(preferences,callback){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User','username',this.client.getUsername(),
+                this.client.buildSetUpdateExpression('preferences',{SS:Array.from(preferences)})),
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.preferences = preferences;
+                        return data;
+                    })
+                } else {
+                    console.error(response.payload);
+                }
+            })
+    }
+
     /**
      * return a Promise that will provide the user data chain and automatically index into the specified field
      * @param  {[type]} name [description]
@@ -403,8 +424,11 @@
     /**
      * apply a function to the user data chain before serving it to future requests
      */
-    addUserData(transform){
+    addUserData(transform,callback){
         this.loadStream = this.loadStream.then(transform);
+        if(callback){
+            callback(this.loadStream)
+        }
     }
 
     /**
