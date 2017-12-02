@@ -97,7 +97,7 @@
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -119,7 +119,7 @@
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -140,7 +140,7 @@
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -174,7 +174,7 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
@@ -193,13 +193,13 @@
                         return data
                 })
              }else {
-                alert(response.payload)
+                console.error(response.payload)
             }
         })
     }
 
     getCookbook(callback){
-        return this.getUserData('cookbook').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('cookbook').then(callback).catch(console.error);
     }
 
 
@@ -244,7 +244,7 @@
 
 
     getCookware(callback){
-        return this.getUserData('cookware').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('cookware').then(callback).catch(console.error);
     }
 
     addToCookware(item){
@@ -287,7 +287,7 @@
 
 
     getExclusionList(callback){
-        return this.getUserData('exclude').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('exclude').then(callback).catch(console.error);
 
     }
 
@@ -331,7 +331,7 @@
     }
 
     getShoppingList(callback){
-        return this.getUserData('shoppingList').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('shoppingList').then(callback).catch(console.error);
 
     }
 
@@ -374,11 +374,11 @@
     }
 
 
-    getPlanner(){
+    getPlanner(callback){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-        return {Monday:['cook'],Tuesday:['eat'],Wednesday:['sleep'],Thursday:['grocery shopping']}
+        this.getUserData('planner').then(callback).catch(console.error)
     }
 
     getNotes(){
@@ -445,7 +445,8 @@
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
     shoppingList:{type:'SS'},
     planner:{},
-    exclude:{type:'SS'}
+    exclude:{type:'SS'},
+    preferences:{type:'SS'},
  }
  DBClient.getClient().registerPrototype(User.UserDataPrototype)
 

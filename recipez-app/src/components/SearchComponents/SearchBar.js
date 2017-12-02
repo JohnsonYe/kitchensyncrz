@@ -167,11 +167,12 @@ class SearchBar extends Component{
                         let count = counter();
                         return (
                         <div className={'dropdown-item'+(count==this.state.selection?' active':'')} 
-                             onMouseOver={(e)=>{this.query=key;this.setState({selection:count})}}>
+                             onMouseOver={(e)=>{this.query=key;this.setState({selection:count})}}
+                             key={count}>
                             <p>
                                 {key}
                                 <span className='pull-right'>
-                                    <div className='btn-group' role='group'>
+                                    <span className='btn-group' role='group'>
                                         <button type='submit' className='btn btn-success btn-sm'>
                                             <span className='glyphicon glyphicon-plus-sign'></span>
                                         </button>
@@ -181,7 +182,7 @@ class SearchBar extends Component{
                                                 onMouseOut={(e)=>this.setState({shiftDown:false})}>
                                             <span className='glyphicon glyphicon-ban-circle'></span>
                                         </button> 
-                                    </div>                           
+                                    </span>                           
                                 </span>
                             </p>
                         </div>)})}
