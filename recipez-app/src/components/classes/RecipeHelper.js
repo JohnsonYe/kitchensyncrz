@@ -140,8 +140,8 @@ import User from '../classes/User';
     Directions:{type:'L',inner:{type:'S'}},
     Reviews:{type:'M',inner:{type:RecipeHelper.ReviewPrototype._NAME}},
     Author:{type:'S'},
-    Difficulty:{type:'N'},
-    TimeCost:{type:'N'}
+    Difficulty:{type:'S'},
+    TimeCost:{type:'S'}
  }
 
  //============================================================================================
