@@ -78,21 +78,35 @@ class PersonalRecipes extends Component{
         this.setState({
            modal: false,
         });
+
     }
+
     getValidationState() {
 
         const recipeName = this.state.value;
+
+        if (!/^[a-zA-Z0-9\s]+$/.test(recipeName)) {
+            this.setState({
+                validation: 'error',
+            });
+            return;
+        }
+
         this.recipeHelper.loadRecipe(recipeName,(recipe)=>{
-            if(recipe){
-                this.setStatus({
-                    validation: 'success',
+            if (!recipe) {
+                this.createNewBlankRecipe(this.state.value);
+                this.setState({
+                    validation: '',
+                    value: '',
                 });
+
             } else {
-                this.setStatus({
+                this.setState({
                     validation: 'error',
                 });
             }
         });
+
 
     }
 
@@ -112,6 +126,22 @@ class PersonalRecipes extends Component{
             recipeCards.push(<PreviewCard src={recipe} removeFunc={this.removeRecipe} personal={1}/>);
         }
 
+        let form =
+            <form>
+                <FormGroup
+                    controlId="formBasicText"
+                    validationState={this.state.validation}
+                >
+                    <FormControl
+                        type={"text"}
+                        value={this.state.value}
+                        placeholder="Title"
+                        onChange={this.handleChange}
+                    />
+                    <FormControl.Feedback/>
+                </FormGroup>
+            </form>
+        ;
 
         return(
             <div>
@@ -133,24 +163,13 @@ class PersonalRecipes extends Component{
                     </Modal.Header>
 
                     <Modal.Body>
-                        <form>
-                            <FormGroup
-                                controlId="formBasicText"
-                                validationState={this.state.validation}
-                            >
-                                <FormControl
-                                    componentClass={"textarea"}
-                                    value={this.state.value}
-                                    placeholder="Title"
-                                    onChange={this.handleChange}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </form>
+                        {form}
                     </Modal.Body>
                     <Modal.Footer>
                         <div>
-                            <div className={"btn btn-success"} onClick={() => {this.createNewBlankRecipe(this.state.value)}}>
+                            <div className={"btn btn-success"} onClick={() => {
+                                this.getValidationState()
+                            }}>
                                 Create
                             </div>
                             <div className={"btn btn-light"} onClick={this.close}>

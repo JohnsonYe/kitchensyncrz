@@ -5,7 +5,9 @@ import PersonalRecipes from "../cookbookComponents/personalRecipes";
 import User from "../classes/User.js";
 import {Modal} from 'react-bootstrap';
 
-
+/**
+ * TODO: Background
+ */
 class Cookbook extends Component {
 
     constructor(props){

@@ -110,7 +110,6 @@
                     },callback)
                 } else {
                     //the request failed, what should we do?
-                    console.log("Hey it didn't go through!");
                     alert(response.payload)
                 }
             })

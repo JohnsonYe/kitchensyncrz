@@ -5,14 +5,17 @@
  * Serves as the basic preview card, either for the saved recipes or for the personal recipes
  */
 
-/**
- * TODO: Need to make it so you can pass a prop for the type (personal/saved) and dynamically determine which it will be
- */
 import React, {Component} from 'react';
 import {Modal} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
-let noImg = require("./no-photo.png");
 
+/**
+ * TODO: Andrew's add-to-planner button
+ * TODO: Review stars/forks
+ * TODO: Recipe editing modal
+ *              *
+ * TODO: Image framework - for hardcoding presentation purposes
+ */
 class PreviewCard extends Component{
 
 
@@ -47,7 +50,7 @@ class PreviewCard extends Component{
 
     removeThis(){
         this.close();
-        this.props.removeFunc(this.state.name);
+        this.props.removeFunc(this.props.src.Name);
     }
 
     render() {
@@ -67,7 +70,7 @@ class PreviewCard extends Component{
                 </div>
         }
         return (
-            <div className={"col-md-2"}>
+            <div className={"col-md-3"}>
                 <div className="card recipes">
                     <Link to={this.props.personal ? '/Recipes/'+this.props.src.Author+'/'+this.props.src.Name : '/Recipes/'+this.props.src.Name}>
 
