@@ -54,7 +54,6 @@ class Register extends Component{
     };
 
     handleConfirmationSubmit = async event => {
-        event.preventDefault();
 
         try {
             await this.client.confirmUser(this.state.newUser, this.state.confirmationCode);
