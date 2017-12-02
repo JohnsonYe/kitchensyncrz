@@ -78,15 +78,6 @@ import User from '../classes/User';
                 callback({status:false,payload:e1})
             }
         }.bind(this))
-
-        // this.client.updateItem(
-        //     this.client.buildUpdateRequest(
-        //         'Recipes',
-        //         'Name',recipeName,
-        //         this.client.combineUpdateExpressions(
-        //             this.client.buildFieldCreateExpression('Reviews',{M:{}}),
-        //             this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject))),
-        //     this.client.alertResponseCallback)
     }
 
     loadRecipe(recipeName,callback,custom){
@@ -130,10 +121,6 @@ import User from '../classes/User';
         }
 
         callback(this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype))
-        // var unpacked = this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype)
-        // alert(JSON.stringify(unpacked))
-        // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
-        // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
 
 
@@ -194,66 +181,5 @@ DBClient.getClient().registerPrototype(RecipeHelper.ReviewPrototype)
  }
 DBClient.getClient().registerPrototype(RecipeHelper.RecipePrototype)
 
- //============================================================================================
- /*
-  * this code is no longer in use but is kept (for now) for convenience and testing
-  */
 
- /**
- * Recipe Object Format:
- * {
- *      Name: Recipe Name
- *      Ingredients: <List> of <String> containing one ingredient specification each
- *      Directions:  <List> of <String> containing one step each
- *      Reviews:     <List> of Review <Objects>:
- *      {
- *          username: <String> username of commenter
- *          Comment:  <String> comment assosciated with review, may be empty
- *          Rating:   <int> rating associated with review, out of 5 (stars)
- *          timestamp: timestamp of comment
- *      }
- * }
- */
-RecipeHelper.unpackRecipe = function(recipeResponse){
-    var reviews = []
-    if(recipeResponse.Reviews){
-        // alert(JSON.stringify(Object.entries(recipeResponse.Reviews.M)))
-        reviews = RecipeHelper.unpackReview(recipeResponse.Reviews)
-    }
-    // alert(recipeResponse)
-    return {
-        Name:recipeResponse.Name.S,
-        Ingredients:recipeResponse.Ingredients.L.map((ingredient) => ingredient.S),
-        Directions:recipeResponse.Directions.L.map((step) => step.S),
-        Reviews:reviews
-    }
-}
-
-RecipeHelper.packRecipe = function(r){
-    return {
-        Name:{S:r.Name},
-        Ingredients:{L:r.Ingredients.map((ingredient)=>({S:ingredient}))},
-        Directions:{L:r.Directions.map((step)=>({S:step}))},
-        Reviews:RecipeHelper.packReview(r.Reviews)
-    }
-
-}
-
-RecipeHelper.unpackReview = function(packedReview){
-    return Object.entries(packedReview.M).map((review) => ({
-                    username:   review[1].M.username.S,
-                    Comment:    review[1].M.Comment.S,
-                    Rating:     review[1].M.Rating.N,
-                    timestamp:  review[1].M.timestamp.N,
-                }))
-}
-
-RecipeHelper.packReview = function(revObj){
-    return {M:{
-            username:   {S:revObj.username},
-            Comment:    {S:revObj.Comment},
-            Rating:     {N:revObj.Rating},
-            timestamp:  {N:revObj.timestamp},
-        }}
-}
  export default RecipeHelper;

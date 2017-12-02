@@ -122,7 +122,6 @@ import JSZip from 'jszip'
                 }                   
                 //since this ingredient is already in the map, dont modify the map or fire the callback
                 //callers should not rely on this method to use the callback for any given set of arguments
-                return ingredientMap
             })
 
     }
@@ -135,11 +134,11 @@ import JSZip from 'jszip'
     updateResultList(map,ingredient,callback,nosort){
         let updateType = map.get(ingredient)[0];
         let status = map.get(ingredient)[2];
-        if(updateType==ADD_TO_SEARCH||updateType==REMOVE_FROM_SEARCH){ //use ingredient in search
-            if((updateType==ADD_TO_SEARCH&&status!=UNUSED_STATUS)||(updateType==REMOVE_FROM_SEARCH&&status!=INCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
+        if(updateType===ADD_TO_SEARCH||updateType===REMOVE_FROM_SEARCH){ //use ingredient in search
+            if((updateType===ADD_TO_SEARCH&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_SEARCH&&status!==INCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
                 return map;
             }
-            map.get(ingredient)[2] = updateType==ADD_TO_SEARCH?INCLUDED_STATUS:UNUSED_STATUS;
+            map.get(ingredient)[2] = updateType===ADD_TO_SEARCH?INCLUDED_STATUS:UNUSED_STATUS;
             let recipeTracker = new Set()
             map.get(ingredient)[1].recipes.forEach((recipe)=>{
                 let recipeName = recipe.Name
@@ -160,12 +159,12 @@ import JSZip from 'jszip'
             } else {
                 callback(ingredient)
             }
-        } else if(updateType==ADD_TO_EXCLUDE||updateType==REMOVE_FROM_EXCLUDE){ //reject or un-reject ingredient from search
-            if((updateType==ADD_TO_EXCLUDE&&status!=UNUSED_STATUS)||(updateType==REMOVE_FROM_EXCLUDE&&status!=EXCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
+        } else if(updateType===ADD_TO_EXCLUDE||updateType===REMOVE_FROM_EXCLUDE){ //reject or un-reject ingredient from search
+            if((updateType===ADD_TO_EXCLUDE&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_EXCLUDE&&status!==EXCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
                 return map;
             }
-            map.get(ingredient)[2] = updateType==REMOVE_FROM_EXCLUDE?UNUSED_STATUS:EXCLUDED_STATUS;
-            let adjustment = (updateType==0)?1:-1;
+            map.get(ingredient)[2] = updateType===REMOVE_FROM_EXCLUDE?UNUSED_STATUS:EXCLUDED_STATUS;
+            let adjustment = (updateType===0)?1:-1;
             map.get(ingredient)[1].recipes.forEach((recipe)=>{
                 let prevEntry = this.recipeMap.has(recipe.Name)?this.recipeMap.get(recipe.Name):[0,0,0]; //set base values to 0 if no entry exists
                 //increment the rejection score by one
@@ -193,7 +192,7 @@ import JSZip from 'jszip'
         console.log('Sorting recipe map . . .')
         this.sorted = this.getRecipeList();
         return Promise.resolve(this.sorted) //use a promise to account for potential asynchronous sort
-            .then((sorted)=>sorted.filter((entry)=>(entry[1][0]==0)&&(entry[1][1]!=0))) //filter rejected items
+            .then((sorted)=>sorted.filter((entry)=>(entry[1][0]===0)&&(entry[1][1]!==0))) //filter rejected items
             .then(this.currentFilter) //apply filter -- may be asynchronous --> promise chain handles this gracefully
             .then(callback);
     }
