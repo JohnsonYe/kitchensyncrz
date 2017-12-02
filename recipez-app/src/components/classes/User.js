@@ -93,6 +93,7 @@ class User {
             (response)=>{
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully remove from Cookbook')
                         delete data.cookbook[recipeName];
                         return data
                     })
@@ -136,6 +137,7 @@ class User {
             (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully add to Cookbook')
                         data.cookbook[recipeName]='none';
                         return data;
                     })
@@ -200,7 +202,8 @@ class User {
     }
 
     getCookbook(callback){
-        return this.getUserData('cookbook').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('cookbook').then(response=>{callback(response)})
+        /*alert(JSON.stringify(response));*/
     }
 
 
