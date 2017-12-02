@@ -4,12 +4,14 @@
  * Date Created: 11/2/2017
  * Description: This file will serve as the Kitchen page
  */
+
 import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Modal, Button } from 'react-bootstrap';
 import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
 
 import User from '../classes/User'
-
+import Autocomplete from '../classes/Autocomplete'
+//call loadlist, list , get completion
 
 //Creates the well and button object that shows up on the screen
 const AddItem = ({item, remove, addOut}) => {
@@ -23,6 +25,7 @@ const AddItem = ({item, remove, addOut}) => {
                         id = "btn-r"
                         type = "button"
                         onClick = {()=> remove(item)}
+                        title = "Remove"
                         style = {{float:'right', display:'block',
                                   fontSize:'10px', marginTop:'-10.5px',
                                   marginRight:'-9px'}}>
@@ -34,10 +37,11 @@ const AddItem = ({item, remove, addOut}) => {
                         id = "btn-d"
                         type = "button"
                         onClick = {()=> addOut(item) }
+                        title = "Add to Restock"
                         style={{float:'right', display:'block',
                                 fontSize:'10px', marginTop:'-10.5px',
                                 marginLeft:'-7px'}}>
-                    <span className = "glyphicon glyphicon-warning-sign"
+                    <span className = "glyphicon glyphicon-alert"
                        style={{fontSize:'1.5em'}}/>
                 </button>
             </div>
@@ -57,6 +61,7 @@ const AddExcludeCookware = ({item, remove}) => {
                         id = "btn-one"
                         type = "button"
                         onClick = {()=> remove(item)}
+                        title = "Remove"
                         style = {{float:'right', display:'block', fontSize:'10px',
                                   marginTop:'-10px', marginRight:'-10px'}}>
 
@@ -79,6 +84,7 @@ const AddRestock = ({item, remove, addBack}) => {
                 <button className = "btn btn-danger"
                         type = "button"
                         onClick = {()=> remove(item)}
+                        title = "Remove"
                         style = {{float:'right', display:'block',
                                   fontSize:'12px', marginTop:'-10.5px',
                                   marginRight:'-9px'}}>
@@ -89,6 +95,7 @@ const AddRestock = ({item, remove, addBack}) => {
                 <button className = "btn btn-success"
                         type = "button"
                         onClick = {()=> addBack(item) }
+                        title = "Add back to list"
                         style = {{float:'right', display:'block',
                                  fontSize:'12px', marginTop:'-10.5px',
                                  marginLeft:'-7px'}}>
@@ -148,8 +155,8 @@ const ItemForm = ( {addProtein,
                       addFruit,
                       addGrain,
                       addOther,
-                      addToPantry,
-                      getKey} ) => {
+                      getKey,
+                      handleChange} ) => {
 
     // Input Tracker
     let input;
@@ -191,15 +198,17 @@ const ItemForm = ( {addProtein,
             }
         }}>
 
-            <div className="input-group">
-                <input className="form-control" type= "text" id = "enter"
-                       autocomplete="off"
-                       placeholder="Pick a category and add food items!"
-                       ref={node => { input = node; }} />
-
+            <div className = "input-group">
+                <input className = "form-control" type = "text" id = "enter"
+                       autocomplete = "off"
+                       placeholder = "Pick a category and enter food items . . ."
+                       ref = { node => { input = node; }}
+                       onChange = {handleChange}
+                />
                 <span className = "input-group-btn">
-                        <button className="btn btn-success"
-                                type="submit">
+                        <button className = "btn btn-success"
+                                type = "submit"
+                                title = "Add to list">
                             <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>
@@ -239,7 +248,9 @@ const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
                        ref={node => { input = node; }} />
 
                 <span className = "input-group-btn">
-                        <button className="btn btn-success" type="submit">
+                        <button className="btn btn-success"
+                                type="submit"
+                                title="Add to list">
                             <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>
@@ -253,7 +264,10 @@ class kitchen extends Component {
     constructor( props ){
         super( props );
         this.user = new User();
+        this.autocomplete = new Autocomplete();
+
         this.loadPantry();
+        this.loadExcluded();
         this.loadPreference();
         this.loadCookware();
 
@@ -267,7 +281,8 @@ class kitchen extends Component {
             outData = [],
             excludeData = [],
             prefData = [],
-            cookwareData = [];
+            cookwareData = [],
+            listData = [];
 
         this.state = {
             numItems: 0,
@@ -286,6 +301,8 @@ class kitchen extends Component {
 
             out: outData,
 
+            list: listData,
+
             showExclude: false,
             showCookware: false,
 
@@ -293,6 +310,8 @@ class kitchen extends Component {
             modalKey: "Exclude"
 
         };
+
+        this.autocomplete.loadList(this.state.list);
 
         this.getKey = this.getKey.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
@@ -356,12 +375,32 @@ class kitchen extends Component {
         this.loadPantry = this.loadPantry.bind(this);
         this.processPantry = this.processPantry.bind(this);
 
+        this.loadExcluded = this.loadExcluded.bind(this);
+        this.processExcluded = this.processExcluded.bind(this);
+
         this.loadPreference = this.loadPreference.bind(this);
         this.processPreference = this.processPreference.bind(this);
+        this.prefChanged = this.prefChanged.bind(this);
+
 
         this.loadCookware = this.loadCookware.bind(this);
         this.processCookware = this.processCookware.bind(this);
+
+        this.handleChange = this.handleChange.bind(this);
     }
+
+    handleChange(e) {
+
+        if(e.target.value.length > 0) {
+            //this.setState({list: this.autocomplete.getCompletion(e.target.value)})
+            alert(this.autocomplete.getCompletion(e.target.value));
+            //this.autocomplete.getCompletion(e.target.value);
+            //this.autocomplete.loadList(this.state.list);
+        }
+
+        //alert( this.state.list );
+    }
+
 
     // Read the json file
     loadPantry(){
@@ -401,15 +440,28 @@ class kitchen extends Component {
         })
     }
 
-    loadPreference(){
-        this.user.getExclusionList(this.processPreference.bind(this));
+    loadExcluded() {
+        this.user.getExclusionList(this.processExcluded.bind(this));
     }
 
-    processPreference(data){
+    processExcluded(data){
         Object.entries(data).forEach((key) => {
             this.addExclude(key[1]);
         })
     }
+
+    loadPreference(){
+        this.user.getPreferences(this.processPreference.bind(this));
+    }
+
+    processPreference(data) {
+        var prefs = [];
+        Object.entries(data).forEach((key) => {
+            prefs.push(key[1]);
+            this.setState({pref: this.state.pref.concat(key[1])});
+        })
+    }
+
 
     loadCookware(){
         this.user.getCookware(this.processCookware.bind(this));
@@ -601,9 +653,10 @@ class kitchen extends Component {
     }
 
     // Exclude functions
-    prefChanged = (newPref) => {
-        this.setState({ pref: newPref});
+    prefChanged(newPref) {
+        this.user.setPreferences(newPref,  this.setState({pref: newPref}) );
     }
+
 
     addExclude(val){
         this.setState({exclude: this.state.exclude.concat(val)});
@@ -774,13 +827,14 @@ class kitchen extends Component {
 
                     <div className = "row" id = "Modal1">
 
-                        <Button
-                            bsStyle="primary"
+                        <button
+                            className = "btn btn-primary"
                             id="btn-one"
+                            title="Preferences"
                             onClick={this.openExclude}
                         >
-                            Preferences: {this.state.numExclude}
-                        </Button>
+                            Preferences: &nbsp;{this.state.numExclude}
+                        </button>
 
                         <Modal show={this.state.showExclude} onHide={this.closeExclude}>
                             <Modal.Header>
@@ -790,6 +844,7 @@ class kitchen extends Component {
 
                                 Dietary Preferences:
                                 <br />
+
                                 <CheckboxGroup
                                     name="pref"
                                     value={this.state.pref}
@@ -800,9 +855,11 @@ class kitchen extends Component {
                                     <label style={{marginRight: '8px'}}><Checkbox value="vegetarian" /> Vegetarian </label>
                                     <label style={{marginRight: '8px'}}><Checkbox value="gluten-free" /> Gluten-Free  </label>
                                 </CheckboxGroup>
+
                                 <br />
                                 Add more items to exclude:
                                 <br />
+
                                 <ExcludeCookwareForm
                                     addExclude = {this.addExclude.bind(this)}
                                     addCookware = {this.addCookware.bind(this)}
@@ -812,7 +869,11 @@ class kitchen extends Component {
                                 {this.renderExclude()}
                             </Modal.Body>
                             <Modal.Footer>
-                                <Button onClick={this.closeExclude}>Close</Button>
+                                <button className= "btn btn-secondary"
+                                        onClick = {this.closeExclude}
+                                        title = "Save and Close">
+                                    <i className="glyphicon glyphicon-saved" />
+                                </button>
                             </Modal.Footer>
                         </Modal>
                     </div>
@@ -821,13 +882,14 @@ class kitchen extends Component {
 
                     <div className = "row" id = "Modal2">
 
-                        <Button
-                            bsStyle="info"
+                        <button
+                            className = "btn btn-info"
                             id = "btn-one"
+                            title = "Cookware"
                             onClick={this.openCookware}
                         >
-                            Cookware: {this.state.cookware.length}
-                        </Button>
+                            Cookware: &nbsp;{this.state.cookware.length}
+                        </button>
 
                         <Modal show={this.state.showCookware} onHide={this.closeCookware}>
                             <Modal.Header>
@@ -843,7 +905,11 @@ class kitchen extends Component {
                                 {this.renderCookware()}
                             </Modal.Body>
                             <Modal.Footer>
-                                <Button onClick={this.closeCookware}>Close</Button>
+                                <button className= "btn btn-secondary"
+                                        onClick = {this.closeCookware}
+                                        title = "Save and Close">
+                                    <i className="glyphicon glyphicon-saved" />
+                                </button>
                             </Modal.Footer>
                         </Modal>
                     </div>
@@ -855,14 +921,16 @@ class kitchen extends Component {
 
                     <div className = "row" >
                         <div className = "col-md-3 col-sm-5 col-xs-5" >
-                            <div className = "card mg-3 card-bg-light text-center">
+                            <div className = "card mg-3 card-bg-light text-center"
+                                 style = {{background: 'aliceblue'}}>
                                 <div className = "card-title"><h1>{this.state.numItems}</h1></div>
                                 <div className = "card-body"> Total Items: </div>
                             </div>
                         </div>&nbsp;
 
                         <div className = "col-md-3 col-sm-5 col-xs-5" >
-                            <div className = "card mg-3 card-bg-light text-center">
+                            <div className = "card mg-3 card-bg-light text-center"
+                                 style={{background: 'yellow'}}>
                                 <div className = "card-title"><h1>{this.state.numRestock}</h1></div>
                                 <div className = "card-body"> Restock: </div>
                             </div>
@@ -884,9 +952,10 @@ class kitchen extends Component {
                                         addFruit = {this.addFruit.bind(this)}
                                         addGrain = {this.addGrain.bind(this)}
                                         addOther = {this.addOther.bind(this)}
-                                        addToPantry = {this.user.addToPantry.bind(this)}
                                         getKey = {this.getKey()}
+                                        handleChange = {this.handleChange.bind(this)}
                                     />
+
                                 </div>
                             </div>
 
@@ -903,7 +972,7 @@ class kitchen extends Component {
                                                 Dairy
                                             </NavItem>
                                             <NavItem eventKey="Vegetable">
-                                                Vegetables
+                                                Vegetable
                                             </NavItem>
                                             <NavItem eventKey="Fruit">
                                                 Fruit
@@ -943,19 +1012,22 @@ class kitchen extends Component {
 
                         </div>
 
-                        <div className = "col-md-4" >
+                        <div className = "col-md-4" style={{background: 'gainsboro'}}>
                             <div className = "container-fluid mg-3">
                                 <h3>
-                                    <span className="glyphicon glyphicon-warning-sign"></span>
+                                    <span className="glyphicon glyphicon-alert"></span>
                                     &nbsp; Needs Restock:
                                 </h3>
+                                <hr />
                                 {this.renderOut()}
                             </div>
                         </div>
 
+
                     </div>
                 </div>
             </div>
+
         );
     }
 }
