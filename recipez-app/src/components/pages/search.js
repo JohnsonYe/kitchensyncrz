@@ -135,7 +135,7 @@ class Search extends Component {
         // e.preventDefault();
         let update_state_and_close_dropdowns_fn = (sorted)=>{
             this.updateState(sorted,value,status);
-            if(this.state.ingredients.size == 0){
+            if(this.state.ingredients.size === 0){
                 this.closeAllDropdowns()
             }
         };
@@ -173,17 +173,17 @@ class Search extends Component {
         this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
     }
     updateIngredientState(value,status){
-        if(status == 1){ //adding an ingredient to search -- we should load the data too
+        if(status === 1){ //adding an ingredient to search -- we should load the data too
             return {ingredients:this.state.ingredients.add(value)};
-        } else if(status==-1){
+        } else if(status===-1){
             return {ingredients:(()=>{this.state.ingredients.delete(value);return this.state.ingredients})()};
-        } else if(status == 0){
+        } else if(status === 0){
             return {excluded:this.state.excluded.add(value)};
-        } else if(status==2){
+        } else if(status===2){
             return {excluded:(()=>{this.state.excluded.delete(value);return this.state.excluded})()};
-        } else if(status==CLEAR_SEARCH){
+        } else if(status===CLEAR_SEARCH){
             return {excluded:new Set(),ingredients:new Set()};
-        } else if(status==ADD_MULTIPLE){
+        } else if(status===ADD_MULTIPLE){
             return {ingredients:(()=>value.reduce((prev,next)=>prev.add(next),this.state.ingredients))()}
         } else {
             return {};

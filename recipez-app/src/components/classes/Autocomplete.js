@@ -98,7 +98,7 @@ class Autocomplete{
             if(node.c){
                 return this.search(node.c,str,idx+1)
             } else {
-                if(idx+1==str.length){
+                if(idx+1===str.length){
                     return [str]
                 }
                 return []
@@ -139,33 +139,6 @@ class Autocomplete{
         return buildRoot
     }
 }
-
-/**
- * AUTOCOMPLETE BUILDER -- run this in node to compile trees into JSON offline, then zip them and push to database with scanner.py in scripts
- */
-// fs = require('fs');
-// csvPath = '../../scripts/ingredient.csv';
-// jsonPath = 'Ingredient.tst'
-// fs.readFile(csvPath,'utf8',(err,data)=>{
-//     if(err){
-//         console.log(err)
-//         return
-//     }
-//     // console.log(JSON.stringify(data))
-//     // var auto = new Autocomplete(['cat','cast','category','cart','cats'])
-//     var auto = new Autocomplete(data.split(','),null)
-//     // var auto = new Autocomplete(null,data)
-//     console.log(JSON.stringify(auto))
-//     console.log(auto.getCompletion('ca'))
-//     fs.writeFile('Ingredient.tst',JSON.stringify(auto.root),(err)=>{
-//         if(err){
-//             console.log(err)
-//             return
-//         }
-//         console.log('saved successfully!')
-//     })
-// })
-
 
 
 export default Autocomplete;
