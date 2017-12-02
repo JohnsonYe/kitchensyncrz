@@ -6,13 +6,11 @@
  */
 import DBClient from "./AWSDatabaseClient";
 import User from './User';
-import RecipeHelper from './RecipeHelper';
 
 class PlannerHelper{
 
-    constructor(updateCallback){
+    constructor(callback){
         this.client = DBClient.getClient();
-        this.recipes = new RecipeHelper();
         this.user = User.getUser(this.client.getUsername());
 
         //Access Meal Data data.days[dayOfTheWeek].mealData[mealIndex]
@@ -20,7 +18,7 @@ class PlannerHelper{
         this.getMealData( (data) => {
             this.data = data;
             this.loaded = true;
-            updateCallback();
+            callback();
         });
     }
 
@@ -44,6 +42,7 @@ class PlannerHelper{
         // create an array of just the current days meals for easy access
         var meals = this.getDayMealList(day),
             mealIndex = 0;
+
         //if empty
         alert(JSON.stringify(meals));
         alert(JSON.stringify(meal));
@@ -61,6 +60,7 @@ class PlannerHelper{
                 meal.startMin > meals[mealIndex].endMin) {
             mealIndex++;
         }
+
         //if mealIndex is out of bound then add to the end
         if(mealIndex == meals.length) {
             this.data.days[day].mealData.push(meal);
@@ -82,10 +82,11 @@ class PlannerHelper{
      /**
       * This function creates a meal object that could be added to one of the entries in mealData.
       * @param recipe - name of recipe for meal
+      * @param dur - a string of the minutes it takes to cook the meal
       * @param startHr - start time of meal
       * @param startMin - start min of meal
       */
-     createMeal(recipe, startHr, startMin, mealCallback) {
+     createMeal(recipe, dur, startHr, startMin) {
 
          var hr = 0,
              endMin = 0,
@@ -93,35 +94,41 @@ class PlannerHelper{
              total = 0,
              recipes = [];
 
-         this.recipes.loadRecipe(recipe, (recipeData,err)=>{
-             if(!recipeData){
-                 alert(err);
-                 return;
-             }
-             recipes.push(recipe);
-             total = startMin + parseInt(recipeData.TimeCost);
-             hr = Math.floor(total/60);
-             endMin = total - (hr)*(60);
-             endHr = startHr + hr;
+         recipes.push(recipe);
+         total = startMin + parseInt(dur);
+         hr = Math.floor(total/60);
+         endMin = total - (hr)*(60);
+         endHr = startHr + hr;
 
-             //check if hr passed to the next day
-             if( endHr >= 24) {
-                 endHr = (24 - endHr) * (-1);  //converts to correct time
-             }
+         //check if hr passed to the next day
+         if( endHr >= 24) {
+             endHr = (24 - endHr) * (-1);  //converts to correct time
+         }
 
-             //create meal object
-             var meal = {
-                 recipes: recipes,
-                 startHr: startHr ,
-                 startMin: startMin,
-                 endHr: endHr,
-                 endMin: endMin
-             };
-
-             mealCallback(meal);
-         });
+         //create meal object
+         return {
+             recipes: recipes,
+             startHr: startHr ,
+             startMin: startMin,
+             endHr: endHr,
+             endMin: endMin
+         };
      }
-     /** Gives the an array of meals for that day
+
+    /** This funtion will edit a meal and save the change to the database
+     * @param day - the day where
+     * @param mealIndex - the index of the meal you want to edit
+     * @param meal - new meal object to replace the old one.
+     */
+    editMeal(day, mealIndex, meal) {
+        // check if meal exist
+        if(this.data.days[day].mealData[mealIndex]) {
+            this.data.days[day].mealData[mealIndex] = meal;
+        }
+    }
+
+
+    /** Gives the an array of meals for that day
       * @param day - day you want the meal list of*/
      getDayMealList(day) {
          //alert(JSON.stringify(this.data));
@@ -187,6 +194,7 @@ class PlannerHelper{
         }
         else return "Unavailable";
      }
+
      /** This function retrieves the number of meeals for a specified day*/
      getNumMeals(day){
          if(this.data.days[day].mealData.length)

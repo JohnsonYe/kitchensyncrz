@@ -16,7 +16,6 @@ import {Button} from 'react-bootstrap';
 import DynamicList from "../../dynamicList"
 import MealEditor from "./editMealPage"
 import PlannerHelper from "../../classes/Planner";
-import RecipeHelper from "../../classes/RecipeHelper";
 
 /**Lets the user know what recipe is up next to cook will be placed in Daily Meal Planner*/
 function UpNextCard(props){
@@ -66,8 +65,8 @@ class Planner extends Component {
         super(props);
         this.update = this.update.bind(this);
         var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            data = new PlannerHelper(this.update),
-            recipes = new RecipeHelper();
+            data = new PlannerHelper(this.update);
+
         this.state = {
             days: days,
             numMeals: 0,
@@ -75,8 +74,6 @@ class Planner extends Component {
             numMealsPrepared: 0,
             items: [],
             mealData: data,
-            mealCards: [[],[],[],[],[],[],[]],
-            recipes: recipes
         };
 
         this.addMeal = this.addMeal.bind(this);
@@ -100,10 +97,6 @@ class Planner extends Component {
      * Adds a meal to the list
      */
     addMeal() {
-        this.state.mealData.createMeal("Marinade for Chicken",
-                                                    5,
-                                                    30,
-                                                    (meal) => this.state.mealData.insertMeal(meal,0));
     }
 
 
@@ -176,6 +169,7 @@ class Planner extends Component {
     }
 
     renderWeekPlanner() {
+
         return (
             <div className="col-md-12">
                 <div className="
@@ -190,13 +184,13 @@ class Planner extends Component {
                     </div>
                 </div>
                 <div className="row">
-                {this.renderWeekCol(0)}
-                {this.renderWeekCol(1)}
-                {this.renderWeekCol(2)}
-                {this.renderWeekCol(3)}
-                {this.renderWeekCol(4)}
-                {this.renderWeekCol(5)}
-                {this.renderWeekCol(6)}
+                    {this.renderWeekCol(0)}
+                    {this.renderWeekCol(1)}
+                    {this.renderWeekCol(2)}
+                    {this.renderWeekCol(3)}
+                    {this.renderWeekCol(4)}
+                    {this.renderWeekCol(5)}
+                    {this.renderWeekCol(6)}
                 </div>
             </div>
         );
@@ -208,35 +202,28 @@ class Planner extends Component {
             today = now.getDay(),
             date = this.state.days[today] + " " + now.getDate().toString() + ", " + (1900+now.getYear()).toString();
 
-        return(
-                <div className="row">
-                    <div className="col-3
+        return (
+            <div className="row">
+                <div className="col-3
                                             border
                                             border-left-0
                                             border-top-0
                                             border-bottom-0
                                             border-dark">
-                        <div className="mx-auto">
-                            <h2>Daily Meal Planner</h2>
-                            <p>{date}</p>
-                            <h3>{this.loadNumMeals(today)}</h3>
-                            <p>Meals</p>
-                            <h3>{this.state.numMealsPrepared}</h3>
-                            <p>Prepared</p>
-                        </div>
-                    </div>
-                    <div className="col-9">
-                        <Button
-                            bsSize="small"
-                            bsStyle="secondary"
-                            onClick={this.addMeal}>Test</Button>
-                        <button
-                            className="btn btn-danger btn-sm"
-                            onClick={this.removeMeal}>Remove Test</button>
-                        <UpNextCard/>
-                        {this.renderMealCards(today)}
+                    <div className="mx-auto">
+                        <h2>Daily Meal Planner</h2>
+                        <p>{date}</p>
+                        <h3>{this.loadNumMeals(today)}</h3>
+                        <p>Meals</p>
+                        <h3>{this.state.numMealsPrepared}</h3>
+                        <p>Prepared</p>
                     </div>
                 </div>
+                <div className="col-9">
+                    <UpNextCard/>
+                    {this.renderMealCards(today)}
+                </div>
+            </div>
         );
     }
 
@@ -292,10 +279,8 @@ class Planner extends Component {
         if(this.state.mealData.isLoaded())
             var numMeals = this.state.mealData.getNumMeals(day);
         else return (<div>Loading ...</div>);
-
         return numMeals;
     }
-
 
     /** Driver */
     render() {
