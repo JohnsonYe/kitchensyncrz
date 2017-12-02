@@ -244,7 +244,7 @@ class Search extends Component {
     mortensButton(){
         this.setState({morten: this.user.client.getUsername()});       
         User.getUser('user001').getPreferences(console.log)
-        // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)                           
+        // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
         
         
