@@ -49,7 +49,7 @@ class Autocomplete{
     chainBuild(str,idx){
         // alert(str.substring(idx+1).split('').reduce((prev,next)=>{return prev.center=this.getNode(next)},this.getNode(str.charAt(idx))))
         var buildRoot = this.getNode(str.charAt(idx))
-        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot)
+        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot).e = '';
         return buildRoot
     }
 }

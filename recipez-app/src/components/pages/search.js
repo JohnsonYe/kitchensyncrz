@@ -17,6 +17,7 @@ import SearchBar from '../SearchComponents/SearchBar';
 
 const CLEAR_SEARCH = 99;
 const ADD_MULTIPLE = 98;
+const MULTI_UPDATE = 97;
 
 class Search extends Component {
 	constructor(props)  {
@@ -53,6 +54,8 @@ class Search extends Component {
 
         this.getRecipeLoader = this.getRecipeLoader.bind(this);
 
+        this.getJustifiedGlyph = this.getJustifiedGlyph.bind(this);
+
 
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
         let query = this.parseQueryString(this.props.history.location.search)
@@ -75,11 +78,12 @@ class Search extends Component {
     getRecipeLoader(){
         return this.recipeLoader;
     }
-    massUpdateSearch(items,action){
+    massUpdateSearch(items,action,shouldUpdate){
         let getCallbacks = (item,pass,fail)=>{
             return ({
                 successCallback: ()=>{pass(item)},
                 failureCallback: ()=>{fail(item)},
+                outputCallback: shouldUpdate?this.updateLoader:undefined,
             });
         };
 
@@ -185,6 +189,11 @@ class Search extends Component {
             return {excluded:new Set(),ingredients:new Set()};
         } else if(status===ADD_MULTIPLE){
             return {ingredients:(()=>value.reduce((prev,next)=>prev.add(next),this.state.ingredients))()}
+        } else if(status===MULTI_UPDATE){
+            return {
+                ingredients:(()=>value[0].reduce((prev,next)=>prev.add(next),this.state.ingredients))(),
+                excluded:(()=>value[1].reduce((prev,next)=>prev.add(next),this.state.excluded))(),
+            }
         } else {
             return {};
         }
@@ -284,29 +293,47 @@ class Search extends Component {
             return null;
         };
 
+        //filter each result set ("pantry" and "excluded")
         let filter_failed_results_fn = (items)=>{
-            return items.filter((item)=>!!item); //check if the item is valid
+            return items.map((pset)=>pset.filter((item)=>!!item)); //check if the item is valid
         };
 
+        //sort the recipe map and update our state with the sorted result
         let sort_results_and_update_fn = (items)=>{
-            this.client.sortRecipeMap(this.searchUpdateWrapper(items,ADD_MULTIPLE))
+            this.client.sortRecipeMap(this.searchUpdateWrapper(items,MULTI_UPDATE))
         };
 
-        User.getUser('user001').getUserData('pantry').then((data)=>{
-            Promise.all(
-                //get an array of update promises
-                this.massUpdateSearch(Object.keys(data),1/* ADD */)
+
+        //User dispenses data asynchronously in a very controlled manner, so we need two calls
+        //to get  the "pantry" and the "excluded" data fields
+        let addPromises = User.getUser('user001').getUserData('pantry').then((data)=>{
+                //wrap the array of promises we get back inside a Promise.all to get everything in sync     
+                return Promise.all(this.massUpdateSearch(Object.keys(data),1/* ADD */,true)
                 //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
-                .map((updatePromise)=>updatePromise.catch(update_failed_fn))
-            )
-            .then( filter_failed_results_fn )
-            .then( sort_results_and_update_fn )
-            .catch((err)=>console.error(err))
+                .map((updatePromise)=>updatePromise.catch(update_failed_fn)))
+            })
+
+        let excludePromises = User.getUser('user001').getUserData('exclude').then((data)=>{
+            return Promise.all(this.massUpdateSearch(data,0/* EXCLUDE */,true)
+            .map((updatePromise)=>updatePromise.catch(update_failed_fn)))
         })
+
+        Promise.all(
+            //both inner Promise.all's must resolve before we act on the data
+            [addPromises,excludePromises]
+        )
+        .then( filter_failed_results_fn )
+        .then( sort_results_and_update_fn )
+        .catch((err)=>console.error(err))
+        
     }
 
     getGlyph(name){
         return (<span className={"glyphicon glyphicon-"+name}></span>);
+    }
+
+    getJustifiedGlyph(name){
+        return (<span className="pull-right">{this.getGlyph(name)}</span>);
     }
 
     getFilterButton(message,icon,filter,largest){
@@ -341,23 +368,27 @@ class Search extends Component {
                         <div className='input-group'>
                             <div className={this.dropdownState('ingredients','input-group-btn')} onClick={this.blockPropagation}>
                                 <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
-                                    <span className="glyphicon glyphicon-list"></span>
+                                    {this.getGlyph('list')}
                                 </button>
                                 <div className="dropdown-menu">
-                                    <div className='dropdown-item' onClick={this.addFromPantry}>Add From Pantry<span className="pull-right"><span className="glyphicon glyphicon-download-alt"></span></span></div>
+                                    <div className='dropdown-item' onClick={this.addFromPantry}>
+                                        Add From Pantry{this.getJustifiedGlyph('download-alt')}
+                                    </div>
                                     <div role="separator" className="dropdown-divider"></div>                                    
-                                    <div className='dropdown-item' onClick={this.clearSearch}>Clear All<span className="pull-right"><span className="glyphicon glyphicon-trash"></span></span></div>
+                                    <div className='dropdown-item' onClick={this.clearSearch}>
+                                        Clear All{this.getJustifiedGlyph('trash')}
+                                    </div>
                                     <div role="separator" className="dropdown-divider"></div>
                                     <div className="dropdown-header">Added Ingredients</div>
                                     {[...this.state.ingredients].map(
                                         (ingredient)=>
-                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option">{this.getGlyph('remove')}</span></div>)
                                         )}
                                     {this.state.ingredients.size>0?'':<div className="dropdown-item"><i>You haven't added any ingredients!</i></div>}
                                     <div className="dropdown-header">Excluded Ingredients</div>
                                     {[...this.state.excluded].map(
                                         (ingredient)=>
-                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,2)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,2)}>{ingredient}<span className="pull-right hover-option">{this.getGlyph('remove')}</span></div>)
                                         )}
                                     {this.state.excluded.size>0?'':<div className="dropdown-item"><i>You haven't excluded any ingredients!</i></div>}
 
@@ -366,17 +397,17 @@ class Search extends Component {
                             <SearchBar form={this.refs.form} client={this.client} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
                             <span className='input-group-btn'>
                                 <button className='btn btn-success' type='button submit'>
-                                    <span className="glyphicon glyphicon-plus-sign"></span>
+                                    {this.getGlyph('plus-sign')}
                                 </button>
                             </span>
                             <span className='input-group-btn'>
                                 <button className='btn btn-danger' type='button' onClick={this.handleReject}>
-                                    <span className="glyphicon glyphicon-ban-circle"></span>
+                                    {this.getGlyph('ban-circle')}
                                 </button>
                             </span>
                             <div className={this.dropdownState('filters','input-group-btn')+' no-wrap-dropdown'} onClick={this.blockPropagation}>
                                 <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')}>
-                                    <span className="glyphicon glyphicon-filter"></span>
+                                    {this.getGlyph('filter')}
                                 </button>
                                 <div className="dropdown-menu dropdown-menu-right">
                                     {this.getFilterButton('Import Preferences','download-alt','custom')}                                    

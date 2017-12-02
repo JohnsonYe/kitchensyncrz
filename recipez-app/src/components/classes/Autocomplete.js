@@ -78,7 +78,7 @@ class Autocomplete{
     }
 
     search(node,str,idx){
-        if(idx >= str.length){//find some completions
+        if(idx === str.length){//find some completions
             return this.dfs(node,str.split(''))
         }
         let curr = str.charAt(idx);
@@ -115,6 +115,9 @@ class Autocomplete{
             result = result.concat(this.dfs(node.l,base))
         }
         base.push(node.v)
+        if(node.e!==undefined){
+            result = result.concat(base.join(''))
+        }
         if(node.c){
             // console.log(JSON.stringify(base))
             result = result.concat(this.dfs(node.c,base))
@@ -135,7 +138,7 @@ class Autocomplete{
     chainBuild(str,idx){
         // alert(str.substring(idx+1).split('').reduce((prev,next)=>{return prev.center=this.getNode(next)},this.getNode(str.charAt(idx))))
         var buildRoot = this.getNode(str.charAt(idx))
-        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot)
+        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot).e = '';
         return buildRoot
     }
 }
