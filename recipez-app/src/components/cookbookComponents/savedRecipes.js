@@ -50,7 +50,7 @@ class SavedRecipes extends Component{
     removeRecipe = (recipeName) => {
         this.userInstance.deleteRecipe(recipeName,this.getRecipeObjects);
 
-    }
+    };
 
     render(){
 
