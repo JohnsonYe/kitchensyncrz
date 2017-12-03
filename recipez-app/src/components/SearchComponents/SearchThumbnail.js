@@ -10,6 +10,7 @@ import React, {Component} from 'react';
 import {Modal} from 'react-bootstrap';
 import Recipe from '../pages/recipe';
 import RecipeHelper from '../classes/RecipeHelper';
+import MealEditor from '../pages/plannerPages/editMealPage';
 
 class SearchThumbail extends Component {
     constructor(props){
@@ -21,7 +22,6 @@ class SearchThumbail extends Component {
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this.heart = this.heart.bind(this);
-        this.calendar = this.calendar.bind(this);
         
     }
 
@@ -33,41 +33,39 @@ class SearchThumbail extends Component {
         this.setState( {quickView: false} );
     }
 
+    // add to cookbook/ favorite
     heart() {
-        alert("HELLO WORLD");
-    }
-
-    calendar() {
         alert("HELLO WORLD");
     }
 
     render() {
         var imgsrc= "http://www.maktabatulmadina.net/img/uploaded/730.jpg";
-        {this.props.data.Image ? imgsrc=this.props.data.Image : null}
+        {this.props.data.Image ? imgsrc=this.props.data.Image[0] : null}
         
         var ingredients = this.props.data.Ingredients.map((ingredient) => <li><span>{ingredient}</span></li>)
         var directions = this.props.data.Directions.map((step) => <li>{step}</li>)
         
         return(
-            <div className="col-lg-3 col-md-3 col-sm-6 search-thumbnail" >
+            <div className="col-lg-3 col-md-4 col-sm-6 search-thumbnail" >
                 {/* Need to check if recipe's img exists, if so use that */}
                 <a href={'/Recipes/'+ this.props.data.Name}>
                     <img src={imgsrc}
-                         className="card-img-top" />
+                         className="card-img-top foodpic" />
                 </a>
 
                 {/* View Recipe, Favorite, and Plan Meal buttons */}  
                 <div className="thumbnail-buttons row mx-auto">
-                    <a href="javascript:undefined;" onClick={this.open} className="btn btn-dark col-4 quickview">
+                    <a href="javascript:undefined;" onClick={this.open} className="btn btn-dark col-4 quickview"
+                        title="Quick View">
                         <img className="view"
                                 width="18"
                                 height="18"
                                 src="http://icons.iconarchive.com/icons/blackvariant/button-ui-system-apps/1024/Preview-2-icon.png" />
                     </a>
                     <Modal show={this.state.quickView} onHide={this.close}>
-                        <Modal.Header>{this.props.data.Name}</Modal.Header>
+                        <Modal.Header><h3>{this.props.data.Name}</h3></Modal.Header>
                         <Modal.Body>
-                            <img src={imgsrc} width="100%"/>
+                            <img className="modal-foodpic" src={imgsrc} width="100%"/>
                             <p>Difficulty: {this.props.data.Difficulty == "Undefined"?"Medium": this.props.data.Difficulty}</p>
                             <p>Rating: {RecipeHelper.getAvgRating(this.props.data)}</p>
                             <h3>Ingredients:</h3>
@@ -79,19 +77,18 @@ class SearchThumbail extends Component {
                                                                             
                         </Modal.Body>
                     </Modal>
-                    <a href="javascript:undefined;" onClick={this.heart} className="btn btn-dark col-4">
+                    <a href="javascript:undefined;" onClick={this.heart} className="btn btn-dark col-4"
+                        title="Save to CookBook">
                         <img className="heart"
                                 width="18"
                                 height="18"
                                 src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png" />
                     
                     </a>
-                    <a href="javascript:undefined;" onClick={this.calendar} className="btn btn-dark col-4">
-                        <img className="calendar"
-                                width="18"
-                                height="18"
-                                src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
-                    </a>
+                    <div className="col-4">
+                        <MealEditor url={this.props.data.Image[0]} recipe={this.props.data.Name} 
+                        duration={this.props.data.TimeCost} />
+                    </div>
                 </div>
 
                 <div className="card-body">

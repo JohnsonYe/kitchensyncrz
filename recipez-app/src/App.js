@@ -80,8 +80,8 @@ class App extends Component {
                             <a href="#" onClick={this.handleClick.bind(this)}>
                                 {this.state.isMenuOpened ?                                 
                                 //set to null if you want banana man to kill himself
-                                //<img className="ks-icon" src={imgsrc} />
-                                null
+                                <img className="ks-icon" src={imgsrc} />
+                                //null
                                 :
                                 <img className="ks-icon" src={imgsrc} />
                                 }
@@ -125,10 +125,11 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
+                    <div className="row">
                     <span className="col-2 pull-right fun-button">
-                    <button className="btn btn-primary btn-sm" onClick={this.toggleFunMode}>Hello There</button>
+                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Hello There</button>
                     </span>
-                    
+                    </div>
                 </div>
             </Router>
         );

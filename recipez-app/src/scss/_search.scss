@@ -132,6 +132,21 @@ $search-grad-end:#4dad1a;
     // min-height: 30px;
     // z-index:1;
     pointer-events: none;
+    background: #e0eff9;
+}
+
+.list-group-item {
+
+    background: #e0eff9;
+    border-radius: 10px;
+
+    a {
+        &:hover {
+            
+            margin-left: 2px;
+            text-decoration: none;
+        }
+    }
 }
 
 .search-adjust{

@@ -87,21 +87,16 @@ class Recipe extends Component {
         var updateComment = {username:'USERTESTING',Comment:this.state.value,Rating:'5',timestamp:'-1'}
 
         const carouselInstance = (
-            <Carousel id="Carousel" className="carousel" max-height="200px" max-width="400px">
-                <Carousel.Item>
-                    <img overflow="hidden" width="500px" height="400px" src="https://andyloweorg.files.wordpress.com/2017/10/file_5890583196d69functional-foods_1-1024x682.jpg?w=1024&h=576&crop=1" class="img-fluid " alt=""/>
+            <Carousel id="Carousel" className="carousel">
+                <Carousel.Item className="carousel-item">
+                    <img src="https://andyloweorg.files.wordpress.com/2017/10/file_5890583196d69functional-foods_1-1024x682.jpg?w=1024&h=576&crop=1" class="img-fluid " alt=""/>
+                </Carousel.Item>
+                <Carousel.Item className="carousel-item">
+                    <img src="http://foodandtravel.mx/home/wp-content/uploads/2017/07/1qTcIHK.jpg" class="img-fluid " alt=""/>
                 </Carousel.Item>
 
-                {/*<Carousel.Item>
-                    <img overflow="hidden" width="500px" height="400px" src={'/Basic Baked Spaghetti.jpg'} class="img-fluid " alt=""/>
-                </Carousel.Item>*/}
-
-                <Carousel.Item>
-                    <img overflow="hidden" width="500px" height="400px" src="http://foodandtravel.mx/home/wp-content/uploads/2017/07/1qTcIHK.jpg" class="img-fluid " alt=""/>
-                </Carousel.Item>
-
-                <Carousel.Item>
-                    <img overflow="hidden" width="500px" height="400px" src="http://cdn.shopify.com/s/files/1/0164/3912/files/tagliatelle_with_mushrooms_3_1024x1024.jpg?12754498851335701329" class="img-fluid " alt="1024x682"/>
+                <Carousel.Item className="carousel-item">
+                    <img src="http://cdn.shopify.com/s/files/1/0164/3912/files/tagliatelle_with_mushrooms_3_1024x1024.jpg?12754498851335701329" class="img-fluid " alt="1024x682"/>
                 </Carousel.Item>
             </Carousel>
         );
@@ -120,7 +115,7 @@ class Recipe extends Component {
                                 {carouselInstance}
                             </div>
 
-                            <div class="btn=group btn-group-sm">
+                            <div class="btn-group btn-group-sm">
                                 {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
                                 <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">
                                     <i class="glyphicon glyphicon-check"/>  check  </button>
@@ -170,7 +165,7 @@ class Recipe extends Component {
                                                     <br/>
                                                     <button onClick={(e)=>this.client.updateReview(this.state.data.Name,updateComment,this.updateReviews)}
                                                         class="btn btn-success btn-circle text-uppercase" type="submit" id="submitComment">
-                                                        <span class="glyphicon glyphicon-send"/> Summit comment
+                                                        <span class="glyphicon glyphicon-send"/> Submit comment
                                                     </button>
                                                 </span>
                                             </div>

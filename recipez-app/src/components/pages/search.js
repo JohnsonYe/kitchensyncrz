@@ -353,13 +353,13 @@ class Search extends Component {
                         {this.state.sorted.map((recipe)=>(
                             <li className="list-group-item">
                                 <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
-                                {(()=>{ //voodoo magic (IIFE) --> conditionally display recipe info, if it is loaded
+                                {(()=>{// (IIFE) --> conditionally display recipe info, if it is loaded
                                     let data = this.state.loadedRecipes.get(recipe[0]);
                                     if(data){
                                         return ([
                                             <div>Difficulty: {data.Difficulty == "Undefined"? "Medium": data.Difficulty}</div>,
                                             <div>Rating: 
-                                                {(()=>{ //more voodoo magic
+                                                {(()=>{ 
                                                     let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
                                                     for(let i=0;i<this.recipeHelper.maxRating;i++){
                                                         result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);

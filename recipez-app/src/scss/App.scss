@@ -52,6 +52,8 @@
   width: 80%;
   background: black;
   color: white;
+  border-right: solid 1px #e0eff9;
+
 
   ul, li {
     list-style-type: none;
@@ -60,6 +62,7 @@
     padding: 0px;
     width: auto;
     margin: 0 0 0 10px;  
+    
   }
 
   ul {
@@ -70,6 +73,13 @@
   a {
     color: white;
     font-size: 25px;
+
+    &:hover {
+      //color: #e0eff9;
+      color: lightgrey;
+      margin-left: 2px;
+      text-decoration: none;
+    }
   }
 
   .first {
@@ -115,8 +125,18 @@
   padding-top: 0;
 }
 
-.carousel {
-  height: auto;
-  width: auto;
-  overflow: hidden;
+.foodpic {
+  border: solid 2px black;
+  object-fit: cover;
+  min-width: 100%;
+  min-height: 400px;
+}
+
+.modal-foodpic {
+  border: solid 2px black;
+}
+
+.carousel-item {
+  height: 250px;
+  
 }
