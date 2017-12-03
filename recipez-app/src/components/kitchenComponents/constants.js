@@ -174,7 +174,7 @@ export const ItemForm = ( {addProtein,
             e.preventDefault();
 
             // Preventing empty answers
-            if( this.searchbar.getValue() !== '') {
+            if( this.searchbar.getValue().trim() !== '') {
 
                 // Call the add function for each group
                 switch( getKey ){
@@ -230,7 +230,7 @@ export const ExcludeForm = ({addExclude, internalClient}) => {
             e.preventDefault();
 
             // Preventing empty answers
-            if( this.prefSearchbar.getValue() !== '') {
+            if( this.prefSearchbar.getValue().trim() !== '') {
                 addExclude(this.prefSearchbar.getValue());
 
                 // Clearing
@@ -264,7 +264,7 @@ export const CookwareForm = ({addCookware}) => {
             e.preventDefault();
 
             // Preventing empty answers
-            if( input.value !== '') {
+            if( input.value.trim() !== '') {
 
                 addCookware(input.value);
 
