@@ -45,5 +45,21 @@ body {
   line-height: 24px;
 }
 
+.pbj-follower {
+  position:fixed;
+  pointer-events:none;
+  padding:0px;
+  // transition: top 0.5s ease-in-out,left 0.5s ease-out;
+  z-index:1000;
+  animation-name: rotate; 
+  animation-duration: 2s; 
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
 
 
