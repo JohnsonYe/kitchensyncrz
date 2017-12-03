@@ -223,8 +223,8 @@ class Planner extends Component {
                 </div>
                 <div className="col-9">
                     <MealEditor
-                        recipe={"Oven Pot Roast"}
-                        dur={"60 m"}
+                        recipe={"Marinade for Chicken"}
+                        dur={"1 h 20 m"}
                     />
                     <UpNextCard/>
                     {this.renderMealCards(today)}

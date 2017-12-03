@@ -122,6 +122,7 @@ class MealEditor extends Component {
             total,
             hr,
             endTime = "calculating ...",
+            day = 0,
             days =  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
         if(this.props.data && this.props.day && this.props.mealIndex) {
@@ -133,6 +134,8 @@ class MealEditor extends Component {
             startMin = strStartTime.substring(colon + 1, colon + 3);
             endTime = this.plannerHelper.getMealEndTime(props.data ,this.props.day, this.props.mealIndex);
             noon =  strStartTime.slice(-2);
+            day = this.props.day;
+
         }
 
         //convert duration to min
@@ -158,12 +161,10 @@ class MealEditor extends Component {
         endMin = total;
         endHr = hr;
 
-        console.log(dur);
-
         this.state = {
             days: days,
             showEditor: false,
-            dayOnBtn: days[this.props.day],
+            dayOnBtn: days[day],
             hourOnBtn: startHr,
             minOnBtn: startMin,
             noonOnBtn: noon,
@@ -220,7 +221,8 @@ class MealEditor extends Component {
         var user = User.getUser('user001');
         user.getPlanner((planner)=>{
             planner = transform(planner);
-            window.location.reload();
+            //if(thi.props.edit === true)
+                window.location.reload();
             user.setPlanner(planner,()=> {console.log('success');});
         })
     }
@@ -262,7 +264,7 @@ class MealEditor extends Component {
     add() {
         var hour = parseInt(this.state.hourOnBtn),
             min = parseInt(this.state.minOnBtn);
-       
+
         //convert to 24 hour
         if(this.state.noonOnBtn === "pm" && hour != 12) {
             hour = hour + 12;
@@ -294,7 +296,6 @@ class MealEditor extends Component {
         }else return(
             <ButtonToolbar>
                 <Button onClick={(e)=>this.update(this.add())}>Add</Button>
-                <Button bsStyle="danger" onClick={(e)=>this.update(this.remove())}>Remove</Button>
                 <Button onClick={this.close}>Close</Button>
             </ButtonToolbar>
         );
@@ -335,11 +336,13 @@ class MealEditor extends Component {
                 <Modal.Header>{this.props.recipe}</Modal.Header>
                 <Modal.Body>
                     <figure>
-                        <img
-                            className="img-fluid"
-                            src="http://twolovesstudio.com/wp-content/uploads/sites/5/2017/05/99-Best-Food-Photography-Tips-5-1.jpg"
-                            alt="No Image"
-                        />
+                        <a href ={"/Recipes/" + this.props.recipe}>
+                            <img
+                                className="img-fluid"
+                                src={this.props.url}
+                                alt="No Image"
+                            />
+                        </a>
                     </figure>
 
                     <Duration dur={this.props.dur}/>
