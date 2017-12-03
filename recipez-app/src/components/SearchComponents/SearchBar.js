@@ -6,6 +6,7 @@
  */
 import React, {Component} from 'react';
 import Autocomplete from '../classes/Autocomplete'
+import Util from '../classes/Util'
 
 class SearchBar extends Component{
     constructor(props){
@@ -195,11 +196,12 @@ class SearchBar extends Component{
 
 SearchBar.InternalClient = class{
     constructor(keyList){
-        this.autocomplete = new Autocomplete().loadList(keyList);
+        this.auto = Util.loadCompiledAutocompleteTree("Ingredients", "internal client" );
+        this.autocomplete = this.autocomplete.bind(this);
     }
 
     autocomplete(base,callback){
-        callback(this.autocomplete.getCompletion(base));
+        this.auto.then((auto)=>callback(auto.getCompletion(base)));
     }
 }
 

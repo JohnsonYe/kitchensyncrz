@@ -13,6 +13,9 @@ import Footer from '../footerComponent/footer'
 
 import User from '../classes/User'
 import Autocomplete from '../classes/Autocomplete'
+import Util from '../classes/Util'
+
+import SearchBar from '../SearchComponents/SearchBar'
 
 //call loadlist, list , get completion
 
@@ -24,7 +27,7 @@ class kitchen extends Component {
     constructor( props ){
         super( props );
         this.user = new User();
-        this.autocomplete = new Autocomplete();
+        this.autocomplete = Util.loadCompiledAutocompleteTree("Ingredients", "kitchen" );
 
         this.loadPantry();
         this.loadExcluded();
@@ -67,11 +70,14 @@ class kitchen extends Component {
             showCookware: false,
 
             key: "Protein",
-            modalKey: "Exclude"
+            modalKey: "Exclude",
+
+            query:'',
+            value:'',
+            selection:-1,
 
         };
 
-        this.autocomplete.loadList(this.state.list);
 
         this.getKey = this.getKey.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
@@ -149,16 +155,16 @@ class kitchen extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    internalClient(){
+        return new SearchBar.InternalClient();
+    }
     handleChange(e) {
 
+        var str = e.target.value;
         if(e.target.value.length > 0) {
-            //this.setState({list: this.autocomplete.getCompletion(e.target.value)})
-            //alert(this.autocomplete.getCompletion(e.target.value));
-            //this.autocomplete.getCompletion(e.target.value);
-            //this.autocomplete.loadList(this.state.list);
+            this.autocomplete.then((auto) => { this.setState({list: auto.getCompletion(str)}); })
         }
 
-        //alert( this.state.list );
     }
 
     // Read the json file
@@ -204,8 +210,8 @@ class kitchen extends Component {
     }
 
     processExcluded(data){
-        Object.entries(data).forEach((key) => {
-            this.addExclude(key[1]);
+        (data).forEach((key) => {
+            this.addExclude(key);
         })
     }
 
@@ -215,9 +221,9 @@ class kitchen extends Component {
 
     processPreference(data) {
         var prefs = [];
-        Object.entries(data).forEach((key) => {
-            prefs.push(key[1]);
-            this.setState({pref: this.state.pref.concat(key[1])});
+        (data).forEach((key) => {
+            prefs.push(key);
+            this.setState({pref: this.state.pref.concat(key)});
         })
     }
 
@@ -227,8 +233,8 @@ class kitchen extends Component {
     }
 
     processCookware(data){
-        Object.entries(data).forEach((key) => {
-            this.addCookware(key[1]);
+        (data).forEach((key) => {
+            this.addCookware(key);
         })
     }
 
@@ -571,7 +577,6 @@ class kitchen extends Component {
 
 
     render() {
-
         return(
 
             <div>
@@ -579,7 +584,6 @@ class kitchen extends Component {
                 <div className="jumbotron">
                     <h1>Kitchen</h1>
                 </div>
-
 
                 <div className="container">
 
@@ -712,6 +716,7 @@ class kitchen extends Component {
                                         addOther = {this.addOther.bind(this)}
                                         getKey = {this.getKey()}
                                         handleChange = {this.handleChange.bind(this)}
+                                        internalClient = {this.internalClient()}
                                     />
 
                                 </div>

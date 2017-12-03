@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import SearchBar from '../SearchComponents/SearchBar'
 
 
 //Creates the well and button object that shows up on the screen
@@ -164,7 +165,7 @@ export const ItemForm = ( {addProtein,
                        addGrain,
                        addOther,
                        getKey,
-                       handleChange} ) => {
+                       handleChange, internalClient} ) => {
 
     // Input Tracker
     let input;
@@ -175,52 +176,49 @@ export const ItemForm = ( {addProtein,
             e.preventDefault();
 
             // Preventing empty answers
-            if( input.value !== '') {
+            if( this.searchbar.getValue() !== '') {
 
                 // Call the add function for each group
                 switch( getKey ){
                     case "Protein":
-                        addProtein(input.value);
+                        addProtein(this.searchbar.getValue());
                         break;
                     case "Dairy":
-                        addDairy(input.value);
+                        addDairy(this.searchbar.getValue());
                         break;
                     case "Vegetable":
-                        addVegetable(input.value);
+                        addVegetable(this.searchbar.getValue());
                         break;
                     case "Fruit":
-                        addFruit(input.value);
+                        addFruit(this.searchbar.getValue());
                         break;
                     case "Grain":
-                        addGrain(input.value);
+                        addGrain(this.searchbar.getValue());
                         break;
                     case "Other":
-                        addOther(input.value);
+                        addOther(this.searchbar.getValue());
                         break;
                     default:
                         break;
                 }
 
                 // Clearing
-                input.value = '';
+                this.searchbar.reset();
             }
         }}>
+        <div className = "input-group">
+            <SearchBar client = {internalClient} ref={(searchbar)=>{this.searchbar = searchbar}}/>
 
-            <div className = "input-group">
-                <input className = "form-control" type = "text" id = "enter"
-                       autocomplete = "off"
-                       placeholder = "Pick a category and enter food items . . ."
-                       ref = { node => { input = node; }}
-                       onChange = {handleChange}
-                />
                 <span className = "input-group-btn">
                         <button className = "btn btn-success"
                                 type = "submit"
-                                title = "Add to list">
+                                title = "Add to list"
+                                >
                             <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>
-            </div>
+        </div>
+
         </form>
     );
 };
@@ -249,6 +247,7 @@ export const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
                 input.value = '';
             }
         }}>
+
 
             <div className="input-group">
                 <input className="form-control" type= "text" id = "enter"
