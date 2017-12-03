@@ -16,6 +16,7 @@ import {Button} from 'react-bootstrap';
 import DynamicList from "../../dynamicList"
 import MealEditor from "./editMealPage"
 import PlannerHelper from "../../classes/Planner";
+import User from '../../classes/User';
 
 /**Lets the user know what recipe is up next to cook will be placed in Daily Meal Planner*/
 function UpNextCard(props){
@@ -46,9 +47,10 @@ function DailyPlannerItem(props) {
                                 recipe={props.recipe}
                                 day={props.day}
                                 mealIndex={props.mealIndex}
+                                dur={props.dur}
                                 edit={true}
                     />
-                    <p className="">{props.start} to {props.end} - {0}</p>
+                    <p className="">{props.start} to {props.end} - {props.dur}</p>
                 </div>
             </div>
     );
@@ -63,9 +65,11 @@ function ShoppingListItem(props) {
 class Planner extends Component {
     constructor(props) {
         super(props);
-        this.update = this.update.bind(this);
         var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            data = new PlannerHelper(this.update);
+            //data = new PlannerHelper(this.update),
+            user = User.getUser("user001");
+
+        this.plannerHelper = new PlannerHelper();
 
         this.state = {
             days: days,
@@ -73,12 +77,14 @@ class Planner extends Component {
             numShopItems: 0,
             numMealsPrepared: 0,
             items: [],
-            mealData: data,
+            mealData:null,
         };
 
-        this.addMeal = this.addMeal.bind(this);
+        user.getPlanner((planner)=>{
+            this.setState({mealData:planner});
+        });
+
         this.removeMeal = this.removeMeal.bind(this);
-        //this.update = this.update.bind(this);
         this.loadNumMeals = this.loadNumMeals.bind(this);
         this.addItem = this.addItem.bind(this);
         this.removeItem = this.removeItem.bind(this);
@@ -93,24 +99,19 @@ class Planner extends Component {
 
     /** Functionality Methods **/
 
-    /**
-     * Adds a meal to the list
-     */
-    addMeal() {
-    }
-
 
     /** TODO Removes card from Daily Meal Planner*/
     removeMeal() {
         if( this.state.numMeals > 0) {
-            this.state.mealData.removeMeal(0,0);
+            this.plannerHelper.removeMeal(this.state.mealData,0,0);
         }
     }
 
     /** Pass to modal and call after they save or remove something*/
     update() {
-        this.setState( {mealData: this.state.mealData} )
+        this.setState( {mealData: this.state.mealData} );
     }
+
     /**
      * Adds a item to the list
      */
@@ -134,27 +135,28 @@ class Planner extends Component {
     /**===============================================================================================================*/
 
     /** Render Items Start **/
-    renderMeal(recipe, day, mealIndex) {
+    renderMeal(day, mealIndex) {
         return (
             <DailyPlannerItem
                 data = {this.state.mealData}
-                recipe = {recipe}
-                start = {this.state.mealData.getMealStartTime(day, mealIndex)}
-                end = {this.state.mealData.getMealEndTime(day, mealIndex)}
+                recipe = {this.plannerHelper.getMealRecipeName(this.state.mealData,day, mealIndex)}
+                start = {this.plannerHelper.getMealStartTime(this.state.mealData ,day, mealIndex)}
+                end = {this.plannerHelper.getMealEndTime(this.state.mealData,day, mealIndex)}
                 day = {day}
+                dur={this.plannerHelper.getDuration(this.plannerHelper.getMeal(this.state.mealData, day, mealIndex))}
                 mealIndex = {mealIndex}
             />
         );
     }
 
     renderMealCards(day) {
-        if(this.state.mealData.isLoaded())
-            var meals = this.state.mealData.getDayMealList(day);
+        if(this.state.mealData)
+            var meals = this.plannerHelper.getDayMealList(this.state.mealData,day);
         else return (<div>Loading ...</div>);
 
         return (
             Object.keys(meals).map((key) => {
-                return this.renderMeal(this.state.mealData.getMealRecipeName(day, key), day, key);
+                return this.renderMeal(day, key);
             })
         );
     }
@@ -220,6 +222,10 @@ class Planner extends Component {
                     </div>
                 </div>
                 <div className="col-9">
+                    <MealEditor
+                        recipe={"Oven Pot Roast"}
+                        dur={"60 m"}
+                    />
                     <UpNextCard/>
                     {this.renderMealCards(today)}
                 </div>
@@ -276,9 +282,10 @@ class Planner extends Component {
     /**Loads the numbers of Meals*/
     loadNumMeals(day) {
         var numMeals = 0;
-        if(this.state.mealData.isLoaded())
-            var numMeals = this.state.mealData.getNumMeals(day);
+        if(this.state.mealData)
+            numMeals = this.plannerHelper.getNumMeals(this.state.mealData, day);
         else return (<div>Loading ...</div>);
+
         return numMeals;
     }
 

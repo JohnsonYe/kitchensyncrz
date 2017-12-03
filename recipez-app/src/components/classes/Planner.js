@@ -1,36 +1,16 @@
 /**
  * Title: Planner.js
- * Authors: Alexander Haggart, Andrew Sanchez(backend implementation)
+ * Authors: Andrew Sanchez(backend implementation)
  * Date Created: 11/13/2017
  * Description: This file will assist in database transactions involving the planner feature.
  */
-import DBClient from "./AWSDatabaseClient";
-import User from './User';
 
 class PlannerHelper{
 
-    constructor(callback){
-        this.client = DBClient.getClient();
-        this.user = User.getUser(this.client.getUsername());
-
-        //Access Meal Data data.days[dayOfTheWeek].mealData[mealIndex]
-        this.data = undefined;
-        this.getMealData( (data) => {
-            this.data = data;
-            this.loaded = true;
-            callback();
-        });
-    }
-
-
-    isLoaded() {
-        return this.loaded;
-    }
-
-    removeMeal(day, mealIndex){
-        this.data.days[day].mealData.splice(0,mealIndex);
-        //push change to database
-        this.pushMealData();
+    removeMeal(data, day, mealIndex){
+        if(data.days[day].mealData[mealIndex]) {
+            data.days[day].mealData.splice(mealIndex, 1);
+        }
     }
 
     /** Insert meal into planner
@@ -38,46 +18,49 @@ class PlannerHelper{
      * @param meal - meal object to be inserted
      * @return pass/fail 1 pass, -1 fail
      */
-    insertMeal(meal, day) {
+    insertMeal(data, meal, day) {
         // create an array of just the current days meals for easy access
-        var meals = this.getDayMealList(day),
+        var meals = this.getDayMealList(data, day),
             mealIndex = 0;
 
-        //if empty
-        alert(JSON.stringify(meals));
-        alert(JSON.stringify(meal));
-
         //if meals has not been instantiated
-        if(meals.length == 0) {
-            this.data.days[day].mealData.push(meal);
-            this.pushMealData();
-            return 1;
+        if (meals.length == 0) {
+            console.log(JSON.stringify(meal));
+            data.days[day].mealData.push(meal);
+            return;
         }
 
         // Go through meals looking at each end times to ensure that this meals
         // start time is greater than meal before's end time.
-        while (meal.startHr > meals[mealIndex].endHr &&
-                meal.startMin > meals[mealIndex].endMin) {
-            mealIndex++;
+        for (var i = 0; i < meals.length; i++) {
+            if (meal.startHr > meals[i].endHr) {
+                mealIndex += 1;
+            }
+            else if (meal.startHr === meals[i].endHr) {
+                if( meal.startMin > meals[i].endMin ) {
+                    mealIndex += 1;
+                }
+            }
         }
 
+        alert(JSON.stringify(mealIndex));
+        alert(JSON.stringify(meals));
+
         //if mealIndex is out of bound then add to the end
-        if(mealIndex == meals.length) {
-            this.data.days[day].mealData.push(meal);
-            //push change to database
-            this.pushMealData();
-            return 1;
+        if(mealIndex === meals.length) {
+            data.days[day].mealData.push(meal);
         }
         // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
-        else if ( meal.endHr < meal[mealIndex + 1].startHr &&
-            meal.endMin < meal[mealIndex + 1].endMin ) {
-            //insertMeal (index, remove, object to add)
-            this.data.days[day].mealData.splice(mealIndex,0,meal);
-            //push change to database
-            this.pushMealData();
-            return 1;
+        else if ( meal.endHr < meals[mealIndex-1].startHr) {
+            console.log("pushed");
+            data.days[day].mealData.splice(mealIndex, 0, meal);
         }
-        else return -1;  //overlap
+        else if( meal.endHr === meals[mealIndex-1].startHr ) {
+            if( meal.endMin < meals[mealIndex-1].startMin) {
+                console.log("pushed");
+                data.days[day].mealData.splice(mealIndex, 0, meal);
+            }
+        }
     }
      /**
       * This function creates a meal object that could be added to one of the entries in mealData.
@@ -95,14 +78,20 @@ class PlannerHelper{
              recipes = [];
 
          recipes.push(recipe);
-         total = startMin + parseInt(dur);
-         hr = Math.floor(total/60);
-         endMin = total - (hr)*(60);
-         endHr = startHr + hr;
+         total = startMin + dur;
+         hr = startHr;
+
+         while( total >= 60) {
+             total = total - 60;
+             hr += 1;
+         }
+
+         endHr = hr;
+         endMin = total;
 
          //check if hr passed to the next day
-         if( endHr >= 24) {
-             endHr = (24 - endHr) * (-1);  //converts to correct time
+         while( endHr >= 24) {
+             endHr = endHr - 24;  //converts to correct time
          }
 
          //create meal object
@@ -120,34 +109,24 @@ class PlannerHelper{
      * @param mealIndex - the index of the meal you want to edit
      * @param meal - new meal object to replace the old one.
      */
-    editMeal(day, mealIndex, meal) {
+    editMeal(data, day, mealIndex, meal) {
         // check if meal exist
-        if(this.data.days[day].mealData[mealIndex]) {
-            this.data.days[day].mealData[mealIndex] = meal;
-        }
+        this.removeMeal(data, day, mealIndex);
+        this.insertMeal(data, meal, day);
     }
 
 
     /** Gives the an array of meals for that day
       * @param day - day you want the meal list of*/
-     getDayMealList(day) {
-         //alert(JSON.stringify(this.data));
-         return this.data.days[day].mealData;
+     getDayMealList(data, day) {
+         //alert(JSON.stringify(data));
+         return data.days[day].mealData;
      }
 
-     /** Give an meal object
-      * @param day - day the meal wanted is in
-      * @param mealIndex - index of the meal you want
-      */
-     getMeal(day, mealIndex) {
-         return this.data.days[day].mealData[mealIndex];
-     }
-
-
-     getMealRecipeName(day, mealIndex){
-         //alert(JSON.stringify(this.data.days));
-         if(this.data.days[day].mealData[mealIndex].recipes) {
-             return this.data.days[day].mealData[mealIndex].recipes[0];
+     getMealRecipeName(data, day, mealIndex){
+         //alert(JSON.stringify(data.days));
+         if(data.days[day].mealData[mealIndex].recipes) {
+             return data.days[day].mealData[mealIndex].recipes[0];
 
          }else return "Unavailable";
      }
@@ -156,70 +135,117 @@ class PlannerHelper{
       * @param day - day the meal wanted is in
       * @param mealIndex - index of the meal you want
       */
-     getMealStartTime(day, mealIndex) {
+     getMealStartTime(data, day, mealIndex) {
 
-         var hour = this.data.days[day].mealData[mealIndex].startHr,
-             min = this.data.days[day].mealData[mealIndex].startMin,
+         var hour = data.days[day].mealData[mealIndex].startHr,
+             min = data.days[day].mealData[mealIndex].startMin,
              noon = "am";
-         if(hour && min) {
-             if(hour == 12) {
-                 noon = "pm";
-             }
-             if(hour > 12) {
-                 hour = (12 - hour)*(-1);
-                 noon = "pm"
-             }
-             return hour + ":" + min + " " + noon ;
+
+         if(hour === 12) {
+             noon = "pm";
          }
-         else return "Unavailable";
+         else if(hour > 12) {
+             hour = (hour - 12);
+             noon = "pm"
+         }
+         else if(hour === undefined) {  //undefined
+             hour = 12;
+             noon = "am";
+         }
+
+         if(min < 10) {
+            min = "0"+min;
+         }else if (min === undefined){ //undefined
+             min = "00";
+         }
+
+         return hour + ":" + min + " " + noon ;
      }
+
+     getMeal(data,day, mealIndex) {
+         return this.getDayMealList(data, day)[mealIndex];
+     }
+
+     /** gets duration string form*/
+     getDuration(meal) {
+         let startHr = meal.startHr,
+             startMin = meal.startMin,
+             endHr = meal.endHr,
+             endMin = meal.endMin;
+
+         if(meal.startMin === undefined) {
+             startMin = 0;
+         }
+
+         if(meal.endMin === undefined) {
+             endMin = 0;
+         }
+
+         if(meal.startHr === undefined) {
+             startHr = 0;
+         }
+
+         if(meal.endHr === undefined) {
+             endHr = 0;
+         }
+
+         let min = endMin - startMin;
+         let hr = endHr - startHr;
+
+         //alert(JSON.stringify(meal.endMin));
+
+         if(min === undefined) {
+             min = "0";
+         }
+
+         if(hr === undefined){
+             hr = "0";
+         }
+
+         if( endHr - startHr === 0) {
+             return (min) + " m";
+         }
+         else {
+             return (hr) + " h " + (min) + " m";
+         }
+     }
+
 
     /** Gives meals end time startHr: startMin
      * @param day - day the meal wanted is in
      * @param mealIndex - index of the meal you want
      */
-     getMealEndTime(day, mealIndex) {
-        var hour = this.data.days[day].mealData[mealIndex].endHr,
-            min = this.data.days[day].mealData[mealIndex].endMin,
+     getMealEndTime(data, day, mealIndex) {
+        var hour = data.days[day].mealData[mealIndex].endHr,
+            min = data.days[day].mealData[mealIndex].endMin,
             noon = "am";
-        if(hour && min) {
-            if(hour == 12) {
-                noon = "pm";
-            }
-            if(hour > 12) {
-                hour = (12 - hour)*(-1);
-                noon = "pm"
-            }
-            return hour + ":" + min + " " + noon ;
+
+        if(hour === 12) {
+            noon = "pm";
         }
-        else return "Unavailable";
+        else if(hour > 12) {
+            hour = (hour - 12);
+            noon = "pm"
+        }
+        else if (hour === undefined){  //undefined
+            hour = 12;
+            noon = "am";
+        }
+
+        if(min < 10) {
+            min = "0"+min;
+        }else if(min === undefined){ //undefined
+            min = "00";
+        }
+
+        return hour + ":" + min + " " + noon ;
      }
 
-     /** This function retrieves the number of meeals for a specified day*/
-     getNumMeals(day){
-         if(this.data.days[day].mealData.length)
-             return this.data.days[day].mealData.length;
+     /** This function retrieves the number of meals for a specified day*/
+     getNumMeals(data, day){
+         if(data.days[day].mealData.length)
+             return data.days[day].mealData.length;
          else return 0;
-     }
-
-     /**
-      * This function will retrieve the users mealData array that is currently in the DataBase
-      * @returns [] Array of meal
-      */
-     getMealData(callback) {
-         return this.user.getUserData('planner').then((e)=>{//alert(JSON.stringify(e));
-         callback(e)});
-     }
-
-     /**
-      * Pushes the local mealData containing changes user made to Database
-      */
-     pushMealData() {
-         this.client.updateItem(
-             this.client.buildUpdateRequest(
-                 'User','username',this.client.getUsername(),
-                 this.client.buildSetUpdateExpression('planner', {M:DBClient.getClient().packItem(this.data, User.PlannerPrototype)})),
-             (response)=>{JSON.stringify(response.payload)})
      }
 }
 

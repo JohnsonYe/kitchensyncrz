@@ -10,14 +10,15 @@
  */
 import React, { Component } from 'react';
 import {Button, Modal, DropdownButton, MenuItem, ButtonToolbar} from 'react-bootstrap';
-import RecipeHelper from "../../classes/RecipeHelper";
+import PlannerHelper from '../../classes/Planner';
+import User from '../../classes/User';
 
 
 function Duration(props) {
     return (
         <div>
             <div className="d-sm-inline-block">
-                <h4>Cooking Duration</h4>
+                <h4>{props.dur}</h4>
             </div>&nbsp;
             <div className="d-sm-inline-block">
                 <img
@@ -112,19 +113,52 @@ class MealEditor extends Component {
     constructor(props) {
         super(props);
 
-        var strStartTime = props.data.getMealStartTime(this.props.day, this.props.mealIndex),
-            startHr = "12",
+        this.plannerHelper = new PlannerHelper();
+        let startHr = "12",
             startMin = "00",
             noon = "pm",
+            endHr = 0,
+            endMin = 0,
+            total,
+            hr,
             endTime = "calculating ...",
-            days =  ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+            days =  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-        if(strStartTime != "Unavailable" ) {
+        if(this.props.data && this.props.day && this.props.mealIndex) {
+            var strStartTime = this.plannerHelper.getMealStartTime(props.data, this.props.day, this.props.mealIndex);
             var colon = strStartTime.indexOf(":");
+            console.log(strStartTime);
+
             startHr = strStartTime.substring(0,colon);
             startMin = strStartTime.substring(colon + 1, colon + 3);
-            endTime = props.data.getMealEndTime(this.props.day, this.props.mealIndex);
+            endTime = this.plannerHelper.getMealEndTime(props.data ,this.props.day, this.props.mealIndex);
+            noon =  strStartTime.slice(-2);
         }
+
+        //convert duration to min
+        let dur = 0;
+        if(this.props.dur.length > 4) {
+            let temp, temp2;
+            temp = this.props.dur.slice(0,2);
+            temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
+
+            //total min
+            dur = parseInt(temp)*60 + parseInt(temp2);
+        }else {
+            dur = parseInt(this.props.dur);
+        }
+
+        total = parseInt(startMin) + dur;
+        hr = parseInt(startHr);
+        while( total >= 60) {
+            total = total - 60;
+            hr += 1;
+        }
+
+        endMin = total;
+        endHr = hr;
+
+        console.log(dur);
 
         this.state = {
             days: days,
@@ -133,16 +167,21 @@ class MealEditor extends Component {
             hourOnBtn: startHr,
             minOnBtn: startMin,
             noonOnBtn: noon,
-            endtime: endTime
+            endtime: endHr+":"+endMin,
+            dur: dur  //duration in minutes
         };
 
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
-        this.save = this.save.bind(this);
+        this.edit = this.edit.bind(this);
+        this.add = this.add.bind(this);
+        this.update = this.update.bind(this);
+        this.remove = this.remove.bind(this);
         this.handleDaySelection = this.handleDaySelection.bind(this);
         this.handleHourSelection = this.handleHourSelection.bind(this);
         this.handleMinSelection = this.handleMinSelection.bind(this);
         this.handleNoonSelection = this.handleNoonSelection.bind(this);
+        this.renderButtonToolBar = this.renderButtonToolBar.bind(this);
     }
 
     /** Updates day on button */
@@ -177,8 +216,88 @@ class MealEditor extends Component {
     }
 
     /** creates/overwrites meal to the meal */
-    save() {
+    update(transform) {
+        var user = User.getUser('user001');
+        user.getPlanner((planner)=>{
+            planner = transform(planner);
+            window.location.reload();
+            user.setPlanner(planner,()=> {console.log('success');});
+        })
+    }
 
+    remove() {
+        let transform = (planner)=> {
+            this.plannerHelper.removeMeal(this.props.data,
+                                            this.props.day,
+                                            this.props.mealIndex);
+            return this.props.data;
+        };
+        return transform;
+    }
+
+    edit() {
+        var hour = parseInt(this.state.hourOnBtn),
+            min = parseInt(this.state.minOnBtn);
+
+        //convert to 24 hour
+        if(this.state.noonOnBtn === "pm") {
+            hour = hour + 12;
+        }else if(this.state.noonOnBtn === "am" && hour === 12) {
+            hour = hour - 12;
+        }
+
+        let transform = (planner)=> {
+            this.plannerHelper.editMeal(this.props.data,
+                                        this.props.day,
+                                        this.props.mealIndex,
+                                        this.plannerHelper.createMeal(this.props.recipe,
+                                                                        this.state.dur,
+                                                                        hour,
+                                                                        min));
+            return this.props.data;
+        };
+        return transform;
+    }
+
+    add() {
+        var hour = parseInt(this.state.hourOnBtn),
+            min = parseInt(this.state.minOnBtn);
+       
+        //convert to 24 hour
+        if(this.state.noonOnBtn === "pm" && hour != 12) {
+            hour = hour + 12;
+        }else if(this.state.noonOnBtn === "am" && hour === 12) {
+            hour = hour - 12;
+        }
+
+        let transform = (planner)=>{
+            this.plannerHelper.insertMeal( planner,
+                                            this.plannerHelper.createMeal(this.props.recipe,
+                                                                            this.state.dur,
+                                                                            hour,
+                                                                            min),
+                                            this.state.days.indexOf(this.state.dayOnBtn));
+            return planner;
+        };
+        return transform;
+    }
+
+    renderButtonToolBar() {
+        if(this.props.edit) {
+            return (
+                <ButtonToolbar>
+                    <Button onClick={(e)=>this.update(this.edit())}>Save</Button>
+                    <Button bsStyle="danger" onClick={(e)=>this.update(this.remove())}>Remove</Button>
+                    <Button onClick={this.close}>Close</Button>
+                </ButtonToolbar>
+            );
+        }else return(
+            <ButtonToolbar>
+                <Button onClick={(e)=>this.update(this.add())}>Add</Button>
+                <Button bsStyle="danger" onClick={(e)=>this.update(this.remove())}>Remove</Button>
+                <Button onClick={this.close}>Close</Button>
+            </ButtonToolbar>
+        );
     }
 
 
@@ -190,7 +309,7 @@ class MealEditor extends Component {
                     onClick={this.open}>{this.props.recipe}
                 </a>
             ),
-            createButton = (
+            addButton = (
                 <a className="btn btn-light"
                     onClick={this.open}>
                     <img alt="planner"
@@ -206,7 +325,7 @@ class MealEditor extends Component {
             button = editButton;
         }
         else {
-            button = createButton;
+            button = addButton;
         }
 
         return (
@@ -223,7 +342,7 @@ class MealEditor extends Component {
                         />
                     </figure>
 
-                    <Duration />
+                    <Duration dur={this.props.dur}/>
                     <div className="border
                                     border-dark
                                     border-top-0
@@ -250,11 +369,7 @@ class MealEditor extends Component {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <ButtonToolbar>
-                        <Button onClick={this.save}>Save</Button>
-                        <Button bsStyle="danger" onClick={null}>Delete</Button>
-                        <Button onClick={this.close}>Close</Button>
-                    </ButtonToolbar>
+                    {this.renderButtonToolBar()}
                 </Modal.Footer>
             </Modal>
             </div>
