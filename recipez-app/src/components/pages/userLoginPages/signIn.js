@@ -14,6 +14,7 @@ import {
     Link,
 } from 'react-router-dom';
 import DBClient from "../../classes/AWSDatabaseClient";
+import User from "../../classes/User";
 
 
 class SignIn extends Component{
@@ -22,7 +23,7 @@ class SignIn extends Component{
         super(props);
 
         this.client = DBClient.getClient();
-
+        this.user = 
         this.state = {
             userName: '',
             password: '',
@@ -34,6 +35,7 @@ class SignIn extends Component{
             await this.client.login(this.state.userName, this.state.password);
             this.client.authenticated = true;
             this.client.user = this.state.userName;
+            User.getUser().reload();
             //alert(this.client.getUsername());
             this.props.history.push("/Search");
         } catch (e) {

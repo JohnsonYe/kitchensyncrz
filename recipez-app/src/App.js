@@ -31,6 +31,7 @@ import Recipe from "./components/pages/recipe";
 import DBClient from "./components/classes/AWSDatabaseClient";
 import SignIn from './components/pages/userLoginPages/signIn';
 import Register from "./components/pages/userLoginPages/register";
+import User from "./components/classes/User";
 
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
@@ -76,6 +77,7 @@ class App extends Component {
         this.client.signOutUser();
         this.client.authenticated = false;
         this.client.user = 'user001';
+        User.getUser().reload();
         //alert(this.client.isLoggedIn());
     }
 

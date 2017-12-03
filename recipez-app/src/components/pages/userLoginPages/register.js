@@ -66,7 +66,7 @@ class Register extends Component{
             this.client.authenticated = true;
             this.client.user = this.state.userName;
             this.client.authUser();
-            this.user.createUser(this.state.userName);
+            this.user.createUser(this.state.userName,()=>User.getUser().reload());
             this.props.history.push("/Search");
         } catch (e) {
             alert(e);

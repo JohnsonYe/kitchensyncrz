@@ -38,7 +38,7 @@ class Search extends Component {
 
         this.planner = new PlannerHelper();
 
-        this.user = new User();
+        this.user = User.getUser();
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
         this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
@@ -252,7 +252,7 @@ class Search extends Component {
 
     mortensButton(){
         this.setState({morten: this.user.client.getUsername()});       
-        User.getUser('user001').getPreferences(console.log)
+        //User.getUser('user001').getPreferences(console.log)
         // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
         
@@ -304,29 +304,17 @@ class Search extends Component {
         };
 
 
-        //User dispenses data asynchronously in a very controlled manner, so we need two calls
-        //to get  the "pantry" and the "excluded" data fields
-        let addPromises = User.getUser('user001').getUserData('pantry').then((data)=>{
-                //wrap the array of promises we get back inside a Promise.all to get everything in sync     
-                return Promise.all(this.massUpdateSearch(Object.keys(data),1/* ADD */,true)
-                //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
-                .map((updatePromise)=>updatePromise.catch(update_failed_fn)))
-            })
+        User.getUser(this.user.client.getUsername()).getUserData('pantry').then((data)=> {
+            Promise.all(
+                //get an array of update promises
+                this.massUpdateSearch(Object.keys(data), 1/* ADD */)
+            )
+                .then(filter_failed_results_fn)
+                .then(sort_results_and_update_fn)
+                .catch((err) => console.error(err))
 
-        let excludePromises = User.getUser('user001').getUserData('exclude').then((data)=>{
-            return Promise.all(this.massUpdateSearch(data,0/* EXCLUDE */,true)
-            .map((updatePromise)=>updatePromise.catch(update_failed_fn)))
-        })
 
-        Promise.all(
-            //both inner Promise.all's must resolve before we act on the data
-            [addPromises,excludePromises]
-        )
-        .then( filter_failed_results_fn )
-        .then( sort_results_and_update_fn )
-        .catch((err)=>console.error(err))
-        
-    }
+        })}
 
     getGlyph(name){
         return (<span className={"glyphicon glyphicon-"+name}></span>);
