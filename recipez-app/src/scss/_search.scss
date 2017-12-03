@@ -185,6 +185,10 @@ $search-grad-end:#4dad1a;
 .group-spacer{
     margin-left:10px;
 }
+
+.visual-reorder{
+    transition:position 0.5s linear;
+}
 // .badge-notify{
 //    background:red;
 //    position:relative;

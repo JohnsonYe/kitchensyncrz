@@ -69,6 +69,10 @@ class Autocomplete{
             }
         } else {
             if(node.c){
+                if(idx===str.length-1){
+                    node.e = '';
+                    return
+                }
                 this.insert(node.c,str,idx+1)
             } else {
                 node.c = this.chainBuild(str,idx+1)
