@@ -19,6 +19,10 @@ import limeImage from '../../Image/SplashScreen/lime.jpg';
 import lemonImage from '../../Image/SplashScreen/lemon.jpg';
 import peachImage from '../../Image/SplashScreen/peach.jpg';
 import tacoImage from '../../Image/SplashScreen/taco.jpg';
+import cookbookIcon from '../../Image/SplashScreen/cookbookFinal.jpg.jpeg';
+import kitchenIcon from '../../Image/SplashScreen/kitchen2.jpg';
+import calendarIcon from '../../Image/SplashScreen/calendarFinal.jpg';
+import plannerIcon from '../../Image/SplashScreen/black.png';
 
 const popoverBottom = (
     <Popover id="popover-positioned-bottom" title="About Browse">
@@ -126,7 +130,7 @@ class Homepage extends Component {
                         </Col>
 
                         <Col sm={3}>
-                            <Image src={browseIcon} circle responsive />
+                            <Image src={cookbookIcon} circle responsive />
                             <h2 className="feature-style">Cookbook</h2>
                             <p> Cookbook is where you can save your favorite recipes for easy access. It will
                                 also serve as the home for any recipes the user themselves uploaded to Kitchen Sync’s
@@ -141,7 +145,7 @@ class Homepage extends Component {
                         </Col>
 
                         <Col sm={3}>
-                            <Image src={browseIcon} circle responsive />
+                            <Image src={kitchenIcon} circle responsive />
                             <h2 className="feature-style">Kitchen</h2>
                             <p> Kitchen is where users can personalize the app and set their preferences. They
                                 can add and remove items in their Pantry, which will tell <strong>Kitchen Sync </strong>
@@ -156,7 +160,7 @@ class Homepage extends Component {
                         </Col>
 
                         <Col sm={3}>
-                            <Image src={browseIcon} circle responsive />
+                            <Image src={calendarIcon} circle responsive />
                             <h2 className="feature-style">Planner</h2>
                             <p> Meal Planner will help users to plan ahead and be ready for meals they plan to
                                 cook beforehand. Users will be able to plan a recipe for a certain date, and Kitchen
