@@ -4,18 +4,19 @@
  * Date Created: 11/8/17
  * Description: This file will handle user data operations through the DBClient
  */
- import DBClient from './AWSDatabaseClient'
+import DBClient from './AWSDatabaseClient'
 
 
- /**
-  * SINGLETON CLASS --> USE User.getUser() to get the shared instance
-  */
+/**
+ * SINGLETON CLASS --> USE User.getUser() to get the shared instance
+ */
 
-  // Trying to create new branch - Morten
+    // Trying to create new branch - Morten
 
- class User {
+class User {
     constructor(){
         this.client = DBClient.getClient()
+        this.client.registerPrototype(User.PantryItemPrototype)
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -92,6 +93,7 @@
             (response)=>{
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully remove from Cookbook')
                         delete data.cookbook[recipeName];
                         return data
                     })
@@ -110,7 +112,7 @@
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
                 //set cookbook[recipeObject.Name] = (data)
-                this.client.buildMapUpdateExpression('cookbook',recipeObject.Name,{S:JSON.stringify(recipeObject)})), 
+                this.client.buildMapUpdateExpression('cookbook',recipeObject.Name,{S:JSON.stringify(recipeObject)})),
             (response)=>{ //if the request succeeds, 'add' to the local use data by transforming it in a then clause
                 if(response.status){
                     this.addUserData((data)=>{
@@ -131,10 +133,11 @@
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
                 //set cookbook[recipeName] = 'none'
-                this.client.buildMapUpdateExpression('cookbook',recipeName,{S:'none'})), 
+                this.client.buildMapUpdateExpression('cookbook',recipeName,{S:'none'})),
             (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully add to Cookbook')
                         data.cookbook[recipeName]='none';
                         return data;
                     })
@@ -156,7 +159,7 @@
      * }
      */
     getPantry(callback){
-         return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
     }
 
 
@@ -172,11 +175,11 @@
                     this.addUserData((data)=>{
                         data.pantry[ingredient] = {amount:amount,unit:unit};
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
     removeFromPantry(ingredient){
@@ -191,15 +194,16 @@
                     this.addUserData((data)=>{
                         delete data.pantry[ingredient];
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
     getCookbook(callback){
-        return this.getUserData('cookbook').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('cookbook').then(response=>{callback(response)})
+        /*alert(JSON.stringify(response));*/
     }
 
 
@@ -215,11 +219,11 @@
                     this.addUserData((data)=>{
                         data.cookbook[recipe] = {info:info};
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
     removeFromCookbook(recipe){
@@ -234,11 +238,11 @@
                     this.addUserData((data)=>{
                         delete data.cookbook[recipe];
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
 
@@ -259,11 +263,11 @@
                     this.addUserData((data)=>{
                         data.cookware[item] = {item:item};
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
     removeFromCookware(item){
@@ -278,11 +282,11 @@
                     this.addUserData((data)=>{
                         delete data.cookware[item];
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
 
@@ -303,11 +307,11 @@
                     this.addUserData((data)=>{
                         data.exclude[ingredient] = {ingredient:ingredient};
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
 
@@ -323,11 +327,11 @@
                     this.addUserData((data)=>{
                         delete data.exclude[ingredient];
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
     getShoppingList(callback){
@@ -347,11 +351,11 @@
                     this.addUserData((data)=>{
                         data.shoppingList[item] = {item:item};
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
     removeFromShoppingList(item){
@@ -366,11 +370,11 @@
                     this.addUserData((data)=>{
                         delete data.shoppingList[item];
                         return data
-                })
-             }else {
-                alert(response.payload)
-            }
-        })
+                    })
+                }else {
+                    alert(response.payload)
+                }
+            })
     }
 
 
@@ -385,9 +389,9 @@
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return {"Good Old Fashioned Pancakes":
-                    {target:{type:'ingredient',id:'blueberry'},
-                    text:'use frozen blueberries for that dank artifical taste'}}
+        return {"Good Old Fashioned Pancakes":
+            {target:{type:'ingredient',id:'blueberry'},
+                text:'use frozen blueberries for that dank artifical taste'}}
 
     }
 
@@ -427,17 +431,16 @@
             throw new Error('You don\'t have permission to view '+username+'\'s personal data.')
         }
     }
- }
+}
 
- User.PantryItemPrototype = {
+User.PantryItemPrototype = {
     _NAME:'PANTRYITEM',
     amount:{type:'N'},
     unit:{type:'S'}
- }
- DBClient.getClient().registerPrototype(User.PantryItemPrototype)
+}
 
 
- User.UserDataPrototype = {
+User.UserDataPrototype = {
     _NAME:'USERDATA',
     username:{type:'S'},
     cookbook:{type:'M',inner:{type:'S'}},
@@ -446,11 +449,10 @@
     shoppingList:{type:'SS'},
     planner:{},
     exclude:{type:'SS'}
- }
- DBClient.getClient().registerPrototype(User.UserDataPrototype)
+}
 
- var static_user = new User();
+var static_user = new User();
 
- User.getUser = (username) => static_user.verify(username);
+User.getUser = (username) => static_user.verify(username);
 
- export default User;
+export default User;

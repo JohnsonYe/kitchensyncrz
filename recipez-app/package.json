@@ -52,6 +52,7 @@
     "gulp-uglify": "^3.0.0",
     "jshint": "^2.9.5",
     "jszip": "^3.1.5",
+    "react-bootstrap-carousel": "^2.2.0",
     "run-sequence": "^2.2.0"
   }
 }
