@@ -30,24 +30,6 @@ class Recipe extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.User = new User();
-
-        this.userInstance = User.getUser('user001');
-        console.log(this.userInstance);
-        this.Active = this.Active.bind(this);
-        this.inActive = this.Active.bind(this);
-    }
-    Active(){
-        console.log('Successfully add to shopping list');
-        this.setState({
-            active:true,
-        });
-    }
-
-    inActive(){
-        console.log('Remove from shopping list');
-        this.setState({
-            active:false,
-        });
     }
 
     setRecipeData(recipeObject,err){
