@@ -50,10 +50,13 @@ class User {
         this.loadStream = Promise.resolve({ //create a new user data object locally
             username:       username,
             cookbook:       {},
-            cookware:       new Set(['oven']), //this can't be empty
-            exclude:        new Set(['beer']),
-            shoppingList:   new Set(['beets']),
-            pantry:         {shrimp: {unit: 'Protein', amount: '1'}},
+            cookware:       new Set(['dirt']), //this can't be empty
+            exclude:        new Set(['mercury']),
+            pantry:         {},
+            planner:        {},
+            preferences:    new Set(['e']),
+            shoppingList:   new Set(['mercury']),
+            
         })
         .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
             return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
