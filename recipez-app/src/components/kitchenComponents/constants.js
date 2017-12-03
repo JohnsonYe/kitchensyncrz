@@ -165,7 +165,7 @@ export const ItemForm = ( {addProtein,
                        addGrain,
                        addOther,
                        getKey,
-                       handleChange, internalClient} ) => {
+                       internalClient} ) => {
 
     // Input Tracker
     let input;

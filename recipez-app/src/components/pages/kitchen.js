@@ -9,16 +9,12 @@ import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Modal } from 'react-bootstrap';
 import { Checkbox, CheckboxGroup } from 'react-checkbox-group';
 
-import Footer from '../footerComponent/footer'
+import Footer from '../footerComponent/footer';
 
-import User from '../classes/User'
-import Autocomplete from '../classes/Autocomplete'
-import Util from '../classes/Util'
+import User from '../classes/User';
+import Util from '../classes/Util';
 
-import SearchBar from '../SearchComponents/SearchBar'
-
-//call loadlist, list , get completion
-
+import SearchBar from '../SearchComponents/SearchBar';
 
 import {ItemForm, ItemList, ExcludeCookwareForm, ExcludeCookwareList, RestockList } from "../kitchenComponents/constants";
 
@@ -27,7 +23,6 @@ class kitchen extends Component {
     constructor( props ){
         super( props );
         this.user = new User();
-        this.autocomplete = Util.loadCompiledAutocompleteTree("Ingredients", "kitchen" );
 
         this.loadPantry();
         this.loadExcluded();
@@ -71,10 +66,6 @@ class kitchen extends Component {
 
             key: "Protein",
             modalKey: "Exclude",
-
-            query:'',
-            value:'',
-            selection:-1,
 
         };
 
@@ -152,19 +143,11 @@ class kitchen extends Component {
         this.loadCookware = this.loadCookware.bind(this);
         this.processCookware = this.processCookware.bind(this);
 
-        this.handleChange = this.handleChange.bind(this);
+        this.internalClient = this.internalClient.bind(this);
     }
 
     internalClient(){
         return new SearchBar.InternalClient();
-    }
-    handleChange(e) {
-
-        var str = e.target.value;
-        if(e.target.value.length > 0) {
-            this.autocomplete.then((auto) => { this.setState({list: auto.getCompletion(str)}); })
-        }
-
     }
 
     // Read the json file
@@ -715,7 +698,6 @@ class kitchen extends Component {
                                         addGrain = {this.addGrain.bind(this)}
                                         addOther = {this.addOther.bind(this)}
                                         getKey = {this.getKey()}
-                                        handleChange = {this.handleChange.bind(this)}
                                         internalClient = {this.internalClient()}
                                     />
 
