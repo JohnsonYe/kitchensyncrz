@@ -116,9 +116,9 @@ class Search extends Component {
                         return recipes
                     })
                     // .then((recipes)=>{console.log(JSON.stringify(this.state.loadedRecipes));return recipes})
-                this.setFilter(this.state.filter) //set the helper's filter method, based on whatever we parsed 
+                this.setFilter(this.state.filter) //set the helper's filter method, based on whatever we parsed
                 return result //pass the result to the next link
-            }) 
+            })
             .then((result)=>this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted})))
         }
     }
@@ -129,7 +129,7 @@ class Search extends Component {
         this.ingredient = ingredient;
     }
     updateState(sortedResults,value,status){
-        
+
         this.setState({
             sorted:sortedResults,
             ...this.updateIngredientState(value,status)
@@ -144,7 +144,7 @@ class Search extends Component {
             }
         };
 
-        this.client.updateIngredient(value,status,{successCallback:update_state_and_close_dropdowns_fn}) 
+        this.client.updateIngredient(value,status,{successCallback:update_state_and_close_dropdowns_fn})
 
     }
     toggleDropdown(event,id){
@@ -218,7 +218,7 @@ class Search extends Component {
             outputCallback: this.updateLoader,
         }
         this.client.updateIngredient(value,status,callbacks)
-        
+
     }
     updateURI(){
         this.props.history.replace('/Search?'+
@@ -229,8 +229,8 @@ class Search extends Component {
     handleReject(e){
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})   
-             
+        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})
+
     }
     parseQueryString(search){
         return search.substring(1)
@@ -251,19 +251,19 @@ class Search extends Component {
     }
 
     mortensButton(){
-        this.setState({morten: this.user.client.getUsername()});       
+        this.setState({morten: this.user.client.getUsername()});
         //User.getUser('user001').getPreferences(console.log)
         // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
-        
-        
+
+
         //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry)}));                     // THIS WORKS
         //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry['milk'])}));             // THIS WORKS
         //this.user.addToPantry('prok','none',1)                                                            // THIS WORKS
         //this.user.removeFromPantry('prok')                                                                // THIS WORKS
-        
 
-        //this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))                // THIS WORKS   
+
+        //this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))                // THIS WORKS
         //this.user.addToCookbook('pork', 'This is how you do')                                             // THIS WORKS
         //this.user.removeFromCookbook('pork')                                                              // THIS WORKS
 
@@ -276,7 +276,7 @@ class Search extends Component {
         //this.user.getExclusionList(exlcude=> this.setState({morten:JSON.stringify(exlcude)}))             // THIS WORKS
         //this.user.addToExclusionList('corn')                                                              // THIS WORKS
         //this.user.removeFromExclusionList('corn')                                                         // THIS WORKS
-        
+
 
         //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
         //this.user.addToShoppingList('milk')                                                               // THIS WORKS
@@ -286,7 +286,7 @@ class Search extends Component {
 
     addFromPantry(e){
         console.log("Adding from user pantry . . .")
-        
+
         let update_failed_fn = (item)=>{
             //this item couldn't be updated -- probably not found in database
             //return null: the promise.all doesn't care what values we get
@@ -308,13 +308,17 @@ class Search extends Component {
             Promise.all(
                 //get an array of update promises
                 this.massUpdateSearch(Object.keys(data), 1/* ADD */)
+
+                //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
+                .map((updatePromise)=>updatePromise.catch(update_failed_fn))
             )
-                .then(filter_failed_results_fn)
-                .then(sort_results_and_update_fn)
-                .catch((err) => console.error(err))
+            .then(filter_failed_results_fn)
+            .then(sort_results_and_update_fn)
+            .catch((err) => console.error(err))
 
 
-        })}
+        })
+    }
 
     getGlyph(name){
         return (<span className={"glyphicon glyphicon-"+name}></span>);
@@ -347,8 +351,8 @@ class Search extends Component {
             </div>
             <div>
                 <h3>{this.state.morten}</h3>
-                <button onClick={this.mortensButton}>Mortens Button</button> 
-                <button onClick={this.mortensButton2}>Mortens Button2</button> 
+                <button onClick={this.mortensButton}>Mortens Button</button>
+                <button onClick={this.mortensButton2}>Mortens Button2</button>
             </div>
             <div className="container-fluid">
                 <div id='searchbar-toolbar-container'>
@@ -362,7 +366,7 @@ class Search extends Component {
                                     <div className='dropdown-item' onClick={this.addFromPantry}>
                                         Add From Pantry{this.getJustifiedGlyph('download-alt')}
                                     </div>
-                                    <div role="separator" className="dropdown-divider"></div>                                    
+                                    <div role="separator" className="dropdown-divider"></div>
                                     <div className='dropdown-item' onClick={this.clearSearch}>
                                         Clear All{this.getJustifiedGlyph('trash')}
                                     </div>
@@ -398,7 +402,7 @@ class Search extends Component {
                                     {this.getGlyph('filter')}
                                 </button>
                                 <div className="dropdown-menu dropdown-menu-right">
-                                    {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
+                                    {this.getFilterButton('Import Preferences','download-alt','custom')}
                                     {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
                                     {this.getFilterButton('Filter by Best Match','signal','best_match')}
                                     {this.getFilterButton('Filter by Time','time','time_filter')}
@@ -421,7 +425,7 @@ class Search extends Component {
                                         if(data){
                                             return ([
                                                 <div>Difficulty: {data.Difficulty}</div>,
-                                                <div>Rating: 
+                                                <div>Rating:
                                                     {(()=>{ //more voodoo magic
                                                         let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
                                                         for(let i=0;i<this.recipeHelper.maxRating;i++){

@@ -155,7 +155,6 @@ class kitchen extends Component {
     processPantry(data){
 
         Object.entries(data).forEach((key)=> {
-
             switch (key[1].unit) {
                 case("Protein"):
                     this.addProtein(key[0]);
@@ -249,7 +248,6 @@ class kitchen extends Component {
     }
 
     renderProtein(){
-
         return(
             <div>
                 <ItemList

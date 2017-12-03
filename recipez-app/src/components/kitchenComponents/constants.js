@@ -15,15 +15,16 @@ export const AddItem = ({item, remove, addOut}) => {
     return (
 
         <form>
-            <div className="well well-sm" id="pantry-node">
-                {item}
+            <div className="well well-sm" id="pantry-node"
+                    style={{wordWrap: 'break-word'}}>
+                <div style={{width: '70%'}}>{item}</div>
                 <button className = "btn btn-danger"
                         id = "btn-r"
                         type = "button"
                         onClick = {()=> remove(item)}
                         title = "Remove"
                         style = {{float:'right', display:'block',
-                            fontSize:'10px', marginTop:'-10.5px',
+                            fontSize:'10px', marginTop:'-32px',
                             marginRight:'-9px'}}>
 
                     <span className = "glyphicon glyphicon-trash"
@@ -35,7 +36,7 @@ export const AddItem = ({item, remove, addOut}) => {
                         onClick = {()=> addOut(item) }
                         title = "Add to Restock"
                         style={{float:'right', display:'block',
-                            fontSize:'10px', marginTop:'-10.5px',
+                            fontSize:'10px', marginTop:'-32px',
                             marginLeft:'-7px'}}>
                     <span className = "glyphicon glyphicon-alert"
                           style={{fontSize:'1.5em'}}/>
@@ -53,14 +54,14 @@ export const AddExcludeCookware = ({item, remove}) => {
 
         <form>
             <div className="well well-sm" id="pantry-node">
-                {item}
+                <div style={{width: '70%'}}>{item}</div>
                 <button className = "btn btn-danger"
                         id = "btn-one"
                         type = "button"
                         onClick = {()=> remove(item)}
                         title = "Remove"
                         style = {{float:'right', display:'block', fontSize:'10px',
-                            marginTop:'-10px', marginRight:'-10px'}}>
+                            marginTop:'-32px', marginRight:'-10px'}}>
 
                     <span className = "glyphicon glyphicon-trash"
                           style={{fontSize:'1.5em'}}/>
@@ -78,13 +79,13 @@ export const AddRestock = ({item, remove, addBack}) => {
 
         <form>
             <div className="well well-sm" id="pantry-node">
-                {item}
+                <div style={{width: '52%'}}>{item}</div>
                 <button className = "btn btn-danger"
                         type = "button"
                         onClick = {()=> remove(item)}
                         title = "Remove"
                         style = {{float:'right', display:'block',
-                            fontSize:'12px', marginTop:'-10.5px',
+                            fontSize:'12px', marginTop:'-35px',
                             marginRight:'-9px'}}>
 
                     <span className = "glyphicon glyphicon-trash"
@@ -95,7 +96,7 @@ export const AddRestock = ({item, remove, addBack}) => {
                         onClick = {()=> addBack(item) }
                         title = "Add back to list"
                         style = {{float:'right', display:'block',
-                            fontSize:'12px', marginTop:'-10.5px',
+                            fontSize:'12px', marginTop:'-35px',
                             marginLeft:'-7px'}}>
                     <span className = "glyphicon glyphicon-plus-sign"
                           style={{fontSize:'1.5em'}}/>
@@ -105,7 +106,7 @@ export const AddRestock = ({item, remove, addBack}) => {
                         onClick = {()=> {} }
                         title = "Add to Shopping List"
                         style = {{float:'right', display:'block',
-                            fontSize:'12px', marginTop:'-10.5px',
+                            fontSize:'12px', marginTop:'-35px',
                             marginRight:'7px'}}>
                     <span className = "glyphicon glyphicon-shopping-cart"
                           style={{fontSize:'1.5em'}}/>
