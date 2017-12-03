@@ -381,7 +381,7 @@
         this.getUserData('planner').then(callback).catch(console.error)
     }
 
-    setPreferences(planner,callback){
+    setPlanner(planner,callback){
         let packed = this.client.packItem(planner,undefined);
         console.log(JSON.stringify(packed));
         this.client.updateItem(
@@ -393,7 +393,7 @@
                     this.addUserData((data)=>{
                         data.planner = planner;
                         return data;
-                    })
+                    },callback);
                 } else {
                     console.error(response.payload);
                 }
@@ -446,7 +446,7 @@
     addUserData(transform,callback){
         this.loadStream = this.loadStream.then(transform);
         if(callback){
-            callback(this.loadStream)
+            callback(this.loadStream);
         }
     }
 
