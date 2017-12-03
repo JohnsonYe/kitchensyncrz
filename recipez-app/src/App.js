@@ -28,14 +28,43 @@ import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
 import Cookbook from "./components/pages/myCookbook";
 import Recipe from "./components/pages/recipe";
+import DBClient from "./components/classes/AWSDatabaseClient";
+import SignIn from './components/pages/userLoginPages/signIn';
+import Register from "./components/pages/userLoginPages/register";
+import User from "./components/classes/User";
+
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 
 class App extends Component {
 
+    constructor(props){
+        super(props);
+
+        this.client = DBClient.getClient();
+
+
+    }
+
+    async componentDidMount() {
+        try {
+            if (await this.client.authUser()) {
+                this.client.authenticated = true;
+            }
+        }
+        catch(e) {
+            alert(e);
+        }
+
+        this.setState({ isAuthenticating: false});
+    }
+
+
     componentWillMount() {
         this.setState({
-        isMenuOpened: false
+            isMenuOpened: false,
+            isAuthenticating: true
+
         })
     }
 
@@ -43,8 +72,18 @@ class App extends Component {
         this.setState({ isMenuOpened: !this.state.isMenuOpened });
     }
 
+    handleLogout = event => {
+        this.handleClick();
+        this.client.signOutUser();
+        this.client.authenticated = false;
+        this.client.user = 'user001';
+        User.getUser().reload();
+        //alert(this.client.isLoggedIn());
+    }
+
     render() {
         return (
+            !this.state.isAuthenticating &&
             <Router>
                 <div className="App">
                     <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
@@ -72,17 +111,16 @@ class App extends Component {
                                     <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
                                 </li>
                                 <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Register</Link>
-                                </li>
-                                <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign in</Link>
-                                </li>
-                                <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
+                                    {
+                                        this.client.authenticated ? 
+                                        <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> : 
+                                        <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                    }
                                 </li>
                             </ul>
                         </OffCanvasMenu>
                     </OffCanvas>
+
 
                     <Route exact path='/' component={Homepage} />
                     <Route exact path='/Search' component={Search} />
@@ -91,6 +129,8 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
+                    <Route exact path='/Register' component={Register} />
+                    <Route exact path='/SignIn' component={SignIn} />
                     <Footer />
                 </div>
             </Router>
