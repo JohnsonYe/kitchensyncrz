@@ -142,10 +142,16 @@ class PersonalRecipes extends Component{
         }
 
         let form =
-            <form>
+            <form onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    this.getValidationState();
+                }
+            }}>
                 <FormGroup
                     controlId="formBasicText"
                     validationState={this.state.validation}
+
                 >
                     <FormControl
                         type={"text"}

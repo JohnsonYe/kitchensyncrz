@@ -55,17 +55,17 @@ class IngredientForm extends Component {
 
             <div>
                 <div className={"row"}>
-                    <div className={"form-group col-md-3"}>
+                    <div className={"form-group col-md-4"}>
                         <FormControl type={"text"}
                                      value={this.state.quantity_unit}
                                      placeholder={"Quantity"}
                                      onChange={this.handleQuantityChange}>
                         </FormControl>
                     </div>
-                    <div className={"col-md-3"} style={{'marginTop': '10px'}}>
+                    <div className={"col-md-2"} style={{'marginTop': '10px'}}>
                         {this.state.ingredient}
                     </div>
-                    <div className={"form-group col-md-3"}>
+                    <div className={"form-group col-md-4"}>
                         <FormControl type={"text"}
                                      value={this.state.additional}
                                      placeHolder={"chopped, diced, etc."}
@@ -74,7 +74,7 @@ class IngredientForm extends Component {
 
                         </FormControl>
                     </div>
-                    <div className={"col-md-3"}>
+                    <div className={"col-md-2"}>
                         <div className={"btn btn-danger pb-3"} onClick={this.removeThis}>
                             X
                         </div>

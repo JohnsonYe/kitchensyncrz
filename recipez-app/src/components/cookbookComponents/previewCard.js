@@ -6,7 +6,7 @@
  */
 
 import React, {Component} from 'react';
-import {Modal, FormGroup, FormControl} from 'react-bootstrap';
+import {Modal, FormGroup, FormControl, ControlLabel, InputGroup} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import IngredientForm from './IngredientForm';
 import RecipeHelper from '../classes/RecipeHelper';
@@ -70,8 +70,35 @@ class PreviewCard extends Component{
         this.recipeHelper = new RecipeHelper();
     }
 
-    componentWillRecieveProps(newProps) {
-        this.constructor(newProps);
+    componentWillReceiveProps(newProps) {
+        let initialIngredientList = [];
+        this.ingredientFormRefs = [];
+        for (let original_ingredient of newProps.src.Ingredients) {
+            initialIngredientList.push(<IngredientForm removeFunc={this.removeIngredient}
+                                                       ingredient={original_ingredient} ref={(newIngredientForm) => {
+                if (newIngredientForm !== null) {
+                    this.ingredientFormRefs.push(newIngredientForm);
+                }
+            }}/>);
+        }
+
+        let initial_directions = "";
+        for (let direction_line of newProps.src.Directions) {
+            initial_directions += direction_line + '\n';
+        }
+        this.setState({
+            deletionModal: false,
+            editModal: false,
+            ingredientList: initialIngredientList.slice(),
+            workingIngredientList: initialIngredientList,
+            ingredientToAdd: '',
+            directions: initial_directions,
+            workingDirections: initial_directions,
+            difficulty: newProps.src.Difficulty,
+            workingDifficulty: newProps.src.Difficulty,
+            duration: newProps.src.TimeCost,
+            workingDuration: newProps.src.TimeCost,
+        })
     }
 
     deletionOpen() {
@@ -96,6 +123,8 @@ class PreviewCard extends Component{
             editModal: true,
             workingDirections: this.state.directions,
             workingIngredientList: this.state.ingredientList.slice(),
+            workingDifficulty: this.state.difficulty,
+            workingDuration: this.state.duration,
         });
     }
 
@@ -104,6 +133,8 @@ class PreviewCard extends Component{
             editModal: false,
             workingIngredientList: this.state.ingredientList.slice(),
             workingDirections: this.state.directions,
+            workingDuration: this.state.duration,
+            workingDifficulty: this.state.difficulty,
         });
         this.ingredientFormRefs = [];
     }
@@ -159,10 +190,25 @@ class PreviewCard extends Component{
 
         let updatedDirections = this.state.workingDirections.split('\n');
         console.log(updatedDirections);
+        let index = 0;
+        while (index < updatedDirections.length) {
+            if (updatedDirections[index] == "") {
+                updatedDirections.splice(index, 1);
+            } else {
+                index = index + 1;
+            }
+        }
+
+        let updatedDirectionsString = "";
+        for (let direction_line of updatedDirections) {
+            updatedDirectionsString += direction_line + '\n';
+        }
         this.setState({
             ingredientList: updatedIngredientList.slice(),
             workingIngredientList: updatedIngredientList.slice(),
-            directions: this.state.workingDirections,
+            directions: updatedDirectionsString,
+            difficulty: this.state.workingDifficulty,
+            duration: this.state.workingDuration,
 
         });
         this.props.updateFunc(this.recipeHelper.createRecipe(this.props.src.Name, stringIngredientList, updatedDirections));
@@ -232,32 +278,37 @@ class PreviewCard extends Component{
 
 
         let insertionForm =
-
-            <div className={"row"}>
-                <div className={"col-md-10"}>
-                    <form onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            this.addIngredient();
-                        }
-                    }}>
-                        <FormGroup
-                            controlId="formBasicText"
-                            validationState={this.state.validation}
-                        >
-                            <FormControl
-                                type={"text"}
-                                value={this.state.ingredientToAdd}
-                                placeholder="Enter an ingredient, without units of measurement or additional information"
-                                onChange={this.handleChangeInsertIngredient}
-                            />
-                            <FormControl.Feedback/>
-                        </FormGroup>
-                    </form>
+            <div>
+                <div>
+                    <ControlLabel>Add Ingredients</ControlLabel>
                 </div>
-                <div className={"col-md-2"}>
-                    <div className={"btn btn-success"} onClick={this.addIngredient}>
-                        Add
+                <div className={"row"}>
+
+                    <div className={"col-md-10"}>
+                        <form onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                this.addIngredient();
+                            }
+                        }}>
+                            <FormGroup
+                                controlId="formBasicText"
+                                validationState={this.state.validation}
+                            >
+                                <FormControl
+                                    type={"text"}
+                                    value={this.state.ingredientToAdd}
+                                    placeholder="Enter an ingredient, without units of measurement or additional information"
+                                    onChange={this.handleChangeInsertIngredient}
+                                />
+                                <FormControl.Feedback/>
+                            </FormGroup>
+                        </form>
+                    </div>
+                    <div className={"col-md-2"}>
+                        <div className={"btn btn-success"} onClick={this.addIngredient}>
+                            Add
+                        </div>
                     </div>
                 </div>
             </div>
@@ -272,6 +323,7 @@ class PreviewCard extends Component{
                         <FormGroup
                             controlId="formBasicText"
                         >
+                            <ControlLabel>Directions</ControlLabel>
                             <FormControl
                                 componentClass={"textarea"}
                                 style={{height: '300px'}}
@@ -280,6 +332,59 @@ class PreviewCard extends Component{
                                 onChange={this.handleChangeDirections}
                             />
                             <FormControl.Feedback/>
+                        </FormGroup>
+                    </form>
+                </div>
+            </div>
+        ;
+
+        let durationAndDifficulty =
+
+            <div className={"row"}>
+                <div className={"col-md-6"}>
+                    <form
+                    >
+                        <FormGroup
+                            controlId="formBasicText"
+                        >
+
+                            <ControlLabel>
+                                Duration
+                            </ControlLabel>
+                            <InputGroup>
+                                <FormControl
+                                    type={"text"}
+                                    value={this.state.workingDuration}
+                                    placeholder="length of time"
+                                    onChange={this.handleChangeDuration}
+                                />
+                                <FormControl.Feedback/>
+                                <InputGroup.Addon>minutes</InputGroup.Addon>
+                            </InputGroup>
+                        </FormGroup>
+                    </form>
+                </div>
+                <div className={"col-md-6"}>
+                    <form
+                    >
+                        <FormGroup
+                            controlId="formBasicText"
+                        >
+                            <ControlLabel>
+                                Difficulty
+                            </ControlLabel>
+                            <InputGroup>
+                                <FormControl
+                                    type={"text"}
+                                    value={this.state.workingDifficulty}
+                                    placeholder=""
+                                    onChange={this.handleChangeDifficulty}
+                                />
+                                <FormControl.Feedback/>
+                                <InputGroup.Addon>
+                                    out of 5
+                                </InputGroup.Addon>
+                            </InputGroup>
                         </FormGroup>
                     </form>
                 </div>
@@ -351,6 +456,9 @@ class PreviewCard extends Component{
                         {this.state.workingIngredientList}
                         <div>
                             {directionForm}
+                        </div>
+                        <div>
+                            {durationAndDifficulty}
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
