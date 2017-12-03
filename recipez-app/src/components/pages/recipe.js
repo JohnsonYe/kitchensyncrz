@@ -81,12 +81,21 @@ class Recipe extends Component {
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item">
                 <span className="ingredient-box">
-                    <button onClick={(e)=>{this.User.addToShoppingList(ingredient);this.state.active}} className="shopping button" type="button" class="btn btn-circle" id="shoppoing_cart">
+                    <button onClick={(e)=>this.User.addToShoppingList(ingredient)} className="shopping button" type="button" class="btn btn-circle" id="shoppoing_cart">
                         <i class="glyphicon glyphicon-shopping-cart"/>
                     </button>&nbsp;&nbsp;
                     {ingredient}
                 </span>
             </li>)
+
+        /*var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item">
+                <span className="ingredient-box">
+                    <button onClick={(e)=>{this.User.addToShoppingList(ingredient);this.state.active}} className="shopping button" type="button" class="btn btn-circle" id="shoppoing_cart">
+                        <i class="glyphicon glyphicon-shopping-cart"/>
+                    </button>&nbsp;&nbsp;
+                    {ingredient}
+                </span>
+        </li>)*/
 
 
 
@@ -126,7 +135,7 @@ class Recipe extends Component {
                 <div className="jumbotron">
                     <h1>Kitchen Sync</h1>
                 </div>
-                <h1>{this.state.data.Name}</h1>
+                <h1 className="PageHeader">{this.state.data.Name}</h1>
                 <br/>
 
                 <div class="container">
@@ -155,12 +164,12 @@ class Recipe extends Component {
                             {/*====button group====*/}
 
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6" className="Ingredient">
                             <h2>Ingredients:</h2>
                             <ul>{ingredients}</ul>
                         </div>
                     </div>
-                    <h2>Directions:</h2>
+                    <h2 className="Direction">Directions:</h2>
                     <ol>{directions}</ol>
                     {/*<h2>Reviews:</h2>*/}
                     {/*<ul>{reviews}</ul>*/}
@@ -168,7 +177,7 @@ class Recipe extends Component {
                             <p>{JSON.stringify(this.state.data)}</p>*/}
                 </div>
 
-                <div class="container" id="reviewContainer">
+                <div class="container">
                     <div>
                         {/* Nav bar content here */}
                         <div className="container">
@@ -178,7 +187,8 @@ class Recipe extends Component {
                                 </Tab>
                                 <Tab eventKey={2} title={"Leave a Comment"}>
                                     <form onSubmit={this.handleSubmit}>
-                                        <label>Leave your comment:</label>
+                                        {/*<label>Leave your comment:</label>*/}
+                                        <i class="glyphicon glyphicon-pencil"/>
                                         <textarea class="form-control" placeholder="Write a comment" name="comment" rows="8" id="comment" value={this.state.value} onChange={this.handleChange}/>
 
                                         <div class="form-group">

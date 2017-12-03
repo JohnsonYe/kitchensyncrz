@@ -4,6 +4,12 @@ h1 {
     text-align: center;
 }
 
+.PageHeader{
+    font-family: "Georgia", serif;
+    font-size: 45px;
+    text-align: center;
+}
+
 h2 {
     font-family: "Times New Roman", Times, serif;
     font-size: 30px;
@@ -48,4 +54,13 @@ h2 {
 .CarouselSize img{
     border-radius: 25px;
     height: 350px;
+}
+
+.Ingredient h2{
+    padding: 0px 50px;
+    margin: auto;
+}
+
+.Direction{
+    padding: 10px 50px;
 }
