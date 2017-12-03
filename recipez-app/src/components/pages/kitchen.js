@@ -16,7 +16,7 @@ import Util from '../classes/Util';
 
 import SearchBar from '../SearchComponents/SearchBar';
 
-import {ItemForm, ItemList, ExcludeCookwareForm, ExcludeCookwareList, RestockList } from "../kitchenComponents/constants";
+import {ItemForm, ItemList, ExcludeForm, CookwareForm, ExcludeCookwareList, RestockList } from "../kitchenComponents/constants";
 
 class kitchen extends Component {
 
@@ -65,15 +65,12 @@ class kitchen extends Component {
             showCookware: false,
 
             key: "Protein",
-            modalKey: "Exclude",
 
         };
 
 
         this.getKey = this.getKey.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
-
-        this.getModalKey = this.getModalKey.bind(this);
 
         // Protein
         this.addProtein = this.addProtein.bind(this);
@@ -210,7 +207,6 @@ class kitchen extends Component {
         })
     }
 
-
     loadCookware(){
         this.user.getCookware(this.processCookware.bind(this));
     }
@@ -223,10 +219,6 @@ class kitchen extends Component {
 
     getKey(){
         return this.state.key;
-    }
-
-    getModalKey(){
-        return this.state.modalKey;
     }
 
     /* Functionality methods */
@@ -538,7 +530,6 @@ class kitchen extends Component {
 
     /**Method that opens Modal*/
     openExclude() {
-        this.setState( {modalKey: "Exclude" });
         this.setState( {showExclude: true} );
     }
 
@@ -549,7 +540,6 @@ class kitchen extends Component {
 
     /**Method that opens Modal*/
     openCookware() {
-        this.setState( {modalKey: "Cookware"} );
         this.setState( {showCookware: true} );
     }
 
@@ -605,10 +595,9 @@ class kitchen extends Component {
                                 Add more items to exclude:
                                 <br />
 
-                                <ExcludeCookwareForm
+                                <ExcludeForm
                                     addExclude = {this.addExclude.bind(this)}
-                                    addCookware = {this.addCookware.bind(this)}
-                                    getModalKey = {this.getModalKey()}
+                                    internalClient = {this.internalClient()}
                                 />
                                 <br />
                                 {this.renderExclude()}
@@ -641,10 +630,8 @@ class kitchen extends Component {
                                 <Modal.Title>Cookware</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <ExcludeCookwareForm
-                                    addExclude = {this.addExclude.bind(this)}
+                                <CookwareForm
                                     addCookware = {this.addCookware.bind(this)}
-                                    getModalKey = {this.getModalKey()}
                                 />
                                 <br />
                                 {this.renderCookware()}

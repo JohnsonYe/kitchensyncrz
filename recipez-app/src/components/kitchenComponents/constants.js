@@ -223,8 +223,42 @@ export const ItemForm = ( {addProtein,
     );
 };
 
-// Calls the add function to update for exclude and cookware
-export const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
+// Calls the add function to update exclude
+export const ExcludeForm = ({addExclude, internalClient}) => {
+
+    // Input Tracker
+    let input;
+
+    return (
+        // Add to the form
+        <form onSubmit={(e) => {
+            e.preventDefault();
+
+            // Preventing empty answers
+            if( this.prefSearchbar.getValue() !== '') {
+                addExclude(this.prefSearchbar.getValue());
+
+                // Clearing
+                this.prefSearchbar.reset();
+            }
+        }}>
+
+            <div className="input-group">
+                <SearchBar client = {internalClient} ref={(searchbar)=>{this.prefSearchbar = searchbar}}/>
+
+                <span className = "input-group-btn">
+                        <button className="btn btn-success"
+                                type="submit"
+                                title="Add to list">
+                            <i className = "glyphicon glyphicon-plus-sign" />
+                        </button>
+                </span>
+            </div>
+        </form>
+    );
+}
+
+export const CookwareForm = ({addCookware}) => {
 
     // Input Tracker
     let input;
@@ -237,11 +271,7 @@ export const ExcludeCookwareForm = ({addExclude, addCookware, getModalKey}) => {
             // Preventing empty answers
             if( input.value !== '') {
 
-                if( getModalKey == "Exclude" ) {
-                    addExclude(input.value);
-                }else if( getModalKey == "Cookware"){
-                    addCookware(input.value);
-                }
+                addCookware(input.value);
 
                 // Clearing
                 input.value = '';
