@@ -145,6 +145,34 @@
             })
     }
 
+    publishRecipe(recipeName){
+        alert('dont fucking use publishRecipe')
+        //remove the recipe JSON from the user's cookbook
+        let set_external_expression = this.client.buildRemoveElementUpdateExpression('cookbook',recipeName);
+
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+            this.client.buildUpdateRequest( //construct the params syntax according to the action we want
+                'User', //table to get item from
+                'username',this.client.getUsername(), //keyfield and specific key
+                //set cookbook[recipeName] = 'none'
+                this.client.buildMapUpdateExpression('cookbook',recipeName,{S:'none'})), 
+            (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.cookbook[recipeName]='none';
+                        return data;
+                    })
+                } else {
+                    //the request failed, what should we do?
+                    console.error(response.payload)
+                }
+            })
+
+        //pull the recipe object from the local user data
+        this.getUserData('cookbook').then((data)=>{})
+
+    }
+
     /**
      * get a Pantry Object:
      * {
