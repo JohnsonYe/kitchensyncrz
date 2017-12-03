@@ -188,7 +188,7 @@
     }
 
 
-    addToPantry(ingredient,unit,amount){
+    addToPantry(ingredient,unit,amount,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -200,7 +200,7 @@
                     this.addUserData((data)=>{
                         data.pantry[ingredient] = {amount:amount,unit:unit};
                         return data
-                })
+                },callback)
              }else {
                 console.error(response.payload)
             }
@@ -363,7 +363,7 @@
 
     }
 
-    addToShoppingList(item){
+    addToShoppingList(item,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -373,16 +373,16 @@
             (response) => {
                 if(response.status){
                     this.addUserData((data)=>{
-                        data.shoppingList[item] = {item:item};
+                        data.shoppingList.add(item);
                         return data
-                })
+                },callback)
              }else {
                 console.error(response.payload)
             }
         })
     }
 
-    removeFromShoppingList(item){
+    removeFromShoppingList(item,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -392,12 +392,12 @@
             (response) => {
                 if(response.status){
                     this.addUserData((data)=>{
-                        delete data.shoppingList[item];
+                        data.shoppingList.delete(item);
                         return data;
-                })
-             }else {
-                console.error(response.payload);
-            }
+                    },callback)
+                }else {
+                    console.error(response.payload);
+                }
         })
     }
 
@@ -465,7 +465,7 @@
      * @return {[type]}      [description]
      */
     getUserData(name){
-        return this.loadStream.then((data)=>data[name]).catch((e)=>'Failed to fetch loaded data!');
+        return this.loadStream.then((data)=>data[name]).catch((e)=>{console.error(e);return e});
     }
 
     /**
@@ -523,6 +523,6 @@
 
  var static_user = new User();
 
- User.getUser = (username) => static_user.verify(username);
+ User.getUser = (username) => static_user;
 
  export default User;

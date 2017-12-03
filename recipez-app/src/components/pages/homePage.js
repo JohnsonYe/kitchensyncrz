@@ -5,6 +5,7 @@
  * Description: This file will serve as the Homepage Content
  */
 import React, { Component } from 'react';
+import ShoppingList from './plannerPages/ShoppingList'
 
 class Homepage extends Component {
     constructor(props){
@@ -41,6 +42,7 @@ class Homepage extends Component {
                 <div className="container-fluid">
                     Homepage content goes here ... Our Website is currently under construction
                     <p className="text-center"><button className="btn btn-success btn-large" id='mortens_button' onClick={(e)=>this.setState({showFollower:!this.state.showFollower})}>MORTEN'S BUTTON</button></p>
+                    <ShoppingList />
                 </div>
                 <div className="popover bs-tether-element bs-tether-element-attached-middle bs-tether-element-attached-left bs-tether-target-attached-middle bs-tether-target-attached-right fade bs-tether-enabled" role="tooltip" id="popover640845" container='btn' >
                     <h3 className="popover-title">Popover title</h3>
@@ -49,6 +51,7 @@ class Homepage extends Component {
                 <div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
                     <img src='/images/Peanut-butter-jelly-time.gif' width={this.state.cursorWidth+'px'} height={this.state.cursorHeight+'px'}/>
                 </div>
+
             </div>
         
         );
