@@ -37,7 +37,7 @@ class Search extends Component {
 
         this.planner = new PlannerHelper();
 
-        this.user = new User();
+        this.user = User.getUser();
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
         this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
@@ -292,8 +292,9 @@ class Search extends Component {
             this.client.sortRecipeMap(this.searchUpdateWrapper(items,ADD_MULTIPLE))
         };
 
-        User.getUser('user001').getUserData('pantry').then((data)=>{
+        User.getUser(this.user.client.getUsername()).getUserData('pantry').then((data)=>{
             Promise.all(
+
                 //get an array of update promises
                 this.massUpdateSearch(Object.keys(data),1/* ADD */)
                 //"map" the array to append .catch() clauses which prevent the Promise.all from aborting

@@ -38,24 +38,27 @@ class User {
         //         'username',this.client.getUsername(),
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
-        this.loadStream = new Promise(this.loadUserData)
+        this.reload();
         this.verified = false;
+    }
+
+    reload(){
+        this.loadStream = new Promise(this.loadUserData)
     }
 
     createUser(username){
         this.loadStream = Promise.resolve({ //create a new user data object locally
-            username:username,
-            cookbook:{},
-            cookware:new Set(['fork']), //this can't be empty
+            username:       username,
+            cookbook:       {},
+            cookware:       new Set(['hand']), //this can't be empty
+            exclude:        new Set(['mortensDefault']),
+            shoppingList:   new Set(['mortensDefault']),
+            pantry:         {beef: {unit: 'Protein', amount: '1'}},
         })
-            .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
-                return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),fail,pass))
-            })
-            .then((data)=>console.log(data.payload))
-    }
-
-    getMort(){
-        return this.client.getUsername;
+        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
+            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
+        })
+        this.loadStream.then((data)=>console.log(data.payload))
     }
 
     /**
@@ -69,11 +72,6 @@ class User {
      * }
      */
     loadUserData(resolve,reject){
-        if(this.userData.username === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
-            // alert('rejected!')
-            reject('User is not logged in!')
-            return
-        }
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
                 this.userData = {
