@@ -1,6 +1,7 @@
 h1 {
     font-family: "Georgia", serif;
     font-size: 50px;
+    text-align: center;
 }
 
 h2 {
@@ -37,4 +38,14 @@ h2 {
 
 #forksize{
     padding-right: 1.5em;
+}
+
+.CarouselSize{
+    height: 350px;
+    border-radius: 25px;
+}
+
+.CarouselSize img{
+    border-radius: 25px;
+    height: 350px;
 }

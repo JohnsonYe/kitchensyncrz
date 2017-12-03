@@ -20,7 +20,7 @@ class PersonalRecipes extends Component{
         };
 
         this.userInstance = props.userInstance;
-        /*console.log('Below is the personal recipes user instance');
+        /*console.log('Below is the     personal recipes user instance');
         console.log(this.userInstance);*/
         this.personalRecipeNames = [];
         this.recipeHelper = new RecipeHelper();
