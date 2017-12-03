@@ -102,7 +102,7 @@ class Search extends Component {
             // use a promise.all to wait for all ingredients to load asynchronously
             Promise.all(
                 //have search manager skip sorting after each update to improve speed
-                this.massUpdateSearch(this.state.ingredients,1),this.massUpdateSearch(this.state.excluded,0)
+                this.massUpdateSearch(this.state.ingredients,1,false),this.massUpdateSearch(this.state.excluded,0,false)
             )
             .catch((err)=>console.error(err))
             //do one sort once everything is done loading
@@ -242,8 +242,13 @@ class Search extends Component {
 
     setFilter(filter){
         this.closeAllDropdowns()
-        this.client.setFilter(filter,this.searchUpdateWrapper())
-        this.setState({filter:filter})
+        if(filter === "custom"){ //special actions based on user preferences
+            
+        } else {
+            this.client.setFilter(filter,this.searchUpdateWrapper());
+        }
+
+        this.setState({filter:filter});
     }
 
     mortensButton2(){
@@ -382,7 +387,7 @@ class Search extends Component {
                                     <div className="dropdown-header">Added Ingredients</div>
                                     {[...this.state.ingredients].map(
                                         (ingredient)=>
-                                        (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option">{this.getGlyph('remove')}</span></div>)
+                                        (<div className='dropdown-item' key={ingredient} onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option">{this.getGlyph('remove')}</span></div>)
                                         )}
                                     {this.state.ingredients.size>0?'':<div className="dropdown-item"><i>You haven't added any ingredients!</i></div>}
                                     <div className="dropdown-header">Excluded Ingredients</div>

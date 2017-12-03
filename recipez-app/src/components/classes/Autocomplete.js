@@ -96,7 +96,7 @@ class Autocomplete{
             }
         } else {
             if(node.c){
-                return this.search(node.c,str,idx+1);
+                return this.search(node.c,str,idx+1).concat(idx+1===str.length&&node.e!==undefined?[str]:[]);
             } else {
                 if(idx+1===str.length){
                     return [str]
@@ -121,10 +121,11 @@ class Autocomplete{
         if(node.c){
             // console.log(JSON.stringify(base))
             result = result.concat(this.dfs(node.c,base))
-        } else {
-            // console.log(base.join(''))
-            result = result.concat(base.join(''))
-        }
+        } 
+        // else {
+        //     // console.log(base.join(''))
+        //     result = result.concat(base.join(''))
+        // }
         base.pop()
         return result
     }

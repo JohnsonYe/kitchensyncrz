@@ -60,7 +60,7 @@ class App extends Component {
                                     <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Search" onClick={this.handleClick.bind(this)}>Browse</Link>
+                                    <Link to="/Search" onClick={this.handleClick.bind(this)}>Search</Link>
                                 </li>
                                 <li>
                                     <Link to="/Cookbook" onClick={this.handleClick.bind(this)}>Cookbook</Link>
