@@ -217,7 +217,9 @@ class kitchen extends Component {
 
     processCookware(data){
         (data).forEach((key) => {
-            this.addCookware(key);
+            if( key !== "dirt") {
+                this.addCookware(key);
+            }
         })
     }
 
