@@ -9,7 +9,8 @@ import React, {Component} from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
 import AndrewPreviewCard from '../cookbookComponents/andrew_previewCard'
 import {FormGroup,FormControl,HelpBlock,ControlLabel,Modal} from 'react-bootstrap';
-import RecipeHelper from '../classes/RecipeHelper.js'
+import RecipeHelper from '../classes/RecipeHelper.js';
+
 // TODO: Some sort of function to automatically add and display preview cards
 class PersonalRecipes extends Component{
 
@@ -23,6 +24,7 @@ class PersonalRecipes extends Component{
         this.close = this.close.bind(this);
         this.getValidationState = this.getValidationState.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.updateRecipe = this.updateRecipe.bind(this);
 
         this.state = {
             recipeList: [],
@@ -55,10 +57,15 @@ class PersonalRecipes extends Component{
 
     createNewBlankRecipe(recipeName){
 
-        let newRecipe = this.recipeHelper.createRecipe(recipeName,["cabbage"],["Icky sticky cabbage bubbleboi"]);
+        let newRecipe = this.recipeHelper.createRecipe(recipeName, "", "");
         this.userInstance.saveCustomRecipe(newRecipe,this.getRecipeObjects);
         this.close();
 
+    }
+
+    updateRecipe(recipeName, ingredients, directions) {
+        let updatedRecipe = this.recipeHelper.createRecipe(recipeName, ingredients, directions);
+        this.userInstance.saveCustomRecipe(updatedRecipe, () => this.getRecipeObjects());
     }
 
     // Had to change to arrow func to get it to bind properly... should work?
@@ -110,6 +117,13 @@ class PersonalRecipes extends Component{
 
     }
 
+    updateRecipe(recipe) {
+
+        this.userInstance.saveCustomRecipe(recipe, () => {
+
+        });
+    }
+
     handleChange(e) {
         this.setState({ value: e.target.value });
     }
@@ -123,7 +137,8 @@ class PersonalRecipes extends Component{
             return 0;
         });
         for( let recipe of this.state.recipeList){
-            recipeCards.push(<PreviewCard src={recipe} removeFunc={this.removeRecipe} personal={1}/>);
+            recipeCards.push(<PreviewCard src={recipe} removeFunc={this.removeRecipe} updateFunc={this.updateRecipe}
+                                          personal={1}/>);
         }
 
         let form =
@@ -179,6 +194,8 @@ class PersonalRecipes extends Component{
                     </Modal.Footer>
 
                 </Modal>
+
+
             </div>
         );
     }

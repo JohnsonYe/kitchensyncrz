@@ -89,7 +89,7 @@ class Recipe extends Component {
                     <div class="row">
                         <div class="col-sm-6">
 
-                            <img src={require('./Basic Baked Spaghetti.jpg')} class="img-fluid " alt=""/>
+                            <img src={require('./gary.jpg')} class="img-fluid " alt=""/>
 
                             <div class="btn=group btn-group-sm">
                                 {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}

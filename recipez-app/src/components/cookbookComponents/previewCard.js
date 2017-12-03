@@ -6,9 +6,10 @@
  */
 
 import React, {Component} from 'react';
-import {Modal} from 'react-bootstrap';
+import {Modal, FormGroup, FormControl} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
-
+import IngredientForm from './IngredientForm';
+import RecipeHelper from '../classes/RecipeHelper';
 /**
  * TODO: Andrew's add-to-planner button
  * TODO: Review stars/forks
@@ -21,36 +22,195 @@ class PreviewCard extends Component{
 
     constructor(props) {
         super(props);
-        this.noImg = require("./no-photo.png");
-        this.state={
-            modal: false,
 
-        };
 
         this.removeThis = this.removeThis.bind(this);
-        this.open = this.open.bind(this);
-        this.close = this.close.bind(this);
+        this.removeIngredient = this.removeIngredient.bind(this);
+        this.deletionOpen = this.deletionOpen.bind(this);
+        this.deletionClose = this.deletionClose.bind(this);
+        this.editOpen = this.editOpen.bind(this);
+        this.editClose = this.editClose.bind(this);
+        this.editorSaveChanges = this.editorSaveChanges.bind(this);
+        this.handleChangeInsertIngredient = this.handleChangeInsertIngredient.bind(this);
+        this.addIngredient = this.addIngredient.bind(this);
+        this.handleChangeDirections = this.handleChangeDirections.bind(this);
+        this.handleChangeDuration = this.handleChangeDuration.bind(this);
+        this.handleChangeDifficulty = this.handleChangeDifficulty.bind(this);
+        this.noImg = require("./no-photo.png");
+        let initialIngredientList = [];
+        this.ingredientFormRefs = [];
+        for (let original_ingredient of props.src.Ingredients) {
+            initialIngredientList.push(<IngredientForm removeFunc={this.removeIngredient}
+                                                       ingredient={original_ingredient} ref={(newIngredientForm) => {
+                if (newIngredientForm !== null) {
+                    this.ingredientFormRefs.push(newIngredientForm);
+                }
+            }}/>);
+        }
+
+        let initial_directions = "";
+        for (let direction_line of props.src.Directions) {
+            initial_directions += direction_line + '\n';
+        }
+
+        this.state={
+            deletionModal: false,
+            editModal: false,
+            ingredientList: initialIngredientList.slice(),
+            workingIngredientList: initialIngredientList,
+            ingredientToAdd: '',
+            directions: initial_directions,
+            workingDirections: initial_directions,
+            difficulty: props.src.Difficulty,
+            workingDifficulty: props.src.Difficulty,
+            duration: props.src.TimeCost,
+            workingDuration: props.src.TimeCost,
+        };
+
+        this.recipeHelper = new RecipeHelper();
     }
 
-    open(){
+    componentWillRecieveProps(newProps) {
+        this.constructor(newProps);
+    }
+
+    deletionOpen() {
 
         this.setState({
-            modal: true,
+            deletionModal: true,
         });
 
     }
 
-    close(){
+    deletionClose() {
 
         this.setState({
-            modal: false,
+            deletionModal: false,
         });
 
+    }
+
+    editOpen() {
+        this.ingredientFormRefs = [];
+        this.setState({
+            editModal: true,
+            workingDirections: this.state.directions,
+            workingIngredientList: this.state.ingredientList.slice(),
+        });
+    }
+
+    editClose() {
+        this.setState({
+            editModal: false,
+            workingIngredientList: this.state.ingredientList.slice(),
+            workingDirections: this.state.directions,
+        });
+        this.ingredientFormRefs = [];
     }
 
     removeThis(){
-        this.close();
+        this.deletionClose();
         this.props.removeFunc(this.props.src.Name);
+    }
+
+    removeIngredient(ingredientToRemove) {
+
+
+        let updatedWorkingIngredientList = [];
+        for (let i in this.ingredientFormRefs) {
+            if (this.ingredientFormRefs[i] === ingredientToRemove) {
+                this.ingredientFormRefs.splice(parseInt(i), 1);
+            }
+        }
+        for (let ingredientFormRef of this.ingredientFormRefs) {
+            updatedWorkingIngredientList.push(<IngredientForm removeFunc={this.removeIngredient}
+                                                              ingredient={ingredientFormRef.getFullString()}
+                                                              ref={(updatedIngredientFormRef) => {
+                                                                  if (updatedIngredientFormRef !== null) {
+                                                                      this.ingredientFormRefs.push(updatedIngredientFormRef);
+                                                                  }
+                                                              }
+                                                              }/>);
+        }
+        this.ingredientFormRefs = [];
+        this.setState({
+            workingIngredientList: updatedWorkingIngredientList.slice(),
+        });
+
+    }
+
+
+    editorSaveChanges() {
+
+        let updatedIngredientList = [];
+        let stringIngredientList = [];
+        console.log(this.ingredientFormRefs);
+        for (let ingredientFormRef of this.ingredientFormRefs) {
+            updatedIngredientList.push(<IngredientForm removeFunc={this.removeIngredient}
+                                                       ingredient={ingredientFormRef.getFullString()}
+                                                       ref={(updatedIngredientFormRef) => {
+                                                           if (updatedIngredientFormRef !== null) {
+                                                               this.ingredientFormRefs.push(updatedIngredientFormRef)
+                                                           }
+                                                       }
+                                                       }/>);
+            stringIngredientList.push(ingredientFormRef.getFullString());
+        }
+
+        let updatedDirections = this.state.workingDirections.split('\n');
+        console.log(updatedDirections);
+        this.setState({
+            ingredientList: updatedIngredientList.slice(),
+            workingIngredientList: updatedIngredientList.slice(),
+            directions: this.state.workingDirections,
+
+        });
+        this.props.updateFunc(this.recipeHelper.createRecipe(this.props.src.Name, stringIngredientList, updatedDirections));
+        this.editClose();
+    }
+
+    handleChangeInsertIngredient(e) {
+        this.setState({
+            ingredientToAdd: e.target.value,
+        });
+    }
+
+    addIngredient() {
+
+        let updatedWorkingIngredientList = this.state.workingIngredientList.slice();
+
+        updatedWorkingIngredientList.push(<IngredientForm removeFunc={this.removeIngredient}
+                                                          ingredient={"\u180e" + this.state.ingredientToAdd + "\u180e"}
+                                                          ref={(updatedIngredientFormRef) => {
+                                                              if (updatedIngredientFormRef !== null) {
+                                                                  this.ingredientFormRefs.push(updatedIngredientFormRef);
+                                                              }
+                                                          }
+                                                          }/>);
+
+
+        this.setState({
+            workingIngredientList: updatedWorkingIngredientList.slice(),
+            ingredientToAdd: '',
+        })
+    }
+
+    handleChangeDirections(e) {
+        this.setState({
+            workingDirections: e.target.value,
+        });
+    }
+
+    handleChangeDuration(e) {
+        this.setState({
+            workingDuration: e.target.value,
+        })
+    }
+
+    handleChangeDifficulty(e) {
+        this.setState({
+            workingDifficulty: e.target.value,
+        })
     }
 
     render() {
@@ -65,10 +225,67 @@ class PreviewCard extends Component{
         let editButton;
         if(this.props.personal){
             editButton =
-                <div className="btn btn-primary">
+                <div className="btn btn-primary" onClick={this.editOpen}>
                     Edit
                 </div>
         }
+
+
+        let insertionForm =
+
+            <div className={"row"}>
+                <div className={"col-md-10"}>
+                    <form onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.addIngredient();
+                        }
+                    }}>
+                        <FormGroup
+                            controlId="formBasicText"
+                            validationState={this.state.validation}
+                        >
+                            <FormControl
+                                type={"text"}
+                                value={this.state.ingredientToAdd}
+                                placeholder="Enter an ingredient, without units of measurement or additional information"
+                                onChange={this.handleChangeInsertIngredient}
+                            />
+                            <FormControl.Feedback/>
+                        </FormGroup>
+                    </form>
+                </div>
+                <div className={"col-md-2"}>
+                    <div className={"btn btn-success"} onClick={this.addIngredient}>
+                        Add
+                    </div>
+                </div>
+            </div>
+        ;
+
+        let directionForm =
+
+            <div className={"row"}>
+                <div className={"col"}>
+                    <form
+                    >
+                        <FormGroup
+                            controlId="formBasicText"
+                        >
+                            <FormControl
+                                componentClass={"textarea"}
+                                style={{height: '300px'}}
+                                value={this.state.workingDirections}
+                                placeholder="Enter directions, each on a new line"
+                                onChange={this.handleChangeDirections}
+                            />
+                            <FormControl.Feedback/>
+                        </FormGroup>
+                    </form>
+                </div>
+            </div>
+        ;
+
         return (
             <div className={"col-md-3"}>
                 <div className="card recipes">
@@ -88,17 +305,18 @@ class PreviewCard extends Component{
                         <p>
                         </p>
                         {editButton}
-                        <div className={"btn btn-danger"} onClick={this.open}>
+                        <div className={"btn btn-danger"} onClick={this.deletionOpen}>
                             {this.props.personal ? 'Delete' : 'Remove'}
                         </div>
+
                     </div>
 
                 </div>
 
-                <Modal show={this.state.modal} onHide={this.close}>
+                <Modal show={this.state.deletionModal} onHide={this.deletionClose}>
                     <Modal.Header>
                         <Modal.Title>
-                            {this.props.Name}
+                            {this.props.src.Name}
                         </Modal.Title>
                     </Modal.Header>
 
@@ -113,12 +331,38 @@ class PreviewCard extends Component{
                             <div className={"btn btn-danger"} onClick={this.removeThis}>
                                 {this.props.personal ? 'Delete' : 'Remove'}
                             </div>
-                            <div className={"btn btn-light"} onClick={this.close}>
+                            <div className={"btn btn-light"} onClick={this.deletionClose}>
                                 Cancel
                             </div>
                         </div>
                     </Modal.Footer>
 
+                </Modal>
+                <Modal bsSize={"large"} show={this.state.editModal} onHide={this.editClose}>
+                    <Modal.Header>
+                        <Modal.Title>
+                            Editing recipe: "{this.props.src.Name}"
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div>
+                            {insertionForm}
+                        </div>
+                        {this.state.workingIngredientList}
+                        <div>
+                            {directionForm}
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div>
+                            <div className={"btn btn-success"} onClick={this.editorSaveChanges}>
+                                Save Changes
+                            </div>
+                            <div className={"btn btn-danger"} onClick={this.editClose}>
+                                Discard Changes
+                            </div>
+                        </div>
+                    </Modal.Footer>
                 </Modal>
             </div>
 

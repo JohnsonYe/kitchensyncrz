@@ -42,15 +42,15 @@ import User from '../classes/User';
       *      }
       * }
       */
-    createRecipe(name,ingredients,directions){
+     createRecipe(name, ingredients, directions, duration, difficulty) {
         return {
             Name: name,
             Author: this.client.getUsername(),
             Ingredients: ingredients,
             Directions: directions,
             Reviews:{},
-            TimeCost:-1,
-            Difficulty:-1
+            TimeCost: duration,
+            Difficulty: difficulty,
         }
     }
 
