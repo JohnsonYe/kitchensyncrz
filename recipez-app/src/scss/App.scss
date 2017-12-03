@@ -5,10 +5,16 @@
 /* ruleset for all jumbotrons across website*/
 .jumbotron {
   //background: #1d1f21;
+  color: white;
   text-align: center;
   margin-top: -150px;
   overflow: hidden;
   height: 180px;
+
+  background-image: url("https://www.kitchfix.com/media/wysiwyg/Banner-Desktop_2880x838_.jpg");
+  //background-image: url("http://www.freshpoint.com/wp-content/uploads/banner-see-what-we-can-do1.jpg");
+  background-size: cover;
+
 }
 
 /* little icon that opens nav bar, will have to be
@@ -21,14 +27,16 @@
   margin-top: -40px;
   margin-left: -30px;
   margin-bottom: -10px;
+
 }
 
 /* actual nav bar menu */
 .navbar-menu {
   z-index: 100;
   height: 100%;
-  background: black;
+  background: white;
   color: white;
+
 
   ul, li {
     list-style-type: none;
