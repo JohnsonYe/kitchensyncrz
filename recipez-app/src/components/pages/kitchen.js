@@ -182,8 +182,10 @@ class kitchen extends Component {
                     break;
             }
 
+
         })
     }
+
 
     loadExcluded() {
         this.user.getExclusionList(this.processExcluded.bind(this));
@@ -191,8 +193,11 @@ class kitchen extends Component {
 
     processExcluded(data){
         (data).forEach((key) => {
-            this.addExclude(key);
+            if(key !== "mercury") {
+                this.addExclude(key);
+            }
         })
+
     }
 
     loadPreference(){

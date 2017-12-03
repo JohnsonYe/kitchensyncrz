@@ -167,9 +167,6 @@ export const ItemForm = ( {addProtein,
                        getKey,
                        internalClient} ) => {
 
-    // Input Tracker
-    let input;
-
     return (
         // Add to the form
         <form onSubmit={(e) => {
@@ -225,9 +222,6 @@ export const ItemForm = ( {addProtein,
 
 // Calls the add function to update exclude
 export const ExcludeForm = ({addExclude, internalClient}) => {
-
-    // Input Tracker
-    let input;
 
     return (
         // Add to the form
