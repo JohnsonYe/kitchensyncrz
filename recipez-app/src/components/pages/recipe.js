@@ -29,7 +29,7 @@ class Recipe extends Component {
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.User = new User();
+        this.User = User.getUser();
     }
 
     setRecipeData(recipeObject,err){
@@ -70,17 +70,6 @@ class Recipe extends Component {
                 </span>
             </li>)
 
-        /*var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item">
-                <span className="ingredient-box">
-                    <button onClick={(e)=>{this.User.addToShoppingList(ingredient);this.state.active}} className="shopping button" type="button" class="btn btn-circle" id="shoppoing_cart">
-                        <i class="glyphicon glyphicon-shopping-cart"/>
-                    </button>&nbsp;&nbsp;
-                    {ingredient}
-                </span>
-        </li>)*/
-
-
-
         var directions = this.state.data.Directions.map((step) => <li class="list-group-item"><i class="fa fa-cutlery" id="forksize"/>{step}</li>)
 
         // alert(JSON.stringify(this.state.data))
@@ -92,7 +81,7 @@ class Recipe extends Component {
                 </div>
             </li>)
 
-        var updateComment = {username:'Morten',Comment:this.state.value,Rating:'5',timestamp:'-1'}
+        var updateComment = {username:this.User.client.getUsername(),Comment:this.state.value,Rating:'5',timestamp:'-1'}
         var defaultImage1 = "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ieqr7Lr2x6Ug/v0/800x-1.jpg"
         var defaultImage2 = "https://s3-ap-northeast-1.amazonaws.com/sharingkyoto2017/articles/KVxqUS8KsRCmG7LTCyM2Tx4xNAdk6s09IKEa5yTU.jpeg"
         var defaultImage3 = "http://cdn-api.skim.gs/images/view/54be909e3847cf000069016b"
@@ -132,11 +121,11 @@ class Recipe extends Component {
                             <div class="row">
                                 <div class="btn=group btn-group-lg">
                                     {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
-                                    <button onClick={(e)=>User.getUser('user001').getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">
+                                    <button onClick={(e)=>User.getUser(this.User.client.getUsername()).getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-check"/>  check  </button>
-                                    <button onClick={(e)=>User.getUser('user001').saveExternalRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
+                                    <button onClick={(e)=>User.getUser(this.User.client.getUsername()).saveExternalRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-book"/>  add to cookbook  </button>
-                                    <button onClick={(e)=>User.getUser('user001').deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
+                                    <button onClick={(e)=>User.getUser(this.User.client.getUsername()).deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-trash"/>  remove from cookbook  </button>
                                 </div>
                             </div>
@@ -144,7 +133,6 @@ class Recipe extends Component {
                                 <h2><i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}</h2>
                             </div>
                             {/*====button group====*/}
-
                         </div>
                         <div class="col-sm-6" className="Ingredient">
                             <h2>Ingredients:</h2>
@@ -153,10 +141,6 @@ class Recipe extends Component {
                     </div>
                     <h2 className="Direction">Directions:</h2>
                     <ol>{directions}</ol>
-                    {/*<h2>Reviews:</h2>*/}
-                    {/*<ul>{reviews}</ul>*/}
-                    {/*<h2>JSON:</h2>
-                            <p>{JSON.stringify(this.state.data)}</p>*/}
                 </div>
 
                 <div class="container">
@@ -191,8 +175,6 @@ class Recipe extends Component {
                 </div>
 
             </div>
-
-
             )
     }
 

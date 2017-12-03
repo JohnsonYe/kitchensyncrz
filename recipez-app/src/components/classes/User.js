@@ -474,6 +474,6 @@
 
  var static_user = new User();
 
- User.getUser = (username) => static_user.verify(username);
+ User.getUser = (username) => static_user/*.verify(username)*/;
 
  export default User;
