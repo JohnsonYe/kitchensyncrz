@@ -1,6 +1,6 @@
 /**
  * Title: Recipe.js
- * Authors: Alexander Haggart & Johnson Ye
+ * Authors: Alexander Haggart
  * Date Created: 11/11/2017
  * Description: This file will load and display a recipe
  */
@@ -29,6 +29,7 @@ class Recipe extends Component {
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.reload = this.reload.bind(this);
         this.User = User.getUser();
     }
 
@@ -44,7 +45,8 @@ class Recipe extends Component {
     }
 
     updateReviews(response){
-        this.setState({data:this.state.data})
+        this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
+        // this.setState({data:this.state.data})
     }
 
     handleChange(event) {
@@ -55,6 +57,10 @@ class Recipe extends Component {
         alert('A comment was submitted: ' + this.state.value);
         this.forceUpdate();
         event.preventDefault();
+    }
+
+    reload() {
+        window.location.reload();
     }
 
     render() {
@@ -161,8 +167,8 @@ class Recipe extends Component {
                                             <div class="col-12">
                                                 <span className="pull-right">
                                                     <br/>
-                                                    <button onClick={(e)=>this.client.updateReview(this.state.data.Name,updateComment,this.updateReviews)}
-                                                            class="btn btn-success btn-circle text-uppercase" type="submit" id="submitComment" value="Reload Page">
+                                                    <button onClick={(e)=>{this.client.updateReview(this.state.data.Name,updateComment,this.updateReviews);/*this.reload()*/}}
+                                                            class="btn btn-success btn-circle text-uppercase" type="submit" id="submitComment" >
                                                         <span class="glyphicon glyphicon-send"/> Summit comment</button>
                                                 </span>
                                             </div>
