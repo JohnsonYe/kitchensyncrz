@@ -248,7 +248,8 @@ class Search extends Component {
     }
 
     mortensButton(){
-        this.setState({morten: this.user.client.getUsername()});
+        // this.setState({morten: this.user.client.getUsername()});
+        User.getUser().createUser('Alex',console.log)
         //User.getUser('user001').getPreferences(console.log)
         // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)
         //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
@@ -340,6 +341,7 @@ class Search extends Component {
                     <h1>Search</h1>
                 </div>
                 <div className="container-fluid">
+                    <button onClick={this.mortensButton}>Mortens Button</button>
                     <div id='searchbar-toolbar-container'>
                         <form onSubmit={this.handleSubmit} ref="form">
                             <div className='input-group'>

@@ -52,6 +52,20 @@ class User {
     }
 
     createUser(username,callback){
+        let failed_load = (pass,data)=>{
+            return ((response)=>{
+                console.log(response.payload);
+                pass(data)
+            });
+        };
+
+        let successful_load = (fail,data)=>{
+            return ((response)=>{
+                console.error(response.error);
+                fail(data);
+            });
+        };
+
         this.loadStream = Promise.resolve({ //create a new user data object locally
             username:       username,
             cookbook:       {},
@@ -61,7 +75,7 @@ class User {
             pantry:         {shrimp: {unit: 'Protein', amount: '1'}},
         })
         .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
-            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
+            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),failed_load(fail,data),successful_load(pass,data)))
         })
         this.loadStream.then((data)=>console.log(data.payload))
         this.loadStream.then(callback)
