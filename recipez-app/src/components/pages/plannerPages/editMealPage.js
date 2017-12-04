@@ -12,6 +12,7 @@ import React, { Component } from 'react';
 import {Button, Modal, DropdownButton, MenuItem, ButtonToolbar} from 'react-bootstrap';
 import PlannerHelper from '../../classes/Planner';
 import User from '../../classes/User';
+import RecipeHelper from "../../classes/RecipeHelper";
 
 
 function Duration(props) {
@@ -169,8 +170,11 @@ class MealEditor extends Component {
             minOnBtn: startMin,
             noonOnBtn: noon,
             endtime: endHr+":"+endMin,
-            dur: dur  //duration in minutes
+            dur: dur,  //duration in minutes
+            mealList: [],
+            img: "http://travelmasters.ca/wp-content/uploads/2017/03/no-image-icon-4-1024x1024.png"
         };
+
 
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
@@ -184,6 +188,12 @@ class MealEditor extends Component {
         this.handleNoonSelection = this.handleNoonSelection.bind(this);
         this.renderButtonToolBar = this.renderButtonToolBar.bind(this);
         this.updateEndTime = this.updateEndTime.bind(this);
+        this.renderMealList = this.renderMealList.bind(this);
+        this.renderImg = this.renderImg.bind(this);
+        this.printMealList = this.printMealList.bind(this);
+
+        this.renderImg();
+        this.renderMealList();
     }
 
     /** Updates day on button */
@@ -199,6 +209,11 @@ class MealEditor extends Component {
 
     /**Updates min on button*/
     handleMinSelection(evt) {
+
+        if(evt < 10) {
+            evt = "0"+evt
+        }
+
         this.setState( {minOnBtn: evt} );
         this.updateEndTime();
     }
@@ -320,6 +335,42 @@ class MealEditor extends Component {
         );
     }
 
+    renderMealList() {
+
+        let user = User.getUser();
+
+        user.getPlanner((planner)=>{
+            let meals = this.plannerHelper.getDayMealList(planner, this.state.days.indexOf(this.state.dayOnBtn));
+            let recipes = [];
+
+            for(let i = 0; i < meals.length; i++) {
+                recipes.push(meals[i].recipe[0]);
+            }
+
+            this.setState({mealList: recipes});
+        });
+    }
+
+    renderImg() {
+        let recipeHelper = new RecipeHelper();
+
+        recipeHelper.loadRecipe(this.props.recipe, (data) => {
+            if(data&&data.Image) {
+                this.setState({img: Array.from(data.Image)[0]});
+            }
+        });
+    }
+
+    printMealList() {
+            return (
+                Object.keys(this.state.mealList).map((key) => {
+                    return (
+                        <li>{this.state.mealList[key]}</li>
+                    );
+                })
+            );
+    }
+
 
     render() {
 
@@ -358,11 +409,17 @@ class MealEditor extends Component {
                         <a href ={"/Recipes/" + this.props.recipe}>
                             <img
                                 className="img-fluid"
-                                src={this.props.url}
+                                src={this.state.img}
                                 alt="No Image"
                             />
                         </a>
                     </figure>
+
+                    <figcaption>
+                        <ul>
+                        {this.printMealList()}
+                        </ul>
+                    </figcaption>
 
                     <Duration dur={this.props.dur}/>
                     <div className="border
