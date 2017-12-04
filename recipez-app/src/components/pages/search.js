@@ -95,6 +95,7 @@ class Search extends Component {
     }
     componentWillMount(){
         window.addEventListener('click', this.closeAllDropdowns);
+        this.startLoading();
         this.client.setRecipeLoaderSource(this.getRecipeLoader); //pass the client an anonymous function that gives it the most recent loader
         if(this.state.ingredients.size||this.state.excluded.size){
             //batch load all the ingredients from the URI
@@ -125,6 +126,12 @@ class Search extends Component {
     componentWillUnmount(){
         window.removeEventListener('click', this.closeAllDropdowns);
     }
+    startLoading(){
+        this.setState({loading:true});
+    }
+    doneLoading(){
+        this.setState({loading:false});
+    }
     addIngredient(ingredient){
         this.ingredient = ingredient;
     }
@@ -132,7 +139,8 @@ class Search extends Component {
         
         this.setState({
             sorted:sortedResults,
-            ...this.updateIngredientState(value,status)
+            ...this.updateIngredientState(value,status),
+            loading:false,
         },this.updateURI)
     }
     removeIngredient(value,status){
@@ -161,6 +169,7 @@ class Search extends Component {
     }
     updateLoader(ingredient){
         // console.log('Loading info for: ' + ingredient)
+        this.startLoading();
         this.recipeLoader = this.recipeLoader.then((recipes)=>{
             // console.log('updating loader: '+JSON.stringify(recipes))
             let recipeNames =  Array.from(new Set(ingredient.recipes.map((recipe)=>recipe.Name))); //remove duplicates
@@ -170,9 +179,10 @@ class Search extends Component {
                 .then((recipeList)=>{
                     // console.log('recipe list: '+JSON.stringify(recipeList));
                     // console.log('recipe map: '+JSON.stringify(recipes));
+                    this.doneLoading();
                     return recipeList.reduce((prev,next)=>prev.set(next.Name,next),recipes);
                 })
-                .catch((err)=>{console.error('updateLoader: '+err);return recipes}))
+                .catch((err)=>{console.error('updateLoader: '+err);this.doneLoading();return recipes}));
         });
         this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
     }
@@ -209,6 +219,7 @@ class Search extends Component {
         console.log('Updated search results: ' + JSON.stringify([value,status]))
     }
     handleSubmit(e){
+        this.startLoading();
         e.preventDefault();
 
         let value = this.searchbar.getValue()
@@ -241,6 +252,7 @@ class Search extends Component {
     }
 
     setFilter(filter){
+        this.startLoading();
         this.closeAllDropdowns()
         if(filter === "custom"){ //special actions based on user preferences
             
@@ -329,7 +341,8 @@ class Search extends Component {
         )
         .then( filter_failed_results_fn )
         .then( sort_results_and_update_fn )
-        .catch((err)=>console.error(err))
+        .catch(console.error)
+        .then(()=>this.setState({loading:false}))
         
     }
 
@@ -428,6 +441,10 @@ class Search extends Component {
                         </div>
                     </form>
                     {/*console.log(this.state.loadedRecipes)*/}
+                    {this.state.loading?
+                    (<div className='well'>
+                        <p className='text-center'>{this.getGlyph('refresh loading-icon')} Loading</p>
+                    </div>):undefined}
                     <ul className="list-group">
                         {this.state.sorted.map((recipe)=>(
                             <li className="list-group-item">

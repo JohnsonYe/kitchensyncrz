@@ -92,7 +92,7 @@ class ShoppingList extends Component{
             <div className='panel panel-default'>
                 <div className='panel-heading'>{this.getGlyph('shopping-cart')} Shopping List</div>
                 <div className='panel-body'>
-                {this.state.shoppingList.map((item)=>this.getListItem(item))}
+                    {this.state.shoppingList.map((item)=>this.getListItem(item))}
                 </div>
             </div>
         )
