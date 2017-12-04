@@ -22,6 +22,7 @@ Util.loadCompiledAutocompleteTree = function(treeName,id){
         .then((file)=>zip.file(treeName+'.tst').async('string')) //MORE ASYNC
         .then((json)=>new Autocomplete().loadJSON(json))
         .then((autocomplete)=>{console.log('Finished loading autocomplete in '+id);return autocomplete})
+        .catch(console.error)
 }
 
 Util.NonVegetarian = [

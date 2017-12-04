@@ -12,6 +12,7 @@ import SearchHelper from '../classes/SearchHelper';
 import RecipeHelper from '../classes/RecipeHelper';
 import PlannerHelper from '../classes/Planner';
 import User from '../classes/User';
+import Util from '../classes/Util'
 
 import SearchBar from '../SearchComponents/SearchBar';
 import SearchThumbnail from '../SearchComponents/SearchThumbnail';
@@ -100,9 +101,9 @@ class Search extends Component {
     }
     componentWillMount(){
         window.addEventListener('click', this.closeAllDropdowns);
-        this.startLoading();
         this.client.setRecipeLoaderSource(this.getRecipeLoader); //pass the client an anonymous function that gives it the most recent loader
         if(this.state.ingredients.size||this.state.excluded.size){
+            this.startLoading();
             //batch load all the ingredients from the URI
             this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
             // use a promise.all to wait for all ingredients to load asynchronously
@@ -255,7 +256,7 @@ class Search extends Component {
         this.startLoading();
         this.closeAllDropdowns()
         if(filter === "custom"){ //special actions based on user preferences
-            
+            this.doneLoading();
         } else {
             this.client.setFilter(filter,this.searchUpdateWrapper());
         }
@@ -269,35 +270,10 @@ class Search extends Component {
 
     mortensButton(){
         this.setState({morten: this.user.client.getUsername()});
-        //User.getUser('user001').getPreferences(console.log)
-        // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)
-        //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
 
-
-        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry)}));                     // THIS WORKS
-        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry['milk'])}));             // THIS WORKS
-        //this.user.addToPantry('prok','none',1)                                                            // THIS WORKS
-        //this.user.removeFromPantry('prok')                                                                // THIS WORKS
-
-
-        //this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))                // THIS WORKS
-        //this.user.addToCookbook('pork', 'This is how you do')                                             // THIS WORKS
-        //this.user.removeFromCookbook('pork')                                                              // THIS WORKS
-
-
-        //this.user.getCookware(cookware=> this.setState({morten:JSON.stringify(cookware)}));               // THIS WORKS
-        //this.user.addToCookware('spoon')                                                                  // THIS WORKS
-        //this.user.removeFromCookware('spoon');                                                            // THIS WORKS
-
-
-        //this.user.getExclusionList(exlcude=> this.setState({morten:JSON.stringify(exlcude)}))             // THIS WORKS
-        //this.user.addToExclusionList('corn')                                                              // THIS WORKS
-        //this.user.removeFromExclusionList('corn')                                                         // THIS WORKS
-
-        //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
-        //this.user.addToShoppingList('milk')                                                               // THIS WORKS
-        //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
-
+        Util.loadCompiledAutocompleteTree('Combined','morten')
+            // .then((auto)=>auto.dumpTree())
+            .then((auto)=>console.log(auto.getCompletion('')))
     }
 
     toggleThumbnails(){
