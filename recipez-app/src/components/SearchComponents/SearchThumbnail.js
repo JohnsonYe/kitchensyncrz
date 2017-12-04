@@ -11,6 +11,7 @@ import {Modal} from 'react-bootstrap';
 import Recipe from '../pages/recipe';
 import RecipeHelper from '../classes/RecipeHelper';
 import MealEditor from '../pages/plannerPages/editMealPage';
+import User from '../classes/User';
 
 class SearchThumbail extends Component {
     constructor(props){
@@ -22,6 +23,8 @@ class SearchThumbail extends Component {
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this.heart = this.heart.bind(this);
+        this.User = User.getUser();
+
         
     }
 
@@ -34,8 +37,8 @@ class SearchThumbail extends Component {
     }
 
     // add to cookbook/ favorite
-    heart() {
-        alert("HELLO WORLD");
+    heart(e) {
+        (e)=>User.getUser(this.User.client.getUsername()).saveExternalRecipe(this.state.data.Name)
     }
 
     render() {
@@ -78,7 +81,7 @@ class SearchThumbail extends Component {
                                                                             
                         </Modal.Body>
                     </Modal>
-                    <a href="javascript:undefined;" onClick={this.heart} className="btn btn-dark col-4"
+                    <a onClick={(e)=>User.getUser(this.User.client.getUsername()).saveExternalRecipe(this.props.data.Name)} className="btn btn-dark col-4"
                         title="Save to CookBook">
                         <img className="heart"
                                 width="18"
