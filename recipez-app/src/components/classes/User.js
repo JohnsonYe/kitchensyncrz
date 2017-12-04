@@ -46,6 +46,7 @@ class User {
     }
 
     reload(){
+        console.log('reloaded user data: '+this.client.getUsername());
         this.loadStream = new Promise(this.loadUserData)
     }
 
@@ -449,7 +450,7 @@ class User {
      * @return {[type]}      [description]
      */
     getUserData(name){
-        return this.loadStream.then((data)=>data[name]).catch((e)=>'Failed to fetch loaded data!');
+        return this.loadStream.then((data)=>{console.log("Requested data: "+name+'\n'+JSON.stringify(data));return data[name]}).catch((e)=>'Failed to fetch loaded data!');
     }
 
     /**

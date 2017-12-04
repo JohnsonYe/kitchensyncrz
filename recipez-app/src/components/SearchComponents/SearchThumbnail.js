@@ -11,6 +11,7 @@ import {Modal} from 'react-bootstrap';
 import Recipe from '../pages/recipe';
 import RecipeHelper from '../classes/RecipeHelper';
 import MealEditor from '../pages/plannerPages/editMealPage';
+import {Link} from 'react-router-dom';
 
 class SearchThumbail extends Component {
     constructor(props) {
@@ -42,17 +43,19 @@ class SearchThumbail extends Component {
         var imgsrc = "http://www.maktabatulmadina.net/img/uploaded/730.jpg";
         imgsrc = this.props.data.Image ? Array.from(this.props.data.Image)[0] : imgsrc;
         // alert(this.props.data.Image);
+        // console.log(JSON.stringify(this.props.data))
 
         var ingredients = this.props.data.Ingredients.map((ingredient) => <li><span>{ingredient}</span></li>)
         var directions = this.props.data.Directions.map((step) => <li>{step}</li>)
 
+
         return (
             <div className="col-lg-3 col-md-4 col-sm-6 search-thumbnail">
                 {/* Need to check if recipe's img exists, if so use that */}
-                <a href={'/Recipes/' + this.props.data.Name}>
+                <Link to={'/Recipes/' + this.props.data.Name}>
                     <img src={imgsrc}
                          className="card-img-top foodpic"/>
-                </a>
+                </Link>
 
                 {/* View Recipe, Favorite, and Plan Meal buttons */}
                 <div className="thumbnail-buttons row mx-auto">
@@ -75,7 +78,7 @@ class SearchThumbail extends Component {
                             <h3>Directions:</h3>
                             <ol>{directions}</ol>
                             <br/>
-                            <p>View Full Recipe <a href={"/Recipes/" + this.props.data.Name}>Here</a>.</p>
+                            <p>View Full Recipe <Link to={"/Recipes/" + this.props.data.Name}>Here</Link>.</p>
 
                         </Modal.Body>
                     </Modal>
