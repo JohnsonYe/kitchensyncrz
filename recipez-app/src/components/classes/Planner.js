@@ -185,11 +185,8 @@ class PlannerHelper{
      * @param meal - new meal object to replace the old one.
      */
     editMeal(data, day, mealIndex, meal, newDay) {
-        // check if meal exist
-        if(this.insertMeal(data, meal, newDay)) {
-            //alert("got here");
-            this.removeMeal(data, day, mealIndex);
-        }
+        this.removeMeal(data, day, mealIndex);
+        this.insertMeal(data, meal, newDay);
     }
 
 
