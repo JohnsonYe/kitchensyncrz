@@ -29,7 +29,6 @@ class Recipe extends Component {
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.reload = this.reload.bind(this);
         this.User = User.getUser();
     }
 
@@ -57,10 +56,6 @@ class Recipe extends Component {
         alert('A comment was submitted: ' + this.state.value);
         this.forceUpdate();
         event.preventDefault();
-    }
-
-    reload() {
-        window.location.reload();
     }
 
     render() {
