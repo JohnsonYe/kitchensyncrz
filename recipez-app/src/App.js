@@ -78,7 +78,7 @@ class App extends Component {
 
 
     componentWillMount() {
-        window.addEventListener('click', this.closeNav);
+        document.addEventListener('click', this.closeNav);
         document.addEventListener('mousemove',this.moveCallback)
         this.setState({
             isMenuOpened: false,
@@ -88,7 +88,7 @@ class App extends Component {
     }
 
     componentWillUnmount() {
-        window.removeEventListener('click', this.closeNav);
+        document.removeEventListener('click', this.closeNav);
         document.removeEventListener('mousemove',this.moveCallback);
     }
 
@@ -180,7 +180,7 @@ class App extends Component {
                     <Footer />
                     <div className="row">
                     <span className="col-2 pull-right fun-button">
-                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Hello There</button>
+                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Morten's Button</button>
                     </span>
                     </div>
                     <div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>

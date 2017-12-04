@@ -236,6 +236,7 @@ class MealEditor extends Component {
 
     /** creates/overwrites meal to the meal */
     update(transform) {
+        this.close();
         var user = User.getUser();
         user.getPlanner((planner)=>{
             planner = transform(planner);
@@ -271,6 +272,7 @@ class MealEditor extends Component {
     }
 
     edit() {
+
         var hour = parseInt(this.state.hourOnBtn),
             min = parseInt(this.state.minOnBtn);
 
