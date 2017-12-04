@@ -7,11 +7,8 @@
 import React,{ Component } from 'react';
 import RecipeHelper from '../classes/RecipeHelper';
 import {Tabs, Tab} from 'react-bootstrap';
-import '../../css/recipes.css';
 import User from '../classes/User'
-import '../../css/review.css';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'react-bootstrap-carousel/dist/react-bootstrap-carousel.css';
+// import 'react-bootstrap-carousel/dist/react-bootstrap-carousel.css';
 import {Carousel} from 'react-bootstrap';
 
 class Recipe extends Component {
@@ -63,7 +60,7 @@ class Recipe extends Component {
             return <div><h1>{this.state.data}</h1></div>
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item col-sm-5">
-                <span className="ingredient-box">
+                <span>
                     <button onClick={(e)=>this.User.addToShoppingList(ingredient)} className="shopping button" type="button" class="btn btn-circle" id="shoppoing_cart">
                         <i class="glyphicon glyphicon-shopping-cart"/>
                     </button>&nbsp;&nbsp;
@@ -71,7 +68,7 @@ class Recipe extends Component {
                 </span>
         </li>)
 
-        var directions = this.state.data.Directions.map((step) => <li class="list-group-item"><i class="fa fa-cutlery" id="forksize"/>{step}</li>)
+        var directions = this.state.data.Directions.map((step) => <li class="list-group-item"><i class="glyphicon glyphicon-cutlery" id="forksize"/>{step}</li>)
 
         // alert(JSON.stringify(this.state.data))
         var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) =>
@@ -105,9 +102,9 @@ class Recipe extends Component {
         return (
             <div>
                 <div className="jumbotron">
-                    <h1>Kitchen Sync</h1>
+                    <h1 id="RPh1">Kitchen Sync</h1>
                 </div>
-                <h1 className="PageHeader">{this.state.data.Name}</h1>
+                <h1 id="RPh1Name">{this.state.data.Name}</h1>
                 <br/>
 
                 <div class="container">
@@ -118,8 +115,8 @@ class Recipe extends Component {
                         </div>
                         <div class="col-sm-3">
                             <div class="row" className="row-height-for-time">
-                                <h2><i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}
-                                    <h2><i class="glyphicon glyphicon-wrench"/>&nbsp;&nbsp;{this.state.data.Difficulty}</h2></h2>
+                                <h2 id="RPh2"><i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}
+                                    <h2 id="RPh2"><i class="glyphicon glyphicon-wrench"/>&nbsp;&nbsp;{this.state.data.Difficulty}</h2></h2>
                             </div>
                             <div class="row">
                                 {/*====button group====*/}
@@ -139,14 +136,14 @@ class Recipe extends Component {
                         <div class="col">
                             <div class="row">
                                 <div class="col-sm-6" className="Ingredient">
-                                    <h2>Ingredients:</h2>
+                                    <h2 id="RPh2">Ingredients:</h2>
                                     <ul>{ingredients}</ul>
                                 </div>
                             </div>
                             <div class="row">
                                 <h2 className="Direction">Directions:</h2>
                             </div>
-                            <div class="row">
+                            <div class="row" className="directionstyle">
                                 <ol>{directions}</ol>
                             </div></div>
                     </div>

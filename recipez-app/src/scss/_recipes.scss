@@ -1,16 +1,16 @@
-h1 {
+#RPh1 {
     font-family: "Georgia", serif;
     font-size: 50px;
     text-align: center;
 }
 
-.PageHeader {
+#RPh1Name{
     font-family: "Georgia", serif;
     font-size: 45px;
     text-align: center;
 }
 
-h2 {
+#RPh2{
     font-family: "Times New Roman", Times, serif;
     font-size: 30px;
 }
@@ -38,29 +38,43 @@ h2 {
 }
 
 #reviewContainer{
-    widht:100%;
+    width:100%;
     margin: auto;
 }
 
-#forksize {
-    padding-right: 1.5em;
+#forksize{
+    padding-right: 1.0em;
 }
 
-.CarouselSize {
-    height: 350px;
+.CarouselSize{
+    height: 500px;
+    width:800px;
     border-radius: 25px;
 }
 
-.CarouselSize img {
+.CarouselSize img{
     border-radius: 25px;
-    height: 350px;
+    height: 500px;
+    width:800px;
 }
 
-.Ingredient h2 {
+.Ingredient h2{
     padding: 0px 50px;
     /* margin: auto;*/
 }
 
-.Direction {
+.Direction{
     padding: 10px 50px;
+}
+
+.row-height-for-time{
+    padding-bottom: 200px
+}
+
+.Ingredient .list-group-item{
+    background-color:#ffffff;
+}
+
+.directionstyle .list-group-item{
+    background-color:#ffffff;
 }
