@@ -64,7 +64,6 @@ class SavedRecipes extends Component{
          for( let recipe of this.state.recipeList){
              recipeCards.push(<PreviewCard src={recipe} removeFunc={this.removeRecipe} personal={0}/>);
         }
-        console.log(recipeCards);
         return(
             <div>
                 <div className={"row"}>

@@ -8,7 +8,7 @@
 import React, {Component} from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
 // import AndrewPreviewCard from '../cookbookComponents/andrew_previewCard'
-import {FormGroup,FormControl,HelpBlock,ControlLabel,Modal} from 'react-bootstrap';
+import {FormGroup, FormControl, HelpBlock, ControlLabel, Modal, Image} from 'react-bootstrap';
 import RecipeHelper from '../classes/RecipeHelper.js';
 
 
@@ -26,6 +26,7 @@ class PersonalRecipes extends Component{
         this.getValidationState = this.getValidationState.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.updateRecipe = this.updateRecipe.bind(this);
+        this.getImage = this.getImage.bind(this);
 
         this.handleImgChange = this.handleImgChange.bind(this);
 
@@ -33,9 +34,10 @@ class PersonalRecipes extends Component{
             recipeList: [],
             modal: false,
             value: '',
-            validation:'',
+            validation: '',
             url: '',
-        };
+            previewImage: <UpdatableImage/>,
+        }
 
         this.userInstance = props.userInstance;
         this.recipeHelper = new RecipeHelper();
@@ -133,10 +135,16 @@ class PersonalRecipes extends Component{
     }
 
     handleImgChange(e){
-        this.setState({ url: e.target.url });
+        this.setState({url: e.target.value});
     }
 
-
+    getImage() {
+        console.log(this.state.url);
+        this.setState({
+            previewImage: <UpdatableImage src={this.state.url}/>,
+        });
+        console.log(this.state.previewImage);
+    }
 
 
     render(){
@@ -184,7 +192,7 @@ class PersonalRecipes extends Component{
                 <FormGroup controlId="formBasicText">
                     <FormControl
                         type={"text"}
-                        url={this.state.url}
+                        value={this.state.url}
                         placeholder="Enter Image URL"
                         onChange={this.handleImgChange}
                         />
@@ -193,7 +201,7 @@ class PersonalRecipes extends Component{
             </form>
 
 
-
+        let image = this.state.previewImage;
         return(
             <div>
 
@@ -215,12 +223,15 @@ class PersonalRecipes extends Component{
 
                     <Modal.Body>
                         {form}
-                        {imgForm}
-                        <img src={this.state.url}
-                             alt="URL Not Found"
-                             height={300}
-                             width={300} />
-
+                        <div className={"row"}>
+                            <div className={"col-md-10"}>
+                                {imgForm}
+                            </div>
+                            <div className={"btn col-md-2 btn-success mb-4"} onClick={this.getImage}>
+                                Add
+                            </div>
+                        </div>
+                        {image}
                     </Modal.Body>
                     <Modal.Footer>
                         <div>
@@ -244,4 +255,25 @@ class PersonalRecipes extends Component{
 
 }
 
+class UpdatableImage extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            src: props.src,
+        }
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.setState({
+            src: newProps.src,
+        });
+    }
+
+    render() {
+        return (
+            <Image responsive src={this.state.src} alt={"URL Not Found"}/>
+        );
+    }
+
+}
 export default PersonalRecipes;

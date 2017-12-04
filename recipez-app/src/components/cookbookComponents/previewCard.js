@@ -175,7 +175,6 @@ class PreviewCard extends Component{
 
         let updatedIngredientList = [];
         let stringIngredientList = [];
-        console.log(this.ingredientFormRefs);
         for (let ingredientFormRef of this.ingredientFormRefs) {
             updatedIngredientList.push(<IngredientForm removeFunc={this.removeIngredient}
                                                        ingredient={ingredientFormRef.getFullString()}
@@ -478,5 +477,6 @@ class PreviewCard extends Component{
         );
     }
 }
+
 
 export default PreviewCard;
