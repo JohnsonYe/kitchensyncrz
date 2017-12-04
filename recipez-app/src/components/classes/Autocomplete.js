@@ -131,10 +131,11 @@ class Autocomplete {
         if(node.c){
             // console.log(JSON.stringify(base))
             result = result.concat(this.dfs(node.c, base))
-        } else {
-            // console.log(base.join(''))
-            result = result.concat(base.join(''))
-        }
+        } 
+        // else {
+        //     // console.log(base.join(''))
+        //     result = result.concat(base.join(''))
+        // }
         base.pop()
         // console.log(result)
         return result

@@ -208,7 +208,7 @@ class SearchBar extends Component{
 
 SearchBar.InternalClient = class{
     constructor(treeName){
-        this.auto = Util.loadCompiledAutocompleteTree(treeName,'internal client');
+        this.auto = Util.loadCompiledAutocompleteTree(treeName?treeName:'Ingredients','internal client');
     }
 
     autocomplete(base,callback){

@@ -339,11 +339,6 @@ class Search extends Component {
             <div className="jumbotron">
                 <h1>Search</h1>
             </div>
-            <div>
-                <h3>{this.state.morten}</h3>
-                <button onClick={this.mortensButton}>Mortens Button</button>
-                <button onClick={this.mortensButton2}>Mortens Button2</button>
-            </div>
             <div className="container-fluid">
                 <div id='searchbar-toolbar-container'>
                     <form onSubmit={this.handleSubmit} ref="form">
