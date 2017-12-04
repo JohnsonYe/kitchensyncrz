@@ -1,16 +1,34 @@
 @import "_config.scss";
 @import "_search.scss";
 
+.modal-backdrop {
+  z-index: 90;
+}
+
+.modal{
+  display: block;
+}
+
+.fun-button {
+  position: fixed;
+  bottom: 0;
+}
+
 
 /* ruleset for all jumbotrons across website*/
 .jumbotron {
   //background: #1d1f21;
   text-align: center;
-  margin-top: -150px;
+  margin-top: -180px;
   overflow: hidden;
   height: 180px;
 }
 
+.navbar-icon {
+  height: 150px;
+}
+
+/* little icon that opens nav bar, will have to be 
 /* little icon that opens nav bar, will have to be
  * adjusted as we change the img */
 .ks-icon {
@@ -23,22 +41,46 @@
   margin-bottom: -10px;
 }
 
+.navbar {
+  padding: 0;
+  width: auto;
+}
+
 /* actual nav bar menu */
 .navbar-menu {
   z-index: 100;
   height: 100%;
+  width: 80%;
   background: black;
   color: white;
+  border-right: solid 1px #e0eff9;
+
 
   ul, li {
     list-style-type: none;
-    margin-left: 10px;
+    //margin-left: 10px;
+    //margin-right: 0;
     padding: 0px;
+    width: auto;
+    margin: 0 0 0 10px;  
+    
+  }
+
+  ul {
+    margin-right: 0;
+    width: 75%;
   }
 
   a {
     color: white;
     font-size: 25px;
+
+    &:hover {
+      //color: #e0eff9;
+      color: lightgrey;
+      margin-left: 2px;
+      text-decoration: none;
+    }
   }
 
   .first {
@@ -46,14 +88,73 @@
   }
 }
 
+
 .nav {
   display: inline-block;
 }
+
+.navbar-icon {
+  width: 20%;
+}
+
+.search-thumbnail {
+  margin: 0 0 0 0;
+  padding-top: 20px;
+  
+  background: #e0eff9;
+  border: solid 2px white;
+  border-radius: 15px;
+
+  position: relative;
+  height: auto;
+  
+  
+
+  .btn-dark {
+    border: solid 1px #e0eff9;
+  }
+  
+  /* Must match thumbnail background with btn-dark border color */
+}
+
+.search-results{
+  padding-top: 10px
+}
+
+.thumbnail-buttons {
+  float: bottom;  
+  padding-top: 10px;
+  position: relative;
+}
+
+.card-body {
+  padding-top: 0;
+}
+
+.foodpic {
+  border: solid 2px black;
+  object-fit: cover;
+  min-width: 100%;
+  min-height: 400px;
+}
+
+.modal-foodpic {
+  border: solid 2px black;
+}
+
+.carousel-item {
+  height: 250px;
+  
+}
+
 
 #pantry-node{
 
   font-size: 15px;
   text-align: center;
+  margin-top:5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 #Modal1{
@@ -68,7 +169,12 @@
   margin-right: 5px;
 }
 
-.navbar-icon {
-  width: 20%;
+#content{
+    padding: -30px 15px;
+    border: none;
+    border-top: 0;
+    border-bottom-right-radius: -4px;
+    border-bottom-left-radius: -4px;
 }
+
 

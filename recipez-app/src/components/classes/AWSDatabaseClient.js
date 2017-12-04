@@ -34,6 +34,7 @@ var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
 
+var MAX_REQUEST_LENGTH = 100;
 
 var appClientID = '1qnpej4u0hul8mq0djs9a5r8me';
 var MAX_REQUEST_LENGTH = 100;
@@ -79,8 +80,7 @@ var MAX_REQUEST_LENGTH = 100;
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':Array.from(ss)}),
-            'N': (n,p)=>({'N':n}),
-            'SET': (n,p)=>{alert('this isnt set up yet')},
+            'N': (n,p)=>({'N':n+''}),
         }
 
 
@@ -452,10 +452,11 @@ var MAX_REQUEST_LENGTH = 100;
         return client_style_map
     }
 
-    registerPrototype(proto){
+    registerPrototype(proto, ){
         if(!proto._NAME){
             throw new TypeError('No _NAME specified for prototype: ' + JSON.stringify(proto))
         }
+
         this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
         this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
 
@@ -472,7 +473,7 @@ var MAX_REQUEST_LENGTH = 100;
         }
         //unpack an item from AWS
         // alert(JSON.stringify(item)+'\n'+JSON.stringify(prototype))
-        var unpacked = {}
+        var unpacked = {};
         Object.keys(item).forEach((key)=>{
             try{
                 unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
@@ -482,6 +483,7 @@ var MAX_REQUEST_LENGTH = 100;
                 //for now, developers working with the database must be careful with adding new fields
                 unpacked[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
+                    //alert(key)
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })

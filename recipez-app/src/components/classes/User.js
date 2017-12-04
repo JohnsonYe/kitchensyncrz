@@ -15,7 +15,12 @@ import DBClient from './AWSDatabaseClient'
 
 class User {
     constructor(){
-        this.client = DBClient.getClient()
+        this.client = DBClient.getClient();
+
+        //Planner data
+        this.client.registerPrototype(User.PlannerPrototype);
+        this.client.registerPrototype(User.DayPrototype);
+        this.client.registerPrototype(User.MealPrototype);
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -29,8 +34,6 @@ class User {
 
         // this.addToPantry('zucchini','none',1)
         // this.removeFromPantry('zucchini')
-
-        this.userData = { username:this.client.getUsername(), cookbook:{},cookware:{},pantry:{},planner:{}}
 
         // this.client.updateItem(
         //     this.client.buildUpdateRequest(
@@ -59,13 +62,13 @@ class User {
             shoppingList:   new Set(['mercury']),
 
         })
-        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
-            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
-        })
+            .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
+                return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
+            })
         this.loadStream.then((data)=>console.log(data.payload))
         this.loadStream.then(callback)
         this.loadStream.catch(console.error)
-        }
+    }
     /**
      * this.userData:
      * {
@@ -74,20 +77,12 @@ class User {
      *      cookbook: <Set<String>> user's favorited/saved recipe list
      *      cookware: <Set<String>> user's available cookware
      *      planner:  <???> TODO work with planner team on data organization
-     * }
+     *
      */
     loadUserData(resolve,reject){
         console.log(this.client.getUsername())
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
-                this.userData = {
-                    username:   response.payload[0].username.S,
-                    cookbook:   response.payload[0].cookbook.M,
-                    cookware:   new Set(response.payload[0].cookware.SS),
-                    exclude:    new Set(response.payload[0].exclude.SS),
-                    shoppingList: new Set(response.payload[0].shoppingList.SS),
-                    pantry:     this.client.unpackMap(response.payload[0].pantry.M)
-                }
                 // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
                 resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))
                 // resolve(this.userData)
@@ -108,6 +103,7 @@ class User {
             (response)=>{
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully remove from Cookbook')
                         delete data.cookbook[recipeName];
                         return data
                     })
@@ -151,6 +147,7 @@ class User {
             (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully add to Cookbook')
                         data.cookbook[recipeName]='none';
                         return data;
                     })
@@ -172,7 +169,7 @@ class User {
      * }
      */
     getPantry(callback){
-         return this.getUserData('pantry').then(response=>{callback(response)})
+        return this.getUserData('pantry').then(callback);
     }
 
 
@@ -398,12 +395,13 @@ class User {
     }
 
     setPlanner(planner,callback){
-        let packed = this.client.packItem(planner,undefined);
+
+        let packed = this.client.packItem(planner,User.PlannerPrototype);
         console.log(JSON.stringify(packed));
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User','username',this.client.getUsername(),
-                this.client.buildSetUpdateExpression('planner',packed)),
+                this.client.buildSetUpdateExpression('planner',{M:packed})),
             (response)=>{
                 if(response.status){
                     this.addUserData((data)=>{
@@ -488,7 +486,6 @@ class User {
     }
 }
 
-
  User.MealPrototype = {
      _NAME: "Meal",
      recipes: { type: 'L' ,inner:{ type:'S'} },
@@ -507,6 +504,7 @@ class User {
      _NAME: "Planner",
      days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
  }
+
 DBClient.getClient().registerPrototype(User.PlannerPrototype)
 DBClient.getClient().registerPrototype(User.DayPrototype)
 DBClient.getClient().registerPrototype(User.MealPrototype)
@@ -526,8 +524,8 @@ User.UserDataPrototype = {
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
-    shoppingList:{type:'SS'},
     planner:{type:User.PlannerPrototype._NAME},
+    shoppingList:{type:'SS'},
     exclude:{type:'SS'},
     preferences:{type:'SS'},
 }

@@ -1,0 +1,66 @@
+h1 {
+    font-family: "Georgia", serif;
+    font-size: 50px;
+    text-align: center;
+}
+
+.PageHeader{
+    font-family: "Georgia", serif;
+    font-size: 45px;
+    text-align: center;
+}
+
+h2 {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+}
+
+#shoppoing_cart {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+
+}
+.btn-circle:active{
+    background: #007299;
+    box-shadow: none;
+}
+.btn-circle:focus, .btn-circle:active:focus, .btn-circle.active:focus {
+    outline: 0 none;
+}
+
+.btn-circle:hover, .btn-circle:focus, .btn-circle:active, .btn-circle.active, .open > .dropdown-toggle.btn-circle {
+    background: forestgreen;
+}
+
+#reviewContainer{
+    widht:100%;
+    margin: auto;
+}
+
+#forksize{
+    padding-right: 1.5em;
+}
+
+.CarouselSize{
+    height: 350px;
+    border-radius: 25px;
+}
+
+.CarouselSize img{
+    border-radius: 25px;
+    height: 350px;
+}
+
+.Ingredient h2{
+    padding: 0px 50px;
+   /* margin: auto;*/
+}
+
+.Direction{
+    padding: 10px 50px;
+}

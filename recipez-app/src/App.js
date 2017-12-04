@@ -37,13 +37,19 @@ import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 
 class App extends Component {
-
     constructor(props){
         super(props);
+        this.componentWillMount = this.componentWillMount.bind(this);
+        this.componentWillUnmount = this.componentWillUnmount.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.closeNav = this.closeNav.bind(this);
+        this.toggleFunMode = this.toggleFunMode.bind(this);
 
+        this.state = {
+            isMenuOpened: false,
+            funMode: false
+        }
         this.client = DBClient.getClient();
-
-
     }
 
     async componentDidMount() {
@@ -53,7 +59,7 @@ class App extends Component {
             }
         }
         catch(e) {
-            alert(e);
+            // alert('app mounted: '+e);
         }
 
         this.setState({ isAuthenticating: false});
@@ -61,6 +67,7 @@ class App extends Component {
 
 
     componentWillMount() {
+        window.addEventListener('click', this.closeNav);
         this.setState({
             isMenuOpened: false,
             isAuthenticating: true
@@ -68,12 +75,26 @@ class App extends Component {
         })
     }
 
-    handleClick() {
+    componentWillUnmount() {
+        window.removeEventListener('click', this.closeNav);
+    }
+
+    handleClick(e) {
+        e.stopPropagation();
         this.setState({ isMenuOpened: !this.state.isMenuOpened });
     }
 
+    closeNav(e) {
+        e.stopPropagation();
+        this.setState( {isMenuOpened: false });
+    }
+
+    toggleFunMode() {
+        this.setState( {funMode: !this.state.funMode} );
+    }
+
     handleLogout = event => {
-        this.handleClick();
+        //this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
         this.client.user = 'user001';
@@ -82,6 +103,9 @@ class App extends Component {
     }
 
     render() {
+        var imgsrc = "http://www.free-icons-download.net/images/a-kitchen-icon-80780.png";
+        {this.state.funMode? imgsrc="http://vignette1.wikia.nocookie.net/epicrapbattlesofhistory/images/c/c2/Peanut-butter-jelly-time.gif/revision/latest?cb=20141129150614":null}
+        
         return (
             !this.state.isAuthenticating &&
             <Router>
@@ -89,26 +113,31 @@ class App extends Component {
                     <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
                         <OffCanvasBody className="navbar-icon">
                             <a href="#" onClick={this.handleClick.bind(this)}>
-                                {<img className="ks-icon" src="http://www.free-icons-download.net/images/a-kitchen-icon-80780.png" />}
-                                {/*<img className="ks-icon" src="/images/Peanut-butter-jelly-time.gif" />*/}
+                                {this.state.isMenuOpened ?                                 
+                                //set to null if you want banana man to kill himself
+                                <img className="ks-icon" src={imgsrc} />
+                                //null
+                                :
+                                <img className="ks-icon" src={imgsrc} />
+                                }
                             </a>
                         </OffCanvasBody>
                         <OffCanvasMenu className="navbar-menu">
                             <ul>
                                 <li className="first">
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
+                                    <Link to="/">Home</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Search" onClick={this.handleClick.bind(this)}>Browse</Link>
+                                    <Link to="/Search">Browse</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Cookbook" onClick={this.handleClick.bind(this)}>Cookbook</Link>
+                                    <Link to="/Cookbook">Cookbook</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Kitchen" onClick={this.handleClick.bind(this)}>Kitchen</Link>
+                                    <Link to="/Kitchen">Kitchen</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
+                                    <Link to="/Planner">Planner</Link>
                                 </li>
                                 <li>
                                     {
@@ -132,10 +161,15 @@ class App extends Component {
                     <Route exact path='/Register' component={Register} />
                     <Route exact path='/SignIn' component={SignIn} />
                     <Footer />
+                    <div className="row">
+                    <span className="col-2 pull-right fun-button">
+                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Hello There</button>
+                    </span>
+                    </div>
                 </div>
             </Router>
-    );
-  }
+        );
+    }
 }
 
 export default App;

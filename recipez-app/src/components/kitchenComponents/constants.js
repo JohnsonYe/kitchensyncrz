@@ -15,59 +15,53 @@ export const AddItem = ({item, remove, addOut}) => {
     return (
 
         <form>
-            <div className="well well-sm" id="pantry-node"
-                    style={{wordWrap: 'break-word'}}>
-                <div style={{width: '70%'}}>{item}</div>
-                <button className = "btn btn-danger"
-                        id = "btn-r"
-                        type = "button"
-                        onClick = {()=> remove(item)}
-                        title = "Remove"
-                        style = {{float:'right', display:'block',
-                            fontSize:'10px', marginTop:'-32px',
-                            marginRight:'-9px'}}>
-
-                    <span className = "glyphicon glyphicon-trash"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-                <button className = "btn btn-warning"
-                        id = "btn-d"
-                        type = "button"
-                        onClick = {()=> addOut(item) }
-                        title = "Add to Restock"
-                        style={{float:'right', display:'block',
-                            fontSize:'10px', marginTop:'-32px',
-                            marginLeft:'-7px'}}>
-                    <span className = "glyphicon glyphicon-alert"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
+            <div className="input-group" id="pantry-node">
+                <div className="form-control">{item}</div>
+                <div className="input-group-btn">
+                    <button className = "btn btn-danger"
+                            id = "btn-r"
+                            type = "button"
+                            onClick = {()=> remove(item)}
+                            title = "Remove"
+                    >
+                    <span className = "glyphicon glyphicon-trash"/>
+                    </button>
+                </div>
+                <div className="input-group-btn">
+                    <button className = "btn btn-warning"
+                            id = "btn-d"
+                            type = "button"
+                            onClick = {()=> addOut(item) }
+                            title = "Add to Restock"
+                    >
+                        <span className = "glyphicon glyphicon-alert"/>
+                    </button>
+                </div>
             </div>
 
         </form>
     );
 }
 
-// The well and buttons for the exclude and cookware
+// The buttons for the exclude and cookware
 export const AddExcludeCookware = ({item, remove}) => {
 
     return (
 
         <form>
-            <div className="well well-sm" id="pantry-node">
-                <div style={{width: '70%'}}>{item}</div>
-                <button className = "btn btn-danger"
-                        id = "btn-one"
-                        type = "button"
-                        onClick = {()=> remove(item)}
-                        title = "Remove"
-                        style = {{float:'right', display:'block', fontSize:'10px',
-                            marginTop:'-32px', marginRight:'-10px'}}>
-
-                    <span className = "glyphicon glyphicon-trash"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
+            <div className="input-group" id="pantry-node">
+                <div className="form-control">{item}</div>
+                    <div className='input-group-btn'>
+                        <button className = "btn btn-danger"
+                                id = "btn-one"
+                                type = "button"
+                                onClick = {()=> remove(item)}
+                                title = "Remove"
+                        >
+                            <span className = "glyphicon glyphicon-trash"/>
+                        </button>
+                    </div>
             </div>
-
         </form>
     );
 }
@@ -78,40 +72,36 @@ export const AddRestock = ({item, remove, addBack}) => {
     return (
 
         <form>
-            <div className="well well-sm" id="pantry-node">
-                <div style={{width: '52%'}}>{item}</div>
-                <button className = "btn btn-danger"
-                        type = "button"
-                        onClick = {()=> remove(item)}
-                        title = "Remove"
-                        style = {{float:'right', display:'block',
-                            fontSize:'12px', marginTop:'-35px',
-                            marginRight:'-9px'}}>
+            <div className='input-group' id="pantry-node">
+                <div className='form-control'>{item}</div>
+                    <div className='input-group-btn'>
+                        <button className = "btn btn-danger"
+                                type = "button"
+                                onClick = {()=> remove(item)}
+                                title = "Remove"
+                        >
 
-                    <span className = "glyphicon glyphicon-trash"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-                <button className = "btn btn-success"
-                        type = "button"
-                        onClick = {()=> addBack(item) }
-                        title = "Add back to list"
-                        style = {{float:'right', display:'block',
-                            fontSize:'12px', marginTop:'-35px',
-                            marginLeft:'-7px'}}>
-                    <span className = "glyphicon glyphicon-plus-sign"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-                <button className = "btn btn-info"
-                        type = "button"
-                        onClick = {()=> {} }
-                        title = "Add to Shopping List"
-                        style = {{float:'right', display:'block',
-                            fontSize:'12px', marginTop:'-35px',
-                            marginRight:'7px'}}>
-                    <span className = "glyphicon glyphicon-shopping-cart"
-                          style={{fontSize:'1.5em'}}/>
-                </button>
-
+                            <span className = "glyphicon glyphicon-trash"/>
+                        </button>
+                    </div>
+                    <div className='input-group-btn'>
+                        <button className = "btn btn-success"
+                                type = "button"
+                                onClick = {()=> addBack(item) }
+                                title = "Add back to list"
+                        >
+                            <span className = "glyphicon glyphicon-plus-sign"/>
+                        </button>
+                    </div>
+                    <div className='input-group-btn'>
+                        <button className = "btn btn-info"
+                                type = "button"
+                                onClick = {()=> {} }
+                                title = "Add to Shopping List"
+                        >
+                            <span className = "glyphicon glyphicon-shopping-cart"/>
+                        </button>
+                    </div>
             </div>
 
         </form>
@@ -211,7 +201,7 @@ export const ItemForm = ( {addProtein,
                         <button className = "btn btn-success"
                                 type = "submit"
                                 title = "Add to list"
-                                >
+                        >
                             <i className = "glyphicon glyphicon-plus-sign" />
                         </button>
                 </span>

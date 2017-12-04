@@ -29,6 +29,8 @@ class kitchen extends Component {
         this.loadPreference();
         this.loadCookware();
 
+        this.client = new SearchBar.InternalClient();
+
         var
             proteinData = [],
             dairyData = [],
@@ -144,7 +146,7 @@ class kitchen extends Component {
     }
 
     internalClient(){
-        return new SearchBar.InternalClient();
+        return this.client;
 
     }
 
@@ -192,7 +194,7 @@ class kitchen extends Component {
     }
 
     processExcluded(data){
-        (data).forEach((key) => {
+        Array.from(data).forEach((key) => {
             if(key !== "mercury") {
                 this.addExclude(key);
             }
@@ -206,7 +208,7 @@ class kitchen extends Component {
 
     processPreference(data) {
         var prefs = [];
-        (data).forEach((key) => {
+        Array.from(data).forEach((key) => {
             prefs.push(key);
             this.setState({pref: this.state.pref.concat(key)});
         })
@@ -217,7 +219,7 @@ class kitchen extends Component {
     }
 
     processCookware(data){
-        (data).forEach((key) => {
+        Array.from(data).forEach((key) => {
             if( key !== "dirt") {
                 this.addCookware(key);
             }
@@ -699,6 +701,7 @@ class kitchen extends Component {
 
                             <br />
 
+
                             <Tab.Container defaultActiveKey={this.state.key} onSelect={this.handleSelect.bind(this)}>
                                 <div className="row clearfix">
                                     <div className="col-xs-4 col-sm-4 col-md-3">
@@ -723,8 +726,9 @@ class kitchen extends Component {
                                             </NavItem>
                                         </Nav>
                                     </div>
+
                                     <div className="col-xs-8 col-sm-8 col-md-9" id = "tabs">
-                                        <Tab.Content animation>
+                                        <Tab.Content animation id = "content">
                                             <Tab.Pane eventKey="Protein">
                                                 {this.renderProtein()}
                                             </Tab.Pane>
