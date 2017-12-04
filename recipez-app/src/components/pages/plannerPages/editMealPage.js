@@ -381,13 +381,12 @@ class MealEditor extends Component {
                 </a>
             ),
             addButton = (
-                <a className="btn btn-light"
+                <a className="col-12"
                     onClick={this.open}>
                     <img alt="planner"
                          width="18"
                          height="18"
                          src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
-                    Plan Meal
                 </a>
             ),
             button;
