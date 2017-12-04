@@ -399,7 +399,7 @@ class Search extends Component {
 
                                 </div>
                             </div>
-                            <SearchBar form={this.refs.form} client={this.client} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
+                            <SearchBar form={this.refs.form} client={this.client} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}} canExclude/>
                             <span className='input-group-btn'>
                                 <button className='btn btn-success' type='button submit'>
                                     {this.getGlyph('plus-sign')}

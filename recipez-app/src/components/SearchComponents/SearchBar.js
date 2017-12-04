@@ -35,6 +35,8 @@ class SearchBar extends Component{
         this.getSearchHighlight = this.getSearchHighlight.bind(this);
 
         this.getCounter = this.getCounter.bind(this);
+
+        this.getDropDownButtons = this.getDropDownButtons.bind(this);
     }
 
 
@@ -122,7 +124,7 @@ class SearchBar extends Component{
      *                                      error  ->user will exclude ingredient from search]
      */
     getSearchHighlight(){
-        return (this.state.value&&this.state.value.length?(this.state.shiftDown?'has-error':'has-success'):'')
+        return (this.state.value&&this.state.value.length?(this.state.shiftDown&&this.props.canExclude?'has-error':'has-success'):'')
     }
 
     getValue(){
@@ -139,6 +141,26 @@ class SearchBar extends Component{
         return (function(){
             return i++;
         })
+    }
+
+    getDropDownButtons(){
+        if(this.props.canExclude){
+            return (
+                <span className='pull-right'>
+                    <span className='btn-group group-spacer' role='group'>
+                        <button type='submit' className='btn btn-success btn-sm'>
+                            <span className='glyphicon glyphicon-plus-sign'></span>
+                        </button>
+                        <button type='submit' 
+                                className='btn btn-danger btn-sm' 
+                                onMouseOver={(e)=>this.setState({shiftDown:true})}
+                                onMouseOut={(e)=>this.setState({shiftDown:false})}>
+                            <span className='glyphicon glyphicon-ban-circle'></span>
+                        </button> 
+                    </span>                           
+                </span>
+            )  
+        }      
     }
 
     render(){
@@ -174,19 +196,7 @@ class SearchBar extends Component{
                              key={count}>
                             <p>
                                 {key}
-                                <span className='pull-right'>
-                                    <span className='btn-group group-spacer' role='group'>
-                                        <button type='submit' className='btn btn-success btn-sm'>
-                                            <span className='glyphicon glyphicon-plus-sign'></span>
-                                        </button>
-                                        <button type='submit' 
-                                                className='btn btn-danger btn-sm' 
-                                                onMouseOver={(e)=>this.setState({shiftDown:true})}
-                                                onMouseOut={(e)=>this.setState({shiftDown:false})}>
-                                            <span className='glyphicon glyphicon-ban-circle'></span>
-                                        </button> 
-                                    </span>                           
-                                </span>
+                                {this.getDropDownButtons()}
                             </p>
                         </div>)})}
                 </div>
