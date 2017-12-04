@@ -12,8 +12,10 @@ keyField = sys.argv[2] if len(sys.argv)>2 else 'Name'
 client = boto3.client('dynamodb',region_name='us-east-2')
 # get a list of database keys using scan
 key_list = [item[keyField]['S'] for item in client.scan(TableName=tableName,AttributesToGet=[keyField])['Items']]
+# key_list = key_list+[item[keyField]['S'] for item in client.scan(TableName='Recipes',AttributesToGet=[keyField])['Items']]
+# tableName = Combined
 with open(tableName+'.csv','w') as file:
-    file.write(str.join(',',key_list))
+    file.write(str.join('\n',key_list))
 
 subprocess.call(['node','AutocompleteBuilder.js',tableName])
 

@@ -22,6 +22,10 @@ class Autocomplete{
         // this.baseStream = new Promise.reject('Tree not loaded');
     }
 
+    dumpTree(){
+        console.log(JSON.stringify(this.root));
+    }
+
     loadJSON(json){
         return this.loadTree(json)
     }
@@ -82,6 +86,7 @@ class Autocomplete{
     }
 
     search(node,str,idx){
+        // console.log(node.v)
         if(idx === str.length){//find some completions
             return this.dfs(node,str.split(''))
         }
@@ -120,6 +125,7 @@ class Autocomplete{
         }
         base.push(node.v)
         if(node.e!==undefined){
+            // console.log(base.join(''))
             result = result.concat(base.join(''))
         }
         if(node.c){
@@ -131,6 +137,7 @@ class Autocomplete{
         //     result = result.concat(base.join(''))
         // }
         base.pop()
+        // console.log(result)
         return result
     }
 

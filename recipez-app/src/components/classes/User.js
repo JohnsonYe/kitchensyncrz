@@ -64,14 +64,6 @@
         }
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
-                this.userData = {
-                    username:   response.payload[0].username.S,
-                    cookbook:   response.payload[0].cookbook.M,
-                    cookware:   new Set(response.payload[0].cookware.SS),
-                    exclude:    new Set(response.payload[0].exclude.SS),
-                    shoppingList: new Set(response.payload[0].shoppingList.SS),
-                    pantry:     this.client.unpackMap(response.payload[0].pantry.M)
-                }
                 // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
                 resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))
                 // resolve(this.userData)

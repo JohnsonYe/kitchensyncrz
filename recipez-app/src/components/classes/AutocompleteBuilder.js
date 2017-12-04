@@ -69,6 +69,14 @@ if(process.argv.length < 3){
 }
 var tableName = process.argv[2]
 
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 csvPath = './'+tableName+'.csv';
 jsonPath = tableName+'.tst'
 fs.readFile(csvPath,'utf8',(err,data)=>{
@@ -79,7 +87,7 @@ fs.readFile(csvPath,'utf8',(err,data)=>{
     console.log('read csv successfully --> building tree')
     // console.log(JSON.stringify(data))
     // var auto = new Autocomplete(['cat','cast','category','cart','cats'])
-    var auto = new Autocomplete(data.split(','))
+    var auto = new Autocomplete(shuffle(data.split('\n')))
     // var auto = new Autocomplete(null,data)
     // console.log(JSON.stringify(auto))
     // console.log(auto.getCompletion('ca'))

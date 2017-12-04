@@ -12,6 +12,7 @@ import SearchHelper from '../classes/SearchHelper';
 import RecipeHelper from '../classes/RecipeHelper';
 import PlannerHelper from '../classes/Planner';
 import User from '../classes/User';
+import Util from '../classes/Util'
 
 import SearchBar from '../SearchComponents/SearchBar';
 
@@ -268,37 +269,11 @@ class Search extends Component {
     }
 
     mortensButton(){
-        this.setState({morten: this.user.client.getUsername()});       
-        User.getUser('user001').getPreferences(console.log)
-        // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)                           
-        //this.setState({morten: this.user.getCookbook()});                                                 // THIS WORKS
-        
-        
-        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry)}));                     // THIS WORKS
-        //this.user.getPantry(pantry=> this.setState({morten:JSON.stringify(pantry['milk'])}));             // THIS WORKS
-        //this.user.addToPantry('prok','none',1)                                                            // THIS WORKS
-        //this.user.removeFromPantry('prok')                                                                // THIS WORKS
-        
+        this.setState({morten: this.user.client.getUsername()});
 
-        //this.user.getCookbook(cookbook=> this.setState({morten:JSON.stringify(cookbook)}))                // THIS WORKS   
-        //this.user.addToCookbook('pork', 'This is how you do')                                             // THIS WORKS
-        //this.user.removeFromCookbook('pork')                                                              // THIS WORKS
-
-
-        //this.user.getCookware(cookware=> this.setState({morten:JSON.stringify(cookware)}));               // THIS WORKS
-        //this.user.addToCookware('spoon')                                                                  // THIS WORKS
-        //this.user.removeFromCookware('spoon');                                                            // THIS WORKS
-
-
-        //this.user.getExclusionList(exlcude=> this.setState({morten:JSON.stringify(exlcude)}))             // THIS WORKS
-        //this.user.addToExclusionList('corn')                                                              // THIS WORKS
-        //this.user.removeFromExclusionList('corn')                                                         // THIS WORKS
-        
-
-        //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
-        //this.user.addToShoppingList('milk')                                                               // THIS WORKS
-        //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
-
+        Util.loadCompiledAutocompleteTree('Combined','morten')
+            // .then((auto)=>auto.dumpTree())
+            .then((auto)=>console.log(auto.getCompletion('')))
     }
 
     addFromPantry(e){
