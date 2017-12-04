@@ -101,23 +101,26 @@ class PreviewCard extends Component{
         })
     }
 
-    deletionOpen() {
-
+    deletionOpen(e) {
+        // e.stopPropagation();
+        console.log('in open');
         this.setState({
             deletionModal: true,
         });
 
     }
 
-    deletionClose() {
-
+    deletionClose(e) {
+        // e.stopPropagation();
+        console.log('in close');
         this.setState({
             deletionModal: false,
         });
 
     }
 
-    editOpen() {
+    editOpen(e) {
+        // e.stopPropagation();
         this.ingredientFormRefs = [];
         this.setState({
             editModal: true,
@@ -128,7 +131,7 @@ class PreviewCard extends Component{
         });
     }
 
-    editClose() {
+    editClose(e) {
         this.setState({
             editModal: false,
             workingIngredientList: this.state.ingredientList.slice(),
@@ -210,7 +213,7 @@ class PreviewCard extends Component{
             duration: this.state.workingDuration,
 
         });
-        this.props.updateFunc(this.recipeHelper.createRecipe(this.props.src.Name, stringIngredientList, updatedDirections));
+        this.props.updateFunc(this.recipeHelper.createRecipe(this.props.src.Name, stringIngredientList, updatedDirections,this.state.duration,this.state.difficulty,this.props.src.Image));
         this.editClose();
     }
 
@@ -391,14 +394,13 @@ class PreviewCard extends Component{
         ;
         let image;
         if (this.props.src.Image) {
+            console.log(this.props.src.Image);
             let imageArray = Array.from(this.props.src.Image);
             image = imageArray[0];
 
         } else {
             image = require("./no-photo.png");
         }
-        console.log("this is iamge");
-        console.log(image);
         return (
             <div className={"col-md-3 mb-3"}>
                 <div className="card recipes">
@@ -429,7 +431,7 @@ class PreviewCard extends Component{
 
                 </div>
 
-                <Modal show={this.state.deletionModal} onHide={this.deletionClose}>
+                <Modal backdrop={'static'} show={this.state.deletionModal} onHide={this.deletionClose}>
                     <Modal.Header>
                         <Modal.Title>
                             {this.props.src.Name}
@@ -454,7 +456,7 @@ class PreviewCard extends Component{
                     </Modal.Footer>
 
                 </Modal>
-                <Modal bsSize={"large"} show={this.state.editModal} onHide={this.editClose}>
+                <Modal bsSize={"large"} backdrop={'static'} show={this.state.editModal} onHide={this.editClose}>
                     <Modal.Header>
                         <Modal.Title>
                             Editing recipe: "{this.props.src.Name}"

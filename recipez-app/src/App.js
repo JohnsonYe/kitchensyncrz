@@ -46,7 +46,7 @@ class App extends Component {
         this.toggleFunMode = this.toggleFunMode.bind(this);
 
         this.state = {
-            isMenuOpened: false,
+            isNavMenuOpened: false,
             funMode: false
         }
         this.client = DBClient.getClient();
@@ -67,26 +67,26 @@ class App extends Component {
 
 
     componentWillMount() {
-        window.addEventListener('click', this.closeNav);
+        // window.addEventListener('click', this.closeNav);
         this.setState({
-            isMenuOpened: false,
+            isNavMenuOpened: false,
             isAuthenticating: true
 
         })
     }
 
     componentWillUnmount() {
-        window.removeEventListener('click', this.closeNav);
+        // window.removeEventListener('click', this.closeNav);
     }
 
     handleClick(e) {
         e.stopPropagation();
-        this.setState({ isMenuOpened: !this.state.isMenuOpened });
+        this.setState({ isNavMenuOpened: !this.state.isNavMenuOpened });
     }
 
     closeNav(e) {
         e.stopPropagation();
-        this.setState({isMenuOpened: false});
+       this.setState({isNavMenuOpened: false});
     }
 
     toggleFunMode() {
@@ -97,7 +97,7 @@ class App extends Component {
         //this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
-        this.client.user = 'user001';
+        // this.client.user = 'user001';
         User.getUser().reload();
         //alert(this.client.isLoggedIn());
     }
@@ -112,10 +112,10 @@ class App extends Component {
             !this.state.isAuthenticating &&
             <Router>
                 <div className="App">
-                    <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
+                    <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isNavMenuOpened} position="left">
                         <OffCanvasBody className="navbar-icon">
                             <a href="#" onClick={this.handleClick.bind(this)}>
-                                {this.state.isMenuOpened ?
+                                {this.state.isNavMenuOpened ?
                                     //set to null if you want banana man to kill himself
                                     <img className="ks-icon" src={imgsrc}/>
                                     //null

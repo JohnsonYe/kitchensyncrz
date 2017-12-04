@@ -40,7 +40,7 @@ class Search extends Component {
 
         this.planner = new PlannerHelper();
 
-        this.user = new User();
+        this.user = User.getUser();
 
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);

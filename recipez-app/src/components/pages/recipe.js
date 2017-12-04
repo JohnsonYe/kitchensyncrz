@@ -29,8 +29,8 @@ class Recipe extends Component {
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.reload = this.reload.bind(this);
-        this.User = User.getUser();
+        // this.reload = this.reload.bind(this);
+        this.User = new User();
     }
 
     setRecipeData(recipeObject,err){
@@ -59,9 +59,9 @@ class Recipe extends Component {
         event.preventDefault();
     }
 
-    reload() {
-        window.location.reload();
-    }
+    // reload() {
+    //     window.location.reload();
+    // }
 
     render() {
         if(!this.state.loaded) {

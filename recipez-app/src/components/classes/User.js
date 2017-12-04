@@ -168,7 +168,7 @@ class User {
      * }
      */
     getPantry(callback){
-        return this.getUserData('pantry').then(response=>{alert(JSON.stringify('get pantry error: '+response));callback(response)})
+        return this.getUserData('pantry').then(callback);
     }
 
 
