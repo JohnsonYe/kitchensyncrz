@@ -131,7 +131,7 @@ class Search extends Component {
         this.ingredient = ingredient;
     }
     updateState(sortedResults,value,status){
-        
+
         this.setState({
             sorted:sortedResults,
             ...this.updateIngredientState(value,status)
@@ -383,7 +383,7 @@ class Search extends Component {
                                         <span className="glyphicon glyphicon-filter"></span>
                                     </button>
                                     <div className="dropdown-menu dropdown-menu-right">
-                                        {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
+                                        {this.getFilterButton('Import Preferences','download-alt','custom')}
                                         {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
                                         {this.getFilterButton('Filter by Best Match','signal','best_match')}
                                         {this.getFilterButton('Filter by Time','time','time_filter')}
@@ -399,52 +399,52 @@ class Search extends Component {
                                     </button>
                                 </span>
                             </div>
-                    </form>
-                    {this.state.viewThumbnails ? 
-                    <div className="container-fluid search-results">
-                        <div className="row">
-                        {this.state.sorted.map((recipe)=>{
-                            let data = this.state.loadedRecipes.get(recipe[0]);
-                            if(data){
-                                return(
-                                <SearchThumbnail data={data} />
-                                );
-                            }
-                        })     
-                        }
-                        {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
-                        </div>
-                    </div> : 
-                     <ul className="list-group search-results">
-                        {this.state.sorted.map((recipe)=>(
-                            <li className="list-group-item">
-                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
-                                {(()=>{// (IIFE) --> conditionally display recipe info, if it is loaded
-                                    let data = this.state.loadedRecipes.get(recipe[0]);
-                                    if(data){
-                                        return ([
-                                            <div>Difficulty: {data.Difficulty == "Undefined"? "Medium": data.Difficulty}</div>,
-                                            <div>Rating: 
-                                                {(()=>{ 
-                                                    let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
-                                                    for(let i=0;i<this.recipeHelper.maxRating;i++){
-                                                        result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);
-                                                    }
-                                                    return result;
-                                                })()}
-                                            </div>,
-                                            <div>{this.getGlyph('time')} <span>{data.TimeCost == "Undefined"? "1 h" :data.TimeCost}</span></div>,
-                                        ])
+                        </form>
+                        {this.state.viewThumbnails ?
+                            <div className="container-fluid search-results">
+                                <div className="row">
+                                    {this.state.sorted.map((recipe)=>{
+                                        let data = this.state.loadedRecipes.get(recipe[0]);
+                                        if(data){
+                                            return(
+                                                <SearchThumbnail data={data} />
+                                            );
+                                        }
+                                    })
                                     }
-                                })()}
-                            </li>
-                        ))}
-                        {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
-                    </ul>
-                    
-                    }
+                                    {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
+                                </div>
+                            </div> :
+                            <ul className="list-group search-results">
+                                {this.state.sorted.map((recipe)=>(
+                                    <li className="list-group-item">
+                                        <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
+                                        {(()=>{// (IIFE) --> conditionally display recipe info, if it is loaded
+                                            let data = this.state.loadedRecipes.get(recipe[0]);
+                                            if(data){
+                                                return ([
+                                                    <div>Difficulty: {data.Difficulty == "Undefined"? "Medium": data.Difficulty}</div>,
+                                                    <div>Rating:
+                                                        {(()=>{
+                                                            let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
+                                                            for(let i=0;i<this.recipeHelper.maxRating;i++){
+                                                                result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);
+                                                            }
+                                                            return result;
+                                                        })()}
+                                                    </div>,
+                                                    <div>{this.getGlyph('time')} <span>{data.TimeCost == "Undefined"? "1 h" :data.TimeCost}</span></div>,
+                                                ])
+                                            }
+                                        })()}
+                                    </li>
+                                ))}
+                                {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
+                            </ul>
+
+                        }
+                    </div>
                 </div>
-            </div>
             </div>
         );
 

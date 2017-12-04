@@ -35,8 +35,6 @@ class User {
         // this.addToPantry('zucchini','none',1)
         // this.removeFromPantry('zucchini')
 
-        this.userData = { username:this.client.getUsername(), cookbook:{},cookware:{},pantry:{},planner:{}}
-
         // this.client.updateItem(
         //     this.client.buildUpdateRequest(
         //         'User',
@@ -52,21 +50,25 @@ class User {
     }
 
     createUser(username,callback){
+
         this.loadStream = Promise.resolve({ //create a new user data object locally
             username:       username,
             cookbook:       {},
-            cookware:       new Set(['oven']), //this can't be empty
-            exclude:        new Set(['beer']),
-            shoppingList:   new Set(['beets']),
-            pantry:         {shrimp: {unit: 'Protein', amount: '1'}},
+            cookware:       new Set(['dirt']), //this can't be empty
+            exclude:        new Set(['mercury']),
+            pantry:         {mercury: {unit: 'none', amount: '1'}},
+            planner:        {days: (()=>{let l = [];for(let i=0;i<7;i++)l.push({mealData: []});return l})()},
+            preferences:    new Set(['mercury']),
+            shoppingList:   new Set(['mercury']),
+
         })
-        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
-            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
-        })
+            .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
+                return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
+            })
         this.loadStream.then((data)=>console.log(data.payload))
         this.loadStream.then(callback)
+        this.loadStream.catch(console.error)
     }
-
     /**
      * this.userData:
      * {
@@ -81,14 +83,6 @@ class User {
         console.log(this.client.getUsername())
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
-                this.userData = {
-                    username:   response.payload[0].username.S,
-                    cookbook:   response.payload[0].cookbook.M,
-                    cookware:   new Set(response.payload[0].cookware.SS),
-                    exclude:    new Set(response.payload[0].exclude.SS),
-                    shoppingList: new Set(response.payload[0].shoppingList.SS),
-                    pantry:     this.client.unpackMap(response.payload[0].pantry.M)
-                }
                 // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
                 resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))
                 // resolve(this.userData)
@@ -175,7 +169,7 @@ class User {
      * }
      */
     getPantry(callback){
-        return this.getUserData('pantry').then(response=>{alert(JSON.stringify('get pantry error: '+response));callback(response)})
+        return this.getUserData('pantry').then(callback);
     }
 
 
@@ -401,6 +395,7 @@ class User {
     }
 
     setPlanner(planner,callback){
+
         let packed = this.client.packItem(planner,User.PlannerPrototype);
         console.log(JSON.stringify(packed));
         this.client.updateItem(
@@ -412,7 +407,7 @@ class User {
                     this.addUserData((data)=>{
                         data.planner = planner;
                         return data;
-                    })
+                    },callback);
                 } else {
                     console.error(response.payload);
                 }
@@ -465,7 +460,7 @@ class User {
     addUserData(transform,callback){
         this.loadStream = this.loadStream.then(transform);
         if(callback){
-            callback(this.loadStream)
+            callback(this.loadStream);
         }
     }
 
@@ -509,6 +504,10 @@ class User {
      _NAME: "Planner",
      days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
  }
+
+DBClient.getClient().registerPrototype(User.PlannerPrototype)
+DBClient.getClient().registerPrototype(User.DayPrototype)
+DBClient.getClient().registerPrototype(User.MealPrototype)
 
 
 User.PantryItemPrototype = {

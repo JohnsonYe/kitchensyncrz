@@ -94,7 +94,7 @@ class App extends Component {
     }
 
     handleLogout = event => {
-        this.handleClick();
+        //this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
         this.client.user = 'user001';
