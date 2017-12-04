@@ -178,10 +178,10 @@ class PlannerHelper{
      * @param mealIndex - the index of the meal you want to edit
      * @param meal - new meal object to replace the old one.
      */
-    editMeal(data, day, mealIndex, meal) {
+    editMeal(data, day, mealIndex, meal, newDay) {
         // check if meal exist
         this.removeMeal(data, day, mealIndex);
-        this.insertMeal(data, meal, day);
+        this.insertMeal(data, meal, newDay);
     }
 
 
@@ -210,7 +210,9 @@ class PlannerHelper{
              min = data.days[day].mealData[mealIndex].startMin,
              noon = "am";
 
-         if(hour === 12) {
+         //alert(JSON.stringify(hour));
+
+         if(hour == 12) {
              noon = "pm";
          }
          else if(hour > 12) {
@@ -271,7 +273,7 @@ class PlannerHelper{
              hr = "0";
          }
 
-         if( endHr - startHr === 0) {
+         if( endHr - startHr == 0) {
              return (min) + " m";
          }
          else {
@@ -289,7 +291,7 @@ class PlannerHelper{
             min = data.days[day].mealData[mealIndex].endMin,
             noon = "am";
 
-        if(hour === 12) {
+        if(hour == 12) {
             noon = "pm";
         }
         else if(hour > 12) {
@@ -315,6 +317,16 @@ class PlannerHelper{
          if(data.days[day].mealData.length)
              return data.days[day].mealData.length;
          else return 0;
+     }
+
+     /** This function counts the meals in the planner*/
+     getTotalNumMeals(data) {
+         let total = 0;
+         for(let i = 0; i < 7; i++) {
+             total += data.days[i].mealData.length;
+         }
+
+         return total;
      }
 }
 

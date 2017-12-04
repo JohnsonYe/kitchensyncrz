@@ -125,7 +125,7 @@ class MealEditor extends Component {
             day = 0,
             days =  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-        if(this.props.data && this.props.day && this.props.mealIndex) {
+        if(this.props.data) {
             var strStartTime = this.plannerHelper.getMealStartTime(props.data, this.props.day, this.props.mealIndex);
             var colon = strStartTime.indexOf(":");
             console.log(strStartTime);
@@ -183,6 +183,7 @@ class MealEditor extends Component {
         this.handleMinSelection = this.handleMinSelection.bind(this);
         this.handleNoonSelection = this.handleNoonSelection.bind(this);
         this.renderButtonToolBar = this.renderButtonToolBar.bind(this);
+        this.updateEndTime = this.updateEndTime.bind(this);
     }
 
     /** Updates day on button */
@@ -193,11 +194,13 @@ class MealEditor extends Component {
     /**Updates hour on button*/
     handleHourSelection(evt) {
         this.setState( {hourOnBtn: evt} );
+        this.updateEndTime();
     }
 
     /**Updates min on button*/
     handleMinSelection(evt) {
         this.setState( {minOnBtn: evt} );
+        this.updateEndTime();
     }
 
     /** Updates noon on button */
@@ -218,12 +221,12 @@ class MealEditor extends Component {
 
     /** creates/overwrites meal to the meal */
     update(transform) {
-        var user = User.getUser('user001');
+        var user = User.getUser();
         user.getPlanner((planner)=>{
             planner = transform(planner);
-            //if(thi.props.edit === true)
-                window.location.reload();
-            user.setPlanner(planner,()=> {console.log('success');});
+            //if(this.props.edit === true)
+            //     window.location.reload();
+            user.setPlanner(planner,()=> {console.log('success');if(this.props.edit === true){this.props.update(planner);}});
         })
     }
 
@@ -235,6 +238,21 @@ class MealEditor extends Component {
             return this.props.data;
         };
         return transform;
+    }
+
+    updateEndTime() {
+        let hour = parseInt(this.state.hourOnBtn),
+            min = parseInt(this.state.minOnBtn);
+
+        let total = min + this.state.dur;
+        let hr = hour;
+
+        while( total >= 60) {
+            total = total - 60;
+            hr += 1;
+        }
+
+        this.setState( {endtime: hr+":"+total});
     }
 
     edit() {
@@ -255,7 +273,8 @@ class MealEditor extends Component {
                                         this.plannerHelper.createMeal(this.props.recipe,
                                                                         this.state.dur,
                                                                         hour,
-                                                                        min));
+                                                                        min),
+                                                                        this.state.days.indexOf(this.state.dayOnBtn));
             return this.props.data;
         };
         return transform;

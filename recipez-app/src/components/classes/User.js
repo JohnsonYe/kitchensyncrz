@@ -412,7 +412,7 @@ class User {
                     this.addUserData((data)=>{
                         data.planner = planner;
                         return data;
-                    })
+                    },callback);
                 } else {
                     console.error(response.payload);
                 }
@@ -530,6 +530,7 @@ User.UserDataPrototype = {
     exclude:{type:'SS'},
     preferences:{type:'SS'},
 }
+
 DBClient.getClient().registerPrototype(User.UserDataPrototype)
 
 var static_user = new User();

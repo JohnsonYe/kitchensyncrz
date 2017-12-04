@@ -49,6 +49,7 @@ function DailyPlannerItem(props) {
                                 mealIndex={props.mealIndex}
                                 dur={props.dur}
                                 edit={true}
+                                update={props.update}
                     />
                     <p className="">{props.start} to {props.end} - {props.dur}</p>
                 </div>
@@ -67,7 +68,7 @@ class Planner extends Component {
         super(props);
         var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
             //data = new PlannerHelper(this.update),
-            user = User.getUser("user001");
+            user = User.getUser();
 
         this.plannerHelper = new PlannerHelper();
 
@@ -75,7 +76,6 @@ class Planner extends Component {
             days: days,
             numMeals: 0,
             numShopItems: 0,
-            numMealsPrepared: 0,
             items: [],
             mealData:null,
         };
@@ -86,6 +86,7 @@ class Planner extends Component {
 
         this.removeMeal = this.removeMeal.bind(this);
         this.loadNumMeals = this.loadNumMeals.bind(this);
+        this.loadTotalMeals = this.loadTotalMeals.bind(this);
         this.addItem = this.addItem.bind(this);
         this.removeItem = this.removeItem.bind(this);
         this.renderMeal = this.renderMeal.bind(this);
@@ -95,6 +96,7 @@ class Planner extends Component {
         this.renderShoppingList = this.renderShoppingList.bind(this);
         this.renderWeekPlanner = this.renderWeekPlanner.bind(this);
         this.renderWeekCol = this.renderWeekCol.bind(this);
+        this.update = this.update.bind(this);
     }
 
     /** Functionality Methods **/
@@ -108,8 +110,8 @@ class Planner extends Component {
     }
 
     /** Pass to modal and call after they save or remove something*/
-    update() {
-        this.setState( {mealData: this.state.mealData} );
+    update(planner) {
+        this.setState( {mealData: planner} );
     }
 
     /**
@@ -145,6 +147,7 @@ class Planner extends Component {
                 day = {day}
                 dur={this.plannerHelper.getDuration(this.plannerHelper.getMeal(this.state.mealData, day, mealIndex))}
                 mealIndex = {mealIndex}
+                update = {this.update}
             />
         );
     }
@@ -181,7 +184,7 @@ class Planner extends Component {
                                             border-dark">
                     <div className="mx-auto">
                         <h2>Weekly Meal Planner</h2>
-                        <h3>{this.state.numMeals}</h3>
+                        <h3>{this.loadTotalMeals()}</h3>
                         <p>Meals</p>
                     </div>
                 </div>
@@ -217,14 +220,13 @@ class Planner extends Component {
                         <p>{date}</p>
                         <h3>{this.loadNumMeals(today)}</h3>
                         <p>Meals</p>
-                        <h3>{this.state.numMealsPrepared}</h3>
-                        <p>Prepared</p>
                     </div>
                 </div>
                 <div className="col-9">
                     <MealEditor
-                        recipe={"Marinade for Chicken"}
-                        dur={"1 h 20 m"}
+                        url={"http://images.media-allrecipes.com/userphotos/960x960/3756556.jpg"}
+                        recipe={"BLT Salad"}
+                        dur={"25 m"}
                     />
                     <UpNextCard/>
                     {this.renderMealCards(today)}
@@ -244,34 +246,20 @@ class Planner extends Component {
 
     renderShoppingList() {
         return (
-            <div className="row">
-                <div className="col-3
-                                            border
-                                            border-left-0
-                                            border-top-0
-                                            border-bottom-0
-                                            border-dark">
-                    <div className="mx-auto">
-                        <h2>Shopping List</h2>
-                        <h2>{this.state.numShopItems}</h2>
-                        <p>Items</p>
+            <div>
+                <div className="row">
+                    <div className="border
+                                border-left-0
+                                border-right-0
+                                border-dark">
+                        <div className="mx-auto">
+                            <h2>Shopping List</h2>
+                            <h2>{this.state.numShopItems}</h2>
+                            <p>Items</p>
+                        </div>
                     </div>
                 </div>
-
-                <div className="col-9">
-                    <Button
-                        bsSize="small"
-                        bsStyle="secondary"
-                        onClick={this.addItem}>Test</Button>
-                    <button
-                        className="btn btn-danger btn-sm"
-                        onClick={this.removeItem}>Remove Test</button>
-                    <ul className="list-group">
-                        <DynamicList
-                            renderLI={this.renderItem("Item")}
-                            list={this.state.items}
-                        />
-                    </ul>
+                <div className="row">
                 </div>
             </div>
         );
@@ -287,6 +275,15 @@ class Planner extends Component {
         else return (<div>Loading ...</div>);
 
         return numMeals;
+    }
+
+    loadTotalMeals() {
+        var total = 0;
+        if(this.state.mealData)
+            total = this.plannerHelper.getTotalNumMeals(this.state.mealData);
+        else return (<div>Loading ...</div>);
+
+        return total;
     }
 
     /** Driver */
