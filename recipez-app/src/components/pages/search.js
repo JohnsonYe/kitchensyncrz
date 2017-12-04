@@ -58,6 +58,9 @@ class Search extends Component {
 
         this.getRecipeLoader = this.getRecipeLoader.bind(this);
 
+        this.getGlyph = this.getGlyph.bind(this);
+        this.getJustifiedGlyph = this.getJustifiedGlyph.bind(this);
+
 
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
         let query = this.parseQueryString(this.props.history.location.search)
@@ -97,6 +100,7 @@ class Search extends Component {
     }
     componentWillMount(){
         window.addEventListener('click', this.closeAllDropdowns);
+        this.startLoading();
         this.client.setRecipeLoaderSource(this.getRecipeLoader); //pass the client an anonymous function that gives it the most recent loader
         if(this.state.ingredients.size||this.state.excluded.size){
             //batch load all the ingredients from the URI
@@ -104,7 +108,7 @@ class Search extends Component {
             // use a promise.all to wait for all ingredients to load asynchronously
             Promise.all(
                 //have search manager skip sorting after each update to improve speed
-                this.massUpdateSearch(this.state.ingredients,1),this.massUpdateSearch(this.state.excluded,0)
+                this.massUpdateSearch(this.state.ingredients,1,false),this.massUpdateSearch(this.state.excluded,0,false)
             )
                 .catch((err)=>console.error(err))
                 //do one sort once everything is done loading
@@ -127,6 +131,12 @@ class Search extends Component {
     componentWillUnmount(){
         window.removeEventListener('click', this.closeAllDropdowns);
     }
+    startLoading(){
+        this.setState({loading:true});
+    }
+    doneLoading(){
+        this.setState({loading:false});
+    }
     addIngredient(ingredient){
         this.ingredient = ingredient;
     }
@@ -134,7 +144,8 @@ class Search extends Component {
 
         this.setState({
             sorted:sortedResults,
-            ...this.updateIngredientState(value,status)
+            ...this.updateIngredientState(value,status),
+            loading:false,
         },this.updateURI)
     }
     removeIngredient(value,status){
@@ -163,6 +174,7 @@ class Search extends Component {
     }
     updateLoader(ingredient){
         // console.log('Loading info for: ' + ingredient)
+        this.startLoading();
         this.recipeLoader = this.recipeLoader.then((recipes)=>{
             // console.log('updating loader: '+JSON.stringify(recipes))
             let recipeNames =  Array.from(new Set(ingredient.recipes.map((recipe)=>recipe.Name))); //remove duplicates
@@ -172,9 +184,10 @@ class Search extends Component {
                 .then((recipeList)=>{
                     // console.log('recipe list: '+JSON.stringify(recipeList));
                     // console.log('recipe map: '+JSON.stringify(recipes));
+                    this.doneLoading();
                     return recipeList.reduce((prev,next)=>prev.set(next.Name,next),recipes);
                 })
-                .catch((err)=>{console.error('updateLoader: '+err);return recipes}))
+                .catch((err)=>{console.error('updateLoader: '+err);this.doneLoading();return recipes}));
         });
         this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
     }
@@ -206,6 +219,7 @@ class Search extends Component {
         console.log('Updated search results: ' + JSON.stringify([value,status]))
     }
     handleSubmit(e){
+        this.startLoading();
         e.preventDefault();
 
         let value = this.searchbar.getValue()
@@ -238,9 +252,15 @@ class Search extends Component {
     }
 
     setFilter(filter){
+        this.startLoading();
         this.closeAllDropdowns()
-        this.client.setFilter(filter,this.searchUpdateWrapper())
-        this.setState({filter:filter})
+        if(filter === "custom"){ //special actions based on user preferences
+            
+        } else {
+            this.client.setFilter(filter,this.searchUpdateWrapper());
+        }
+
+        this.setState({filter:filter});
     }
 
     mortensButton2(){
@@ -318,6 +338,10 @@ class Search extends Component {
         return (<span className={"glyphicon glyphicon-"+name}></span>);
     }
 
+    getJustifiedGlyph(name){
+        return (<span className="pull-right">{this.getGlyph(name)}</span>);
+    }
+
     getFilterButton(message,icon,filter,largest){
         let glyph = (<span className={"glyphicon glyphicon-"+icon+(largest?" pad-icon":"")}></span>);
         if(!largest){
@@ -336,26 +360,35 @@ class Search extends Component {
     render() {
         return (
             <div onClick={this.closeAllDropdowns}>
-                <div className="jumbotron">
-                    <h1>Search</h1>
-                </div>
-                <div className="container-fluid">
-                    <div id='searchbar-toolbar-container'>
-                        <form onSubmit={this.handleSubmit} ref="form">
-                            <div className='input-group'>
-                                <div className={this.dropdownState('ingredients','input-group-btn')} onClick={this.blockPropagation}>
-                                    <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
-                                        <span className="glyphicon glyphicon-list"></span>
-                                    </button>
-                                    <div className="dropdown-menu">
-                                        <div className='dropdown-item' onClick={this.addFromPantry}>Add From Pantry<span className="pull-right"><span className="glyphicon glyphicon-download-alt"></span></span></div>
-                                        <div role="separator" className="dropdown-divider"></div>
-                                        <div className='dropdown-item' onClick={this.clearSearch}>Clear All<span className="pull-right"><span className="glyphicon glyphicon-trash"></span></span></div>
-                                        <div role="separator" className="dropdown-divider"></div>
-                                        <div className="dropdown-header">Added Ingredients</div>
-                                        {[...this.state.ingredients].map(
-                                            (ingredient)=>
-                                                (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+            <div className="jumbotron">
+                <h1>Search</h1>
+            </div>
+            <div>
+                <h3>{this.state.morten}</h3>
+                <button onClick={this.mortensButton}>Mortens Button</button>
+                <button onClick={this.mortensButton2}>Mortens Button2</button>
+            </div>
+            <div className="container-fluid">
+                <div id='searchbar-toolbar-container'>
+                    <form onSubmit={this.handleSubmit} ref="form">
+                        <div className='input-group'>
+                            <div className={this.dropdownState('ingredients','input-group-btn')} onClick={this.blockPropagation}>
+                                <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
+                                    {this.getGlyph('list')}
+                                </button>
+                                <div className="dropdown-menu">
+                                    <div className='dropdown-item' onClick={this.addFromPantry}>
+                                        Add From Pantry{this.getJustifiedGlyph('download-alt')}
+                                    </div>
+                                    <div role="separator" className="dropdown-divider"></div>
+                                    <div className='dropdown-item' onClick={this.clearSearch}>
+                                        Clear All{this.getJustifiedGlyph('trash')}
+                                    </div>
+                                    <div role="separator" className="dropdown-divider"></div>
+                                    <div className="dropdown-header">Added Ingredients</div>
+                                    {[...this.state.ingredients].map(
+                                        (ingredient)=>
+                                        (<div className='dropdown-item' key={ingredient} onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option">{this.getGlyph('remove')}</span></div>)
                                         )}
                                         {this.state.ingredients.size>0?'':<div className="dropdown-item"><i>You haven't added any ingredients!</i></div>}
                                         <div className="dropdown-header">Excluded Ingredients</div>
@@ -365,42 +398,42 @@ class Search extends Component {
                                         )}
                                         {this.state.excluded.size>0?'':<div className="dropdown-item"><i>You haven't excluded any ingredients!</i></div>}
 
-                                    </div>
                                 </div>
-                                <SearchBar client={this.client} callback={this.addIngredient} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
-                                <span className='input-group-btn'>
-                                    <button className='btn btn-success' type='button submit' title="Include Ingredient">
-                                        <span className="glyphicon glyphicon-plus-sign"></span>
-                                    </button>
-                                </span>
-                                <span className='input-group-btn'>
-                                    <button className='btn btn-danger' type='button' onClick={this.handleReject} title="Exclude Ingredient">
-                                        <span className="glyphicon glyphicon-ban-circle"></span>
-                                    </button>
-                                </span>
-                                <div className={this.dropdownState('filters','input-group-btn')+' no-wrap-dropdown'} onClick={this.blockPropagation}>
-                                    <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')} title="Filter">
-                                        <span className="glyphicon glyphicon-filter"></span>
-                                    </button>
-                                    <div className="dropdown-menu dropdown-menu-right">
-                                        {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
-                                        {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
-                                        {this.getFilterButton('Filter by Best Match','signal','best_match')}
-                                        {this.getFilterButton('Filter by Time','time','time_filter')}
-                                        {this.getFilterButton('Filter by Cost','piggy-bank','cost_filter')}
-                                        {this.getFilterButton('Filter by Rating','star','rating_filter')}
-                                        {this.getFilterButton('Filter by Difficulty','sunglasses','difficulty_filter')}
-                                        {this.getFilterButton('Filter by Cookware','cutlery','cookware_filter')}
-                                    </div>
-                                </div>
-                                <span className='input-group-btn'>
-                                    <button className='btn btn-warning' type='button' onClick={this.toggleThumbnails} title="Toggle View Mode">
-                                        <span className={this.state.viewThumbnails ? "glyphicon glyphicon-font" : "glyphicon glyphicon-picture"}></span>
-                                    </button>
-                                </span>
                             </div>
+                            <SearchBar form={this.refs.form} client={this.client} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}} canExclude/>
+                            <span className='input-group-btn'>
+                                <button className='btn btn-success' type='button submit'>
+                                    {this.getGlyph('plus-sign')}
+                                </button>
+                            </span>
+                            <span className='input-group-btn'>
+                                <button className='btn btn-danger' type='button' onClick={this.handleReject}>
+                                    {this.getGlyph('ban-circle')}
+                                </button>
+                            </span>
+                            <div className={this.dropdownState('filters','input-group-btn')+' no-wrap-dropdown'} onClick={this.blockPropagation}>
+                                <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')}>
+                                    {this.getGlyph('filter')}
+                                </button>
+                                <div className="dropdown-menu dropdown-menu-right">
+                                    {this.getFilterButton('Import Preferences','download-alt','custom')}
+                                    {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
+                                    {this.getFilterButton('Filter by Best Match','signal','best_match')}
+                                    {this.getFilterButton('Filter by Time','time','time_filter')}
+                                    {this.getFilterButton('Filter by Cost','piggy-bank','cost_filter')}
+                                    {this.getFilterButton('Filter by Rating','star','rating_filter')}
+                                    {this.getFilterButton('Filter by Difficulty','sunglasses','difficulty_filter')}
+                                    {this.getFilterButton('Filter by Cookware','cutlery','cookware_filter')}
+                                </div>
+                            </div>
+                            <span className='input-group-btn'>
+                                <button className='btn btn-warning' type='button' onClick={this.toggleThumbnails} title="Toggle View Mode">
+                                    <span className={this.state.viewThumbnails ? "glyphicon glyphicon-font" : "glyphicon glyphicon-picture"}></span>
+                                </button>
+                            </span>
+                        </div>
                     </form>
-                    {this.state.viewThumbnails ? 
+                    {this.state.viewThumbnails ?
                     <div className="container-fluid search-results">
                         <div className="row">
                         {this.state.sorted.map((recipe)=>{

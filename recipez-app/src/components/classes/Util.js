@@ -24,4 +24,8 @@ Util.loadCompiledAutocompleteTree = function(treeName,id){
         .then((autocomplete)=>{console.log('Finished loading autocomplete in '+id);return autocomplete})
 }
 
+Util.NonVegetarian = [
+    "beef", "chicken","pork","fish",
+];
+
 export default Util;

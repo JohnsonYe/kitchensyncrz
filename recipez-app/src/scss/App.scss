@@ -1,5 +1,6 @@
 @import "_config.scss";
 @import "_search.scss";
+@import "_shoppinglist.scss";
 
 .modal-backdrop {
   z-index: 90;
@@ -109,16 +110,16 @@
 .search-thumbnail {
   margin: 0 0 0 0;
   padding-top: 20px;
-
-  background: #e0eff9;
-  border: solid 2px white;
+  
+  background: #e5e5e5;
+  border: solid 4px white;
   border-radius: 15px;
 
   position: relative;
   height: auto;
 
   .btn-dark {
-    border: solid 1px #e0eff9;
+    border: solid 1px #e5e5e5;
   }
 
   /* Must match thumbnail background with btn-dark border color */

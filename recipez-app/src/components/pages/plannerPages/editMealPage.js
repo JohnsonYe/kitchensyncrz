@@ -12,6 +12,8 @@ import React, { Component } from 'react';
 import {Button, Modal, DropdownButton, MenuItem, ButtonToolbar} from 'react-bootstrap';
 import PlannerHelper from '../../classes/Planner';
 import User from '../../classes/User';
+import RecipeHelper from "../../classes/RecipeHelper";
+import {Link} from "react-router-dom";
 
 
 function Duration(props) {
@@ -126,7 +128,7 @@ class MealEditor extends Component {
             day = 0,
             days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-        if (this.props.data && this.props.day && this.props.mealIndex) {
+        if(this.props.data) {
             var strStartTime = this.plannerHelper.getMealStartTime(props.data, this.props.day, this.props.mealIndex);
             var colon = strStartTime.indexOf(":");
             console.log(strStartTime);
@@ -169,9 +171,12 @@ class MealEditor extends Component {
             hourOnBtn: startHr,
             minOnBtn: startMin,
             noonOnBtn: noon,
-            endtime: endHr + ":" + endMin,
-            dur: dur  //duration in minutes
+            endtime: endHr+":"+endMin,
+            dur: dur,  //duration in minutes
+            mealList: [],
+            img: "http://travelmasters.ca/wp-content/uploads/2017/03/no-image-icon-4-1024x1024.png"
         };
+
 
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
@@ -184,6 +189,13 @@ class MealEditor extends Component {
         this.handleMinSelection = this.handleMinSelection.bind(this);
         this.handleNoonSelection = this.handleNoonSelection.bind(this);
         this.renderButtonToolBar = this.renderButtonToolBar.bind(this);
+        this.updateEndTime = this.updateEndTime.bind(this);
+        this.renderMealList = this.renderMealList.bind(this);
+        this.renderImg = this.renderImg.bind(this);
+        this.printMealList = this.printMealList.bind(this);
+
+        this.renderImg();
+        this.renderMealList();
     }
 
     /** Updates day on button */
@@ -193,12 +205,18 @@ class MealEditor extends Component {
 
     /**Updates hour on button*/
     handleHourSelection(evt) {
-        this.setState({hourOnBtn: evt});
+        this.setState( {hourOnBtn: evt} );
+        this.updateEndTime();
     }
 
     /**Updates min on button*/
     handleMinSelection(evt) {
-        this.setState({minOnBtn: evt});
+        if(evt < 10) {
+            evt = "0"+evt
+        }
+
+        this.setState( {minOnBtn: evt} );
+        this.updateEndTime();
     }
 
     /** Updates noon on button */
@@ -219,14 +237,13 @@ class MealEditor extends Component {
 
     /** creates/overwrites meal to the meal */
     update(transform) {
-        var user = User.getUser('user001');
-        user.getPlanner((planner) => {
+        this.close();
+        var user = User.getUser();
+        user.getPlanner((planner)=>{
             planner = transform(planner);
-            //if(thi.props.edit === true)
-            window.location.reload();
-            user.setPlanner(planner, () => {
-                console.log('success');
-            });
+            //if(this.props.edit === true)
+            //     window.location.reload();
+            user.setPlanner(planner,()=> {console.log('success');if(this.props.edit === true){this.props.update(planner);}});
         })
     }
 
@@ -238,6 +255,21 @@ class MealEditor extends Component {
             return this.props.data;
         };
         return transform;
+    }
+
+    updateEndTime() {
+        let hour = parseInt(this.state.hourOnBtn),
+            min = parseInt(this.state.minOnBtn);
+
+        let total = min + this.state.dur;
+        let hr = hour;
+
+        while( total >= 60) {
+            total = total - 60;
+            hr += 1;
+        }
+
+        this.setState( {endtime: hr+":"+total});
     }
 
     edit() {
@@ -253,12 +285,13 @@ class MealEditor extends Component {
 
         let transform = (planner) => {
             this.plannerHelper.editMeal(this.props.data,
-                this.props.day,
-                this.props.mealIndex,
-                this.plannerHelper.createMeal(this.props.recipe,
-                    this.state.dur,
-                    hour,
-                    min));
+                                        this.props.day,
+                                        this.props.mealIndex,
+                                        this.plannerHelper.createMeal(this.props.recipe,
+                                                                        this.state.dur,
+                                                                        hour,
+                                                                        min),
+                                                                        this.state.days.indexOf(this.state.dayOnBtn));
             return this.props.data;
         };
         return transform;
@@ -304,6 +337,42 @@ class MealEditor extends Component {
         );
     }
 
+    renderMealList() {
+
+        let user = User.getUser();
+
+        user.getPlanner((planner)=>{
+            let meals = this.plannerHelper.getDayMealList(planner, this.state.days.indexOf(this.state.dayOnBtn));
+            let recipes = [];
+
+            for(let i = 0; i < meals.length; i++) {
+                recipes.push(meals[i].recipe[0]);
+            }
+
+            this.setState({mealList: recipes});
+        });
+    }
+
+    renderImg() {
+        let recipeHelper = new RecipeHelper();
+
+        recipeHelper.loadRecipe(this.props.recipe, (data) => {
+            if(data&&data.Image) {
+                this.setState({img: Array.from(data.Image)[0]});
+            }
+        });
+    }
+
+    printMealList() {
+            return (
+                Object.keys(this.state.mealList).map((key) => {
+                    return (
+                        <li>{this.state.mealList[key]}</li>
+                    );
+                })
+            );
+    }
+
 
     render() {
 
@@ -314,13 +383,12 @@ class MealEditor extends Component {
                 </a>
             ),
             addButton = (
-                <a className="btn btn-light"
-                   onClick={this.open}>
+                <a className="col-12"
+                    onClick={this.open}>
                     <img alt="planner"
                          width="18"
                          height="18"
-                         src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png"/>
-                    Plan Meal
+                         src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
                 </a>
             ),
             button;
@@ -335,21 +403,27 @@ class MealEditor extends Component {
         return (
             <div>
                 {button}
-                <Modal show={this.state.showEditor} onHide={this.close}>
-                    <Modal.Header>{this.props.recipe}</Modal.Header>
-                    <Modal.Body>
-                        <figure>
-                            <a href={"/Recipes/" + this.props.recipe}>
-                                <img
-                                    className="img-fluid"
-                                    src={this.props.url}
-                                    alt="No Image"
-                                />
-                            </a>
-                        </figure>
+            <Modal show={this.state.showEditor} onHide={this.close}>
+                <Modal.Header>{this.props.recipe}</Modal.Header>
+                <Modal.Body>
+                    <figure>
+                        <Link to={"/Recipes/" + this.props.recipe}>
+                            <img
+                                className="img-fluid"
+                                src={this.state.img}
+                                alt="No Image"
+                            />
+                        </Link>
+                    </figure>
 
-                        <Duration dur={this.props.dur}/>
-                        <div className="border
+                    <figcaption>
+                        <ul>
+                        {this.printMealList()}
+                        </ul>
+                    </figcaption>
+
+                    <Duration dur={this.props.dur}/>
+                    <div className="border
                                     border-dark
                                     border-top-0
                                     border-right-0

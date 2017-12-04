@@ -197,6 +197,25 @@ $search-grad-end: #4dad1a;
   }
 }
 
+.group-spacer{
+    margin-left:10px;
+}
+
+.visual-reorder{
+    transition:position 0.5s linear;
+}
+
+.loading-icon{
+  animation-name: spinner; 
+  animation-duration: 2s; 
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes spinner {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
 // .badge-notify{
 //    background:red;
 //    position:relative;

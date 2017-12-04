@@ -26,7 +26,6 @@ class PlannerHelper{
         //if meals has not been instantiated
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
-            return;
         }
 
         var startHr = meal.startHr,
@@ -85,7 +84,6 @@ class PlannerHelper{
                 }
             }
         }
-        alert(JSON.stringify(mealIndex));
 
         //if mealIndex is out of bound then add to the end
         if (mealIndex === meals.length) {
@@ -129,6 +127,9 @@ class PlannerHelper{
                 console.log("pushed");
                 data.days[day].mealData.splice(mealIndex, 0, meal);
             }
+        }
+        else {
+            alert("Your meal cannot be added because it conflicts with another scheduled meal.");
         }
     }
      /**
@@ -178,10 +179,9 @@ class PlannerHelper{
      * @param mealIndex - the index of the meal you want to edit
      * @param meal - new meal object to replace the old one.
      */
-    editMeal(data, day, mealIndex, meal) {
-        // check if meal exist
+    editMeal(data, day, mealIndex, meal, newDay) {
         this.removeMeal(data, day, mealIndex);
-        this.insertMeal(data, meal, day);
+        this.insertMeal(data, meal, newDay);
     }
 
 
@@ -210,17 +210,19 @@ class PlannerHelper{
             min = data.days[day].mealData[mealIndex].startMin,
             noon = "am";
 
-        if (hour === 12) {
-            noon = "pm";
-        }
-        else if (hour > 12) {
-            hour = (hour - 12);
-            noon = "pm"
-        }
-        else if (hour === undefined) {  //undefined
-            hour = 12;
-            noon = "am";
-        }
+         //alert(JSON.stringify(hour));
+
+         if(hour == 12) {
+             noon = "pm";
+         }
+         else if(hour > 12) {
+             hour = (hour - 12);
+             noon = "pm"
+         }
+         else if(hour === undefined) {  //undefined
+             hour = 12;
+             noon = "am";
+         }
 
         if (min < 10) {
             min = "0" + min;
@@ -271,13 +273,13 @@ class PlannerHelper{
             hr = "0";
         }
 
-        if (endHr - startHr === 0) {
-            return (min) + " m";
-        }
-        else {
-            return (hr) + " h " + (min) + " m";
-        }
-    }
+         if( endHr - startHr == 0) {
+             return (min) + " m";
+         }
+         else {
+             return (hr) + " h " + (min) + " m";
+         }
+     }
 
 
     /** Gives meals end time startHr: startMin
@@ -289,7 +291,7 @@ class PlannerHelper{
             min = data.days[day].mealData[mealIndex].endMin,
             noon = "am";
 
-        if (hour === 12) {
+        if(hour == 12) {
             noon = "pm";
         }
         else if (hour > 12) {
@@ -310,12 +312,22 @@ class PlannerHelper{
         return hour + ":" + min + " " + noon;
     }
 
-    /** This function retrieves the number of meals for a specified day*/
-    getNumMeals(data, day) {
-        if (data.days[day].mealData.length)
-            return data.days[day].mealData.length;
-        else return 0;
-    }
+     /** This function retrieves the number of meals for a specified day*/
+     getNumMeals(data, day){
+         if(data.days[day].mealData.length)
+             return data.days[day].mealData.length;
+         else return 0;
+     }
+
+     /** This function counts the meals in the planner*/
+     getTotalNumMeals(data) {
+         let total = 0;
+         for(let i = 0; i < 7; i++) {
+             total += data.days[i].mealData.length;
+         }
+
+         return total;
+     }
 }
 
  export default PlannerHelper;

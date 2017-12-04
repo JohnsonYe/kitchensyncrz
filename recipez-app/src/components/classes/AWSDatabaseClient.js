@@ -36,8 +36,8 @@ const UNAUTH_NAME = 'GUEST'
 
 var MAX_REQUEST_LENGTH = 100;
 
-var appClientID = '1qnpej4u0hul8mq0djs9a5r8me';
-var MAX_REQUEST_LENGTH = 100;
+var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+
 
  class DBClient {
     constructor(){
@@ -81,6 +81,7 @@ var MAX_REQUEST_LENGTH = 100;
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':Array.from(ss)}),
             'N': (n,p)=>({'N':n+''}),
+            'SET': (n,p)=>{alert('this isnt set up yet')},
         }
 
 
@@ -189,7 +190,7 @@ var MAX_REQUEST_LENGTH = 100;
     }
 
     buildMapUpdateExpression(mapName,key,value){
-        let xkey = key.replace(/\s/g, '_')
+        let xkey = key.replace(exprRegex, '_')
         return {
                 expr: 'SET #'+xkey+'.#' + xkey + '2 = :'+xkey+'_value',
                 names:{["#"+xkey]:mapName,['#'+xkey+'2']:key},
@@ -238,7 +239,7 @@ var MAX_REQUEST_LENGTH = 100;
     }
 
     buildRemoveElementUpdateExpression(attr,key){
-        let xattr = attr.replace(/\s/g, '_')       
+        let xattr = attr.replace(exprRegex, '_')       
         return {
             expr: 'REMOVE #'+xattr+'.#'+xattr+'_value',
             names:{['#'+xattr]:attr,['#'+xattr+'_value']:key},

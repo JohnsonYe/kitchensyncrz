@@ -46,10 +46,21 @@ class App extends Component {
         this.toggleFunMode = this.toggleFunMode.bind(this);
 
         this.state = {
-            isNavMenuOpened: false,
-            funMode: false
+            isMenuOpened: false,
+            funMode: false,
+            cursorWidth:100,
+            cursorHeight:100,
         }
         this.client = DBClient.getClient();
+
+        this.moveCallback = ((e)=>{
+            this.setState({
+                transform:{
+                    'left': e.pageX-this.state.cursorWidth/2,
+                    'top' : e.pageY-this.state.cursorHeight/2,
+                }
+            });
+        });
     }
 
     async componentDidMount() {
@@ -67,16 +78,18 @@ class App extends Component {
 
 
     componentWillMount() {
-        // window.addEventListener('click', this.closeNav);
+
+        window.addEventListener('click', this.closeNav);
+        document.addEventListener('mousemove',this.moveCallback)
         this.setState({
             isNavMenuOpened: false,
             isAuthenticating: true
-
         })
     }
 
     componentWillUnmount() {
-        // window.removeEventListener('click', this.closeNav);
+        window.removeEventListener('click', this.closeNav);
+        document.removeEventListener('mousemove',this.moveCallback);
     }
 
     handleClick(e) {
@@ -90,8 +103,11 @@ class App extends Component {
     }
 
     toggleFunMode() {
-        this.setState({funMode: !this.state.funMode});
+        this.setState( {funMode: !this.state.funMode} );
+        this.setState({showFollower:!this.state.showFollower})
     }
+
+    
 
     handleLogout = event => {
         //this.handleClick();
@@ -127,7 +143,7 @@ class App extends Component {
                         <OffCanvasMenu className="navbar-menu">
                             <ul>
                                 <li className="first">
-                                    <Link to="/">Home</Link>
+                                    <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
                                 </li>
                                 <li>
                                     <Link to="/Search">Browse</Link>
@@ -168,6 +184,9 @@ class App extends Component {
                     <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Hello There</button>
                     </span>
                     </div>
+                    <div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
+                    <img src='/images/Peanut-butter-jelly-time.gif' width={this.state.cursorWidth+'px'} height={this.state.cursorHeight+'px'}/>
+                </div>
                 </div>
             </Router>
         );

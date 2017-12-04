@@ -11,6 +11,7 @@ import {Modal} from 'react-bootstrap';
 import Recipe from '../pages/recipe';
 import RecipeHelper from '../classes/RecipeHelper';
 import MealEditor from '../pages/plannerPages/editMealPage';
+import User from '../classes/User';
 
 class SearchThumbail extends Component {
     constructor(props) {
@@ -22,7 +23,6 @@ class SearchThumbail extends Component {
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this.heart = this.heart.bind(this);
-
     }
 
     open() {
@@ -34,8 +34,8 @@ class SearchThumbail extends Component {
     }
 
     // add to cookbook/ favorite
-    heart() {
-        alert("HELLO WORLD");
+    heart(e) {
+        (e)=>User.getUser().saveExternalRecipe(this.state.data.Name)
     }
 
     render() {
@@ -79,17 +79,17 @@ class SearchThumbail extends Component {
 
                         </Modal.Body>
                     </Modal>
-                    <a href="javascript:undefined;" onClick={this.heart} className="btn btn-dark col-4"
-                       title="Save to CookBook">
+                    <a onClick={(e)=>User.getUser().saveExternalRecipe(this.props.data.Name)} className="btn btn-dark col-4"
+                        title="Save to CookBook">
                         <img className="heart"
                              width="18"
                              height="18"
                              src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png"/>
 
                     </a>
-                    <div className="col-4">
-                        {/*<MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
-                        duration={this.props.data.TimeCost} />*/}
+                    <div className="btn btn-dark col-4">
+                        <MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
+                        dur={this.props.data.TimeCost} />
                     </div>
                 </div>
 
