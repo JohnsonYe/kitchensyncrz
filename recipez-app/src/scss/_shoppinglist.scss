@@ -7,4 +7,9 @@
 
 .spaced{
     margin-top:5px;
+    transition: margin 0.1s linear,content 0.1s linear;
+}
+
+.removing{
+    opacity:0;
 }
