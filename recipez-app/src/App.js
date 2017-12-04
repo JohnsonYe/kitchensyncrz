@@ -26,63 +26,148 @@ import Homepage from './components/pages/homePage';
 import Search from './components/pages/search';
 import Kitchen from './components/pages/kitchen';
 import Planner from './components/pages/plannerPages/plannerPageDefault';
-import Cookbook from "./components/pages/myCookbook";
+import Cookbook from "./components/pages/Cookbook";
 import Recipe from "./components/pages/recipe";
+import DBClient from "./components/classes/AWSDatabaseClient";
+import SignIn from './components/pages/userLoginPages/signIn';
+import Register from "./components/pages/userLoginPages/register";
+import User from "./components/classes/User";
+
 import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 
 class App extends Component {
+    constructor(props) {
+        super(props);
+        this.componentWillMount = this.componentWillMount.bind(this);
+        this.componentWillUnmount = this.componentWillUnmount.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.closeNav = this.closeNav.bind(this);
+        this.toggleFunMode = this.toggleFunMode.bind(this);
+
+        this.state = {
+            isMenuOpened: false,
+            funMode: false,
+            cursorWidth:100,
+            cursorHeight:100,
+        }
+        this.client = DBClient.getClient();
+
+        this.moveCallback = ((e)=>{
+            this.setState({
+                transform:{
+                    'left': e.pageX-this.state.cursorWidth/2,
+                    'top' : e.pageY-this.state.cursorHeight/2,
+                }
+            });
+        });
+    }
+
+    async componentDidMount() {
+        try {
+            if (await this.client.authUser()) {
+                this.client.authenticated = true;
+            }
+        }
+        catch (e) {
+            // alert('app mounted: '+e);
+        }
+
+        this.setState({isAuthenticating: false});
+    }
+
 
     componentWillMount() {
+
+        window.addEventListener('click', this.closeNav);
+        document.addEventListener('mousemove',this.moveCallback)
         this.setState({
-        isMenuOpened: false
+            isNavMenuOpened: false,
+            isAuthenticating: true
         })
     }
 
-    handleClick() {
-        this.setState({ isMenuOpened: !this.state.isMenuOpened });
+    componentWillUnmount() {
+        window.removeEventListener('click', this.closeNav);
+        document.removeEventListener('mousemove',this.moveCallback);
+    }
+
+    handleClick(e) {
+        e.stopPropagation();
+        this.setState({ isNavMenuOpened: !this.state.isNavMenuOpened });
+    }
+
+    closeNav(e) {
+        e.stopPropagation();
+       this.setState({isNavMenuOpened: false});
+    }
+
+    toggleFunMode() {
+        this.setState( {funMode: !this.state.funMode} );
+        this.setState({showFollower:!this.state.showFollower})
+    }
+
+    
+
+    handleLogout = event => {
+        //this.handleClick();
+        this.client.signOutUser();
+        this.client.authenticated = false;
+        this.client.user = 'user001';
+        User.getUser().reload();
+        //alert(this.client.isLoggedIn());
     }
 
     render() {
+        var imgsrc = "http://www.free-icons-download.net/images/a-kitchen-icon-80780.png";
+        {
+            this.state.funMode ? imgsrc = "http://vignette1.wikia.nocookie.net/epicrapbattlesofhistory/images/c/c2/Peanut-butter-jelly-time.gif/revision/latest?cb=20141129150614" : null
+        }
+        
         return (
+            !this.state.isAuthenticating &&
             <Router>
                 <div className="App">
-                    <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
+                    <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isNavMenuOpened} position="left">
                         <OffCanvasBody className="navbar-icon">
-                            <a href="#" onClick={this.handleClick.bind(this)}>
-                                {<img className="ks-icon" src="http://www.free-icons-download.net/images/a-kitchen-icon-80780.png" />}
-                                {/*<img className="ks-icon" src="/images/Peanut-butter-jelly-time.gif" />*/}
-                            </a>
+                            <div onClick={this.handleClick.bind(this)} style={{cursor:'pointer'}}>
+                                {this.state.isNavMenuOpened ?
+                                    //set to null if you want banana man to kill himself
+                                    <img className="ks-icon" src={imgsrc}/>
+                                    //null
+                                    :
+                                    <img className="ks-icon" src={imgsrc}/>
+                                }
+                            </div>
                         </OffCanvasBody>
                         <OffCanvasMenu className="navbar-menu">
                             <ul>
                                 <li className="first">
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
+                                    <Link to="/" onClick={this.closeNav}>Home</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Search" onClick={this.handleClick.bind(this)}>Search</Link>
+                                    <Link to="/Search" onClick={this.closeNav}>Browse</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Cookbook" onClick={this.handleClick.bind(this)}>Cookbook</Link>
+                                    <Link to="/Cookbook" onClick={this.closeNav}>Cookbook</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Kitchen" onClick={this.handleClick.bind(this)}>Kitchen</Link>
+                                    <Link to="/Kitchen" onClick={this.closeNav}>Kitchen</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Planner" onClick={this.handleClick.bind(this)}>Planner</Link>
+                                    <Link to="/Planner" onClick={this.closeNav}>Planner</Link>
                                 </li>
                                 <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Register</Link>
-                                </li>
-                                <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign in</Link>
-                                </li>
-                                <li>
-                                    <Link to="/" onClick={this.handleClick.bind(this)}>Sign out</Link>
+                                    {
+                                        this.client.authenticated ?
+                                            <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> :
+                                            <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                    }
                                 </li>
                             </ul>
                         </OffCanvasMenu>
                     </OffCanvas>
+
 
                     <Route exact path='/' component={Homepage} />
                     <Route exact path='/Search' component={Search} />
@@ -91,11 +176,21 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
+                    <Route exact path='/Register' component={Register}/>
+                    <Route exact path='/SignIn' component={SignIn}/>
                     <Footer />
+                    <div className="row">
+                    <span className="col-2 pull-right fun-button">
+                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Hello There</button>
+                    </span>
+                    </div>
+                    <div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
+                    <img src='/images/Peanut-butter-jelly-time.gif' width={this.state.cursorWidth+'px'} height={this.state.cursorHeight+'px'}/>
+                </div>
                 </div>
             </Router>
-    );
-  }
+        );
+    }
 }
 
 export default App;

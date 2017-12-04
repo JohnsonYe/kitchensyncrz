@@ -1,0 +1,41 @@
+#login { display: none; }
+.login,
+.logout {
+    position: absolute;
+    top: -3px;
+    right: 0;
+}
+
+/*.reviews {
+    color: #555;
+    font-weight: bold;
+    margin: 10px auto 20px;
+}*/
+
+.btn-circle {
+    font-weight: bold;
+    font-size: 12px;
+    padding: 6px 15px;
+    border-radius: 20px;
+}
+.btn-circle span { padding-right: 6px; }
+
+.tab-content {
+    padding: 30px 15px;
+    border: 1px solid #ddd;
+    border-top: 0;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+#comment {
+    height: 50%;
+    width: 100%;
+    font-size: 100%;
+}
+
+.Container {
+    padding: 10px 120px;
+}
+
+

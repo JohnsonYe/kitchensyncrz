@@ -38,7 +38,7 @@ import Util from "../classes/Util";
         //     .then((json)=>new Autocomplete().loadJSON(json))
         //     .then((autocomplete)=>{console.log('Finished loading autocomplete in searchbar: ');return autocomplete})
             // .catch((err)=>err)
-            // 
+            //
         this.asyncCompletions = Util.loadCompiledAutocompleteTree('Ingredients','searchbar');
     }
 

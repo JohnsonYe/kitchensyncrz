@@ -5,8 +5,8 @@
  * Description: modular searchbar component that provides autocomplete in a dropdown menu
  */
 import React, {Component} from 'react';
+import Util from '../classes/Util.js'
 import Autocomplete from '../classes/Autocomplete'
-import Util from '../classes/Util'
 
 class SearchBar extends Component{
     constructor(props){

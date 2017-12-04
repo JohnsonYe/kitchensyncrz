@@ -10,7 +10,7 @@
  *      list: The array that holds all the data you are trying to render
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 class DynamicList extends Component {
 
