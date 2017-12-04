@@ -10,11 +10,9 @@ import User from '../classes/User';
 
 
 
- class RecipeHelper{
+class RecipeHelper{
     constructor(){
         this.client = DBClient.getClient();
-        this.client.registerPrototype(RecipeHelper.RecipePrototype)
-        this.client.registerPrototype(RecipeHelper.ReviewPrototype)
 
         this.createRecipe = this.createRecipe.bind(this);
         this.loadRecipe     = this.loadRecipe.bind(this);
@@ -22,13 +20,14 @@ import User from '../classes/User';
         this.receiveRecipe  = this.receiveRecipe.bind(this);
         this.updateReview   = this.updateReview.bind(this);
         this.testUnpack = this.testUnpack.bind(this);
+        this.maxRating = 5;
     }
 
-     /**
-      * Use this method to build a recipe object
-      * 
-      * Recipe Object Format:
-      * {
+    /**
+     * Use this method to build a recipe object
+     *
+     * Recipe Object Format:
+     * {
       *      Name: <String> recipe Name
       *      Author: <String> username of user that created this recipe
       *      Ingredients: <List> of <String> containing one ingredient specification each
@@ -41,7 +40,8 @@ import User from '../classes/User';
       *          timestamp: timestamp of comment
       *      }
       * }
-      */
+     */
+
      createRecipe(name, ingredients, directions, duration, difficulty, imageURL) {
         return {
             Name: name,
@@ -68,31 +68,22 @@ import User from '../classes/User';
         this.client.updateItem(//create the reviews field if it doesnt exist
             this.client.buildUpdateRequest('Recipes','Name',recipeName,this.client.buildFieldCreateExpression('Reviews',{M:{}})),
             function (e1,r1){ //chain update calls to keep them synced up
-            if(e1){
-                this.client.updateItem( //add the review to the reviews field once the create call resolves
-                    this.client.buildUpdateRequest(
-                        'Recipes',
-                        'Name',recipeName,
-                        this.client.buildMapUpdateExpression('Reviews',revObj.username,RecipeHelper.packReview(revObj))),
-                    callback)
-            } else {
-                //field creation failed (!) (?)
-                callback({status:false,payload:e1})
-            }
-        }.bind(this))
-
-        // this.client.updateItem(
-        //     this.client.buildUpdateRequest(
-        //         'Recipes',
-        //         'Name',recipeName,
-        //         this.client.combineUpdateExpressions(
-        //             this.client.buildFieldCreateExpression('Reviews',{M:{}}),
-        //             this.client.buildMapUpdateExpression('Reviews',revObj.username,packedReviewObject))),
-        //     this.client.alertResponseCallback)
+                if(e1){
+                    this.client.updateItem( //add the review to the reviews field once the create call resolves
+                        this.client.buildUpdateRequest(
+                            'Recipes',
+                            'Name',recipeName,
+                            this.client.buildMapUpdateExpression('Reviews',revObj.username,RecipeHelper.packReview(revObj))),
+                        callback)
+                } else {
+                    //field creation failed (!) (?)
+                    callback({status:false,payload:e1})
+                }
+            }.bind(this))
     }
 
     loadRecipe(recipeName,callback,custom){
-        if(custom){ 
+        if(custom){
             //load recipe from JSON string
             User.getUser(custom).getUserData('cookbook') //queue up the custom display after user data loads
                 .then((cookbook)=>
@@ -106,19 +97,24 @@ import User from '../classes/User';
                     }
                 })
                 //verification failed, user data failed to load, or invalid recipe name --> pass the error object we get
-                .catch((message)=>this.receiveRecipe({status:false,payload:message.toString()},callback)) 
+                .catch((message)=>this.receiveRecipe({status:false,payload:message.toString()},callback))
         } else {
             this.client.getDBItems('Recipes','Name',[recipeName],e => this.receiveRecipe(e,callback))
         }
     }
 
-    loadRecipeBatch(batch,callback){
+    loadRecipeBatch(batch,success,failure){
         this.client.getDBItems('Recipes','Name',batch,
-            (response)=>callback(response.payload.map(
-                (recipe)=>this.client.unpackItem(recipe,RecipeHelper.RecipePrototype)
-                )
-            )
-        )
+            (response)=>{
+                if(response.status){
+                    success(response.payload.map((recipe)=>this.client.unpackItem(recipe,RecipeHelper.RecipePrototype)))
+                } else {
+                    console.error(response.payload)
+                    if(failure) {
+                        failure(response.payload)
+                    }
+                }
+            })
     }
 
     receiveRecipe(response,callback) {
@@ -129,53 +125,83 @@ import User from '../classes/User';
         }
 
         callback(this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype))
-        // var unpacked = this.client.unpackItem(response.payload[0],RecipeHelper.RecipePrototype)
-        // alert(JSON.stringify(unpacked))
-        // alert(JSON.stringify(this.client.packItem(unpacked,RecipeHelper.RecipePrototype)))
-        // callback(RecipeHelper.unpackRecipe(response.payload[0]))
     }
- }
+}
 
- RecipeHelper.ReviewPrototype = {
+RecipeHelper.getAvgRating = function(recipe){
+    if(!recipe.Reviews){
+        return 0;
+    }
+    let reviews = Object.entries(recipe.Reviews).map((review)=>review[1]);
+    return reviews.reduce((prev,next)=>prev+next.Rating,0)/reviews.length;
+}
+
+RecipeHelper.getPrepTime = function(recipe){
+    if(!recipe.TimeCost ||recipe.TimeCost==='Undefined'){
+        return 360000;//600 hours to force these results to the bottom
+    }
+    let total = 0, tokens = recipe.TimeCost.split(/\s+/); //tokenize the string for parsing
+    //do nothing unless the previous token was a time unit specifier
+    tokens.reverse().reduce((prev,next)=>{total+=(prev==='m'?+next:(prev==='h'?+next*60:0));return next},0)
+    return total;
+}
+
+RecipeHelper.RecipeReferencePrototype = {
+    _NAME:'RECIPE_REFERENCE',
+    Name:{type:'S'},
+    Importance:{type:'N'}
+}
+DBClient.getClient().registerPrototype(RecipeHelper.RecipeReferencePrototype)
+
+RecipeHelper.IngredientPrototype = {
+    _NAME:'INGREDIENT_BASE',
+    Name:{type:'S'},
+    recipes:{type:'L',inner:{'type':RecipeHelper.RecipeReferencePrototype._NAME}}
+}
+DBClient.getClient().registerPrototype(RecipeHelper.IngredientPrototype)
+
+RecipeHelper.ReviewPrototype = {
     _NAME:'REVIEW',
     username:{type:'S'},
     Comment:{type:'S'},
     Rating:{type:'N'},
     timestamp:{type:'N'}
- }
+}
+DBClient.getClient().registerPrototype(RecipeHelper.ReviewPrototype)
 
- RecipeHelper.RecipePrototype = {
+RecipeHelper.RecipePrototype = {
     _NAME:'RECIPE',
     Name:{type:'S'},
     Ingredients:{type:'L',inner:{type:'S'}},
     Directions:{type:'L',inner:{type:'S'}},
     Reviews:{type:'M',inner:{type:RecipeHelper.ReviewPrototype._NAME}},
     Author:{type:'S'},
-    Difficulty:{type:'N'},
-    TimeCost:{type:'N'},
-     Image:{type:'SS'},
- }
+    Difficulty:{type:'S'},
+    TimeCost:{type:'S'},
+    Image:{type:'SS'}
 
- //============================================================================================
- /*
-  * this code is no longer in use but is kept (for now) for convenience and testing
-  */
+}
+DBClient.getClient().registerPrototype(RecipeHelper.RecipePrototype)
 
- /**
- * Recipe Object Format:
- * {
- *      Name: Recipe Name
- *      Ingredients: <List> of <String> containing one ingredient specification each
- *      Directions:  <List> of <String> containing one step each
- *      Reviews:     <List> of Review <Objects>:
- *      {
- *          username: <String> username of commenter
- *          Comment:  <String> comment assosciated with review, may be empty
- *          Rating:   <int> rating associated with review, out of 5 (stars)
- *          timestamp: timestamp of comment
- *      }
- * }
- */
+//==========================================================================
+RecipeHelper.unpackReview = function(packedReview){
+    return Object.entries(packedReview.M).map((review) => ({
+        username:   review[1].M.username.S,
+        Comment:    review[1].M.Comment.S,
+        Rating:     review[1].M.Rating.N,
+        timestamp:  review[1].M.timestamp.N,
+    }))
+}
+
+RecipeHelper.packReview = function(revObj){
+    return {M:{
+        username:   {S:revObj.username},
+        Comment:    {S:revObj.Comment},
+        Rating:     {N:revObj.Rating},
+        timestamp:  {N:revObj.timestamp},
+    }}
+}
+
 RecipeHelper.unpackRecipe = function(recipeResponse){
     var reviews = []
     if(recipeResponse.Reviews){
@@ -200,22 +226,55 @@ RecipeHelper.packRecipe = function(r){
     }
 
 }
-
 RecipeHelper.unpackReview = function(packedReview){
     return Object.entries(packedReview.M).map((review) => ({
-                    username:   review[1].M.username.S,
-                    Comment:    review[1].M.Comment.S,
-                    Rating:     review[1].M.Rating.N,
-                    timestamp:  review[1].M.timestamp.N,
-                }))
+        username:   review[1].M.username.S,
+        Comment:    review[1].M.Comment.S,
+        Rating:     review[1].M.Rating.N,
+        timestamp:  review[1].M.timestamp.N,
+    }))
 }
 
 RecipeHelper.packReview = function(revObj){
     return {M:{
-            username:   {S:revObj.username},
-            Comment:    {S:revObj.Comment},
-            Rating:     {N:revObj.Rating},
-            timestamp:  {N:revObj.timestamp},
-        }}
+        username:   {S:revObj.username},
+        Comment:    {S:revObj.Comment},
+        Rating:     {N:revObj.Rating},
+        timestamp:  {N:revObj.timestamp},
+    }}
 }
- export default RecipeHelper;
+
+RecipeHelper.RecipeReferencePrototype = {
+    _NAME:'RECIPE_REFERENCE',
+    Name:{type:'S'},
+    Importance:{type:'N'}
+}
+DBClient.getClient().registerPrototype(RecipeHelper.RecipeReferencePrototype)
+
+RecipeHelper.IngredientPrototype = {
+    _NAME:'INGREDIENT_BASE',
+    Name:{type:'S'},
+    recipes:{type:'L',inner:{'type':RecipeHelper.RecipeReferencePrototype._NAME}}
+}
+DBClient.getClient().registerPrototype(RecipeHelper.IngredientPrototype)
+
+
+RecipeHelper.getAvgRating = function(recipe){
+    if(!recipe.Reviews){
+        return 0;
+    }
+    let reviews = Object.entries(recipe.Reviews).map((review)=>review[1]);
+    return reviews.reduce((prev,next)=>prev+next.Rating,0)/reviews.length;
+}
+
+RecipeHelper.getPrepTime = function(recipe){
+    if(!recipe.TimeCost ||recipe.TimeCost==='Undefined'){
+        return 360000;//600 hours to force these results to the bottom
+    }
+    let total = 0, tokens = recipe.TimeCost.split(/\s+/); //tokenize the string for parsing
+    //do nothing unless the previous token was a time unit specifier
+    tokens.reverse().reduce((prev,next)=>{total+=(prev==='m'?+next:(prev==='h'?+next*60:0));return next},0)
+    return total;
+}
+
+export default RecipeHelper;

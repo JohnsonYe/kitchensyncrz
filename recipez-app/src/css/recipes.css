@@ -1,6 +1,13 @@
 h1 {
     font-family: "Georgia", serif;
     font-size: 50px;
+    text-align: center;
+}
+
+.PageHeader{
+    font-family: "Georgia", serif;
+    font-size: 45px;
+    text-align: center;
 }
 
 h2 {
@@ -33,4 +40,27 @@ h2 {
 #reviewContainer{
     widht:100%;
     margin: auto;
+}
+
+#forksize{
+    padding-right: 1.5em;
+}
+
+.CarouselSize{
+    height: 350px;
+    border-radius: 25px;
+}
+
+.CarouselSize img{
+    border-radius: 25px;
+    height: 350px;
+}
+
+.Ingredient h2{
+    padding: 0px 50px;
+   /* margin: auto;*/
+}
+
+.Direction{
+    padding: 10px 50px;
 }
