@@ -213,7 +213,7 @@ class PreviewCard extends Component{
             duration: this.state.workingDuration,
 
         });
-        this.props.updateFunc(this.recipeHelper.createRecipe(this.props.src.Name, stringIngredientList, updatedDirections,this.state.duration,this.state.difficulty,this.props.src.Image));
+        this.props.updateFunc(this.recipeHelper.createRecipe(this.props.src.Name, stringIngredientList, updatedDirections,this.state.workingDuration,this.state.workingDifficulty,this.props.src.Image));
         this.editClose();
     }
 
@@ -357,11 +357,11 @@ class PreviewCard extends Component{
                                 <FormControl
                                     type={"text"}
                                     value={this.state.workingDuration}
-                                    placeholder="length of time"
+
                                     onChange={this.handleChangeDuration}
                                 />
                                 <FormControl.Feedback/>
-                                <InputGroup.Addon>minutes</InputGroup.Addon>
+                                <InputGroup.Addon>## h ## m</InputGroup.Addon>
                             </InputGroup>
                         </FormGroup>
                     </form>
@@ -394,9 +394,7 @@ class PreviewCard extends Component{
         ;
         let image;
         if (this.props.src.Image) {
-            console.log(this.props.src.Image);
-            let imageArray = Array.from(this.props.src.Image);
-            image = imageArray[0];
+            image = this.props.src.Image[0];
 
         } else {
             image = require("./no-photo.png");

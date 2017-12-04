@@ -30,7 +30,7 @@ class Recipe extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         // this.reload = this.reload.bind(this);
-        this.User = new User();
+        this.User = User.getUser();
     }
 
     setRecipeData(recipeObject,err){

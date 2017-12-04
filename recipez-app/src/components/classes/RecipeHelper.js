@@ -42,8 +42,6 @@ class RecipeHelper {
      */
 
      createRecipe(name, ingredients, directions, duration, difficulty, imageURL) {
-         let images = new Set();
-         images.add(imageURL);
         return {
             Name: name,
             Author: this.client.getUsername(),
@@ -52,7 +50,7 @@ class RecipeHelper {
             Reviews:{},
             TimeCost: duration,
             Difficulty: difficulty,
-            Image: images,
+            Image: imageURL,
         }
     }
 

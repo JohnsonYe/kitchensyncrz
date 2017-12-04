@@ -22,7 +22,7 @@ class kitchen extends Component {
 
     constructor( props ){
         super( props );
-        this.user = new User();
+        this.user = User.getUser();
 
         this.loadPantry();
         this.loadExcluded();

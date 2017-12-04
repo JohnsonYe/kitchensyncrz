@@ -12,7 +12,7 @@ class Cookbook extends Component {
 
     constructor(props){
         super(props);
-        this.userInstance = new User();
+        this.userInstance = User.getUser();
 
     }
 
