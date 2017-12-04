@@ -51,7 +51,7 @@ class User {
         this.loadStream = Promise.resolve({ //create a new user data object locally
             username:       username,
             cookbook:       {},
-            cookware:       new Set(['oven']), //this can't be empty
+            cookware:       new Set(['dirt']), //this can't be empty
             exclude:        new Set(['mercury']),
             pantry:         {mercury: {unit: 'none', amount: '1'}},
             planner:        {days: (()=>{let l = [];for(let i=0;i<7;i++)l.push({mealData: []});return l})()},
