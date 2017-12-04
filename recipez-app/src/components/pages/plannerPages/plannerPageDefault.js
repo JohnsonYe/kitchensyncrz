@@ -11,29 +11,26 @@
  * Components: dailyMealPlanner, shoppingList
  */
 import React, { Component } from 'react';
-import {Button} from 'react-bootstrap';
 
-import DynamicList from "../../dynamicList"
 import MealEditor from "./editMealPage"
 import PlannerHelper from "../../classes/Planner";
 import User from '../../classes/User';
 
+
 /**Lets the user know what recipe is up next to cook will be placed in Daily Meal Planner*/
 function UpNextCard(props){
 
-    const img1 = "http://twolovesstudio.com/wp-content/uploads/sites/5/2017/05/99-Best-Food-Photography-Tips-5-1.jpg";
-    const img2 = "https://static1.squarespace.com/static/533dbfc0e4b0a3ebd0e44c92/t/552f072de4b0b098cbb115b6/1429145391117/Chris+Sanchez+Food+photo";
     return (
         <div className="card m-3">
             <div className="view overlay">
                 <img
                     className="img-fluid "
-                    src={img2}
+                    src={props.url}
                     alt="Food Porn"
                 />
             </div>
             <div className="card-img-overlay">
-                <h3 className="card-title text-white">Up next ...</h3>
+                <h3 className="card-title text-white">Up next {props.recipe}</h3>
             </div>
         </div>
     );
@@ -70,13 +67,15 @@ class Planner extends Component {
             //data = new PlannerHelper(this.update),
             user = User.getUser();
 
+
         this.plannerHelper = new PlannerHelper();
 
         this.state = {
             days: days,
-            numMeals: 0,
-            numShopItems: 0,
-            items: [],
+            numMealDay: 0,
+            numMealWeek: 0,
+            nextMeal: "Loading ...",
+            nextImg: "http://travelmasters.ca/wp-content/uploads/2017/03/no-image-icon-4-1024x1024.png",
             mealData:null,
         };
 
@@ -87,8 +86,6 @@ class Planner extends Component {
         this.removeMeal = this.removeMeal.bind(this);
         this.loadNumMeals = this.loadNumMeals.bind(this);
         this.loadTotalMeals = this.loadTotalMeals.bind(this);
-        this.addItem = this.addItem.bind(this);
-        this.removeItem = this.removeItem.bind(this);
         this.renderMeal = this.renderMeal.bind(this);
         this.renderMealCards = this.renderMealCards.bind(this);
         this.renderItem = this.renderItem.bind(this);
@@ -114,23 +111,6 @@ class Planner extends Component {
         this.setState( {mealData: planner} );
     }
 
-    /**
-     * Adds a item to the list
-     */
-    addItem() {
-        this.state.items[this.state.numShopItems] = "Item-" + this.state.numShopItems;
-        this.setState({ items : this.state.items });
-        this.setState({ numShopItems: (++this.state.numShopItems) });
-    }
-
-    /** TODO Removes card from Daily Meal Planner*/
-    removeItem() {
-        if (this.state.numShopItems > 0) {
-            this.state.items.splice((this.state.numShopItems - 1), 1);
-            this.setState({items: this.state.items});
-            this.setState({numShopItems: (--this.state.numShopItems)});
-        }
-    }
 
     /** Functionality Methods End **/
 
@@ -183,7 +163,7 @@ class Planner extends Component {
                                             border-right-0
                                             border-dark">
                     <div className="mx-auto">
-                        <h2>Weekly Meal Planner</h2>
+                        <h3>Weekly Meal Planner</h3>
                         <h3>{this.loadTotalMeals()}</h3>
                         <p>Meals</p>
                     </div>
@@ -216,19 +196,17 @@ class Planner extends Component {
                                             border-bottom-0
                                             border-dark">
                     <div className="mx-auto">
-                        <h2>Daily Meal Planner</h2>
+                        <h3>Daily Meal Planner</h3>
                         <p>{date}</p>
                         <h3>{this.loadNumMeals(today)}</h3>
                         <p>Meals</p>
                     </div>
                 </div>
                 <div className="col-9">
-                    <MealEditor
-                        url={"http://images.media-allrecipes.com/userphotos/960x960/3756556.jpg"}
-                        recipe={"BLT Salad"}
-                        dur={"25 m"}
+                    <UpNextCard
+                        recipe = {this.state.nextMeal}
+                        url={this.state.nextImg}
                     />
-                    <UpNextCard/>
                     {this.renderMealCards(today)}
                 </div>
             </div>
@@ -246,20 +224,20 @@ class Planner extends Component {
 
     renderShoppingList() {
         return (
-            <div>
-                <div className="row">
-                    <div className="border
-                                border-left-0
-                                border-right-0
-                                border-dark">
-                        <div className="mx-auto">
-                            <h2>Shopping List</h2>
-                            <h2>{this.state.numShopItems}</h2>
-                            <p>Items</p>
-                        </div>
+            <div className="row">
+                <div className="col-3
+                                            border
+                                            border-left-0
+                                            border-top-0
+                                            border-bottom-0
+                                            border-dark">
+                    <div className="mx-auto">
+                        <h3>Shopping List</h3>
+                        <h3>{}</h3>
+                        <p>Items</p>
                     </div>
                 </div>
-                <div className="row">
+                <div className="col-9">
                 </div>
             </div>
         );
