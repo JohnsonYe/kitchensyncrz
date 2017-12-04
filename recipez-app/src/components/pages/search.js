@@ -20,7 +20,7 @@ const CLEAR_SEARCH = 99;
 const ADD_MULTIPLE = 98;
 
 class Search extends Component {
-    constructor(props)  {
+    constructor(props) {
         super(props);
 
         this.client = new SearchHelper();
@@ -61,193 +61,229 @@ class Search extends Component {
 
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
         let query = this.parseQueryString(this.props.history.location.search)
-        console.log('query parse: '+JSON.stringify(query))
-        this.state = {  ingredients:new Set(query.ingredients?query.ingredients:[]),
-            excluded: new Set(query.excluded?query.excluded:[]),
-            filter:query.filter?query.filter[0]:'least_additional',
-            morten:"Do something cool?",
-            completions:[],
-            dropdown:{ingredients:false,filters:false},
-            sorted:[],
-            loadedRecipes:new Map(),
+        console.log('query parse: ' + JSON.stringify(query))
+        this.state = {
+            ingredients: new Set(query.ingredients ? query.ingredients : []),
+            excluded: new Set(query.excluded ? query.excluded : []),
+            filter: query.filter ? query.filter[0] : 'least_additional',
+            morten: "Do something cool?",
+            completions: [],
+            dropdown: {ingredients: false, filters: false},
+            sorted: [],
+            loadedRecipes: new Map(),
             viewThumbnails: true
         };
 
         this.recipeLoader = Promise.resolve(new Map()) //set up an async chain for loading recipe info
 
 
-
     }
-    getRecipeLoader(){
+
+    getRecipeLoader() {
         return this.recipeLoader;
     }
-    massUpdateSearch(items,action){
-        let getCallbacks = (item,pass,fail)=>{
+
+    massUpdateSearch(items, action) {
+        let getCallbacks = (item, pass, fail) => {
             return ({
-                successCallback: ()=>{pass(item)},
-                failureCallback: ()=>{fail(item)},
+                successCallback: () => {
+                    pass(item)
+                },
+                failureCallback: () => {
+                    fail(item)
+                },
             });
         };
 
-        return Array.from(items).map((item)=>{
-            return new Promise((pass,fail)=>{
-                this.client.updateIngredient(item,action,getCallbacks(item,pass,fail),true)
+        return Array.from(items).map((item) => {
+            return new Promise((pass, fail) => {
+                this.client.updateIngredient(item, action, getCallbacks(item, pass, fail), true)
             })
         })
     }
-    componentWillMount(){
+
+    componentWillMount() {
         window.addEventListener('click', this.closeAllDropdowns);
         this.client.setRecipeLoaderSource(this.getRecipeLoader); //pass the client an anonymous function that gives it the most recent loader
-        if(this.state.ingredients.size||this.state.excluded.size){
+        if (this.state.ingredients.size || this.state.excluded.size) {
             //batch load all the ingredients from the URI
             this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
             // use a promise.all to wait for all ingredients to load asynchronously
             Promise.all(
                 //have search manager skip sorting after each update to improve speed
-                this.massUpdateSearch(this.state.ingredients,1),this.massUpdateSearch(this.state.excluded,0)
+                this.massUpdateSearch(this.state.ingredients, 1), this.massUpdateSearch(this.state.excluded, 0)
             )
-                .catch((err)=>console.error(err))
+                .catch((err) => console.error(err))
                 //do one sort once everything is done loading
-                .then((result)=>{ //get the loaded recipes and load them in one batch, then pass the result
-                    this.recipeLoader = new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch(this.client.getRecipeList().map((entry)=>entry[0]),pass,fail))
-                        .then((recipeList)=>new Map(recipeList.map((recipe)=>[recipe.Name,recipe]))); //convert list of named objects to a map
+                .then((result) => { //get the loaded recipes and load them in one batch, then pass the result
+                    this.recipeLoader = new Promise((pass, fail) => this.recipeHelper.loadRecipeBatch(this.client.getRecipeList().map((entry) => entry[0]), pass, fail))
+                        .then((recipeList) => new Map(recipeList.map((recipe) => [recipe.Name, recipe]))); //convert list of named objects to a map
                     this.recipeLoader //attach clause to the loader that sets the state and logs it once loaded
-                        .then((recipes)=>{
-                            this.setState({loadedRecipes:recipes},
-                                (done)=>console.log('batch loaded: '+this.state.loadedRecipes));
+                        .then((recipes) => {
+                            this.setState({loadedRecipes: recipes},
+                                (done) => console.log('batch loaded: ' + this.state.loadedRecipes));
                             return recipes
                         })
                     // .then((recipes)=>{console.log(JSON.stringify(this.state.loadedRecipes));return recipes})
                     this.setFilter(this.state.filter) //set the helper's filter method, based on whatever we parsed
                     return result //pass the result to the next link
                 })
-                .then((result)=>this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted})))
+                .then((result) => this.client.sortRecipeMap((sorted) => this.setState({sorted: sorted})))
         }
     }
-    componentWillUnmount(){
+
+    componentWillUnmount() {
         window.removeEventListener('click', this.closeAllDropdowns);
     }
-    addIngredient(ingredient){
+
+    addIngredient(ingredient) {
         this.ingredient = ingredient;
     }
-    updateState(sortedResults,value,status){
-        
+
+    updateState(sortedResults, value, status) {
+
         this.setState({
-            sorted:sortedResults,
-            ...this.updateIngredientState(value,status)
-        },this.updateURI)
+            sorted: sortedResults,
+            ...this.updateIngredientState(value, status)
+        }, this.updateURI)
     }
-    removeIngredient(value,status){
+
+    removeIngredient(value, status) {
         // e.preventDefault();
-        let update_state_and_close_dropdowns_fn = (sorted)=>{
-            this.updateState(sorted,value,status);
-            if(this.state.ingredients.size === 0){
+        let update_state_and_close_dropdowns_fn = (sorted) => {
+            this.updateState(sorted, value, status);
+            if (this.state.ingredients.size === 0) {
                 this.closeAllDropdowns()
             }
         };
 
-        this.client.updateIngredient(value,status,{successCallback:update_state_and_close_dropdowns_fn})
+        this.client.updateIngredient(value, status, {successCallback: update_state_and_close_dropdowns_fn})
 
     }
-    toggleDropdown(event,id){
-        this.setState({dropdown:Object.assign(this.state.dropdown,{[id]:!this.state.dropdown[id]})})
+
+    toggleDropdown(event, id) {
+        this.setState({dropdown: Object.assign(this.state.dropdown, {[id]: !this.state.dropdown[id]})})
     }
-    blockPropagation(event){
+
+    blockPropagation(event) {
         event.stopPropagation();
     }
-    closeAllDropdowns(){
-        this.setState({dropdown:{}})
+
+    closeAllDropdowns() {
+        this.setState({dropdown: {}})
     }
-    dropdownState(id,base){
-        return (base + (this.state.dropdown[id]?' open':''))
+
+    dropdownState(id, base) {
+        return (base + (this.state.dropdown[id] ? ' open' : ''))
     }
-    updateLoader(ingredient){
+
+    updateLoader(ingredient) {
         // console.log('Loading info for: ' + ingredient)
-        this.recipeLoader = this.recipeLoader.then((recipes)=>{
+        this.recipeLoader = this.recipeLoader.then((recipes) => {
             // console.log('updating loader: '+JSON.stringify(recipes))
-            let recipeNames =  Array.from(new Set(ingredient.recipes.map((recipe)=>recipe.Name))); //remove duplicates
+            let recipeNames = Array.from(new Set(ingredient.recipes.map((recipe) => recipe.Name))); //remove duplicates
             console.log('Loading new ingredient data: ' + ingredient.Name)
             // return (new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch([ingredient],pass,fail))
-            return (new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch(recipeNames,pass,fail))
-                .then((recipeList)=>{
+            return (new Promise((pass, fail) => this.recipeHelper.loadRecipeBatch(recipeNames, pass, fail))
+                .then((recipeList) => {
                     // console.log('recipe list: '+JSON.stringify(recipeList));
                     // console.log('recipe map: '+JSON.stringify(recipes));
-                    return recipeList.reduce((prev,next)=>prev.set(next.Name,next),recipes);
+                    return recipeList.reduce((prev, next) => prev.set(next.Name, next), recipes);
                 })
-                .catch((err)=>{console.error('updateLoader: '+err);return recipes}))
+                .catch((err) => {
+                    console.error('updateLoader: ' + err);
+                    return recipes
+                }))
         });
-        this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
+        this.recipeLoader.then((recipes) => this.setState({loadedRecipes: recipes}))
     }
-    updateIngredientState(value,status){
-        if(status === 1){ //adding an ingredient to search -- we should load the data too
-            return {ingredients:this.state.ingredients.add(value)};
-        } else if(status===-1){
-            return {ingredients:(()=>{this.state.ingredients.delete(value);return this.state.ingredients})()};
-        } else if(status === 0){
-            return {excluded:this.state.excluded.add(value)};
-        } else if(status===2){
-            return {excluded:(()=>{this.state.excluded.delete(value);return this.state.excluded})()};
-        } else if(status===CLEAR_SEARCH){
-            return {excluded:new Set(),ingredients:new Set()};
-        } else if(status===ADD_MULTIPLE){
-            return {ingredients:(()=>value.reduce((prev,next)=>prev.add(next),this.state.ingredients))()}
+
+    updateIngredientState(value, status) {
+        if (status === 1) { //adding an ingredient to search -- we should load the data too
+            return {ingredients: this.state.ingredients.add(value)};
+        } else if (status === -1) {
+            return {
+                ingredients: (() => {
+                    this.state.ingredients.delete(value);
+                    return this.state.ingredients
+                })()
+            };
+        } else if (status === 0) {
+            return {excluded: this.state.excluded.add(value)};
+        } else if (status === 2) {
+            return {
+                excluded: (() => {
+                    this.state.excluded.delete(value);
+                    return this.state.excluded
+                })()
+            };
+        } else if (status === CLEAR_SEARCH) {
+            return {excluded: new Set(), ingredients: new Set()};
+        } else if (status === ADD_MULTIPLE) {
+            return {ingredients: (() => value.reduce((prev, next) => prev.add(next), this.state.ingredients))()}
         } else {
             return {};
         }
     }
-    searchUpdateWrapper(value,status){
-        return ((sorted)=>this.searchUpdate(sorted,value,status));
+
+    searchUpdateWrapper(value, status) {
+        return ((sorted) => this.searchUpdate(sorted, value, status));
     }
-    searchUpdate(sorted,value,status){
-        this.updateState(sorted,value,status);
-        if(this.searchbar){
+
+    searchUpdate(sorted, value, status) {
+        this.updateState(sorted, value, status);
+        if (this.searchbar) {
             this.searchbar.reset();
         }
-        console.log('Updated search results: ' + JSON.stringify([value,status]))
+        console.log('Updated search results: ' + JSON.stringify([value, status]))
     }
-    handleSubmit(e){
+
+    handleSubmit(e) {
         e.preventDefault();
 
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
         let callbacks = {
-            successCallback: this.searchUpdateWrapper(value,status),
+            successCallback: this.searchUpdateWrapper(value, status),
             outputCallback: this.updateLoader,
         }
-        this.client.updateIngredient(value,status,callbacks)
+        this.client.updateIngredient(value, status, callbacks)
 
     }
-    updateURI(){
-        this.props.history.replace('/Search?'+
-            'ingredients='+Array.from(this.state.ingredients).join(',')+
-            '&excluded='+Array.from(this.state.excluded).join(',')+
-            '&filter='+this.state.filter)
+
+    updateURI() {
+        this.props.history.replace('/Search?' +
+            'ingredients=' + Array.from(this.state.ingredients).join(',') +
+            '&excluded=' + Array.from(this.state.excluded).join(',') +
+            '&filter=' + this.state.filter)
     }
-    handleReject(e){
+
+    handleReject(e) {
         let value = this.searchbar.getValue()
         let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})
+        this.client.updateIngredient(value, 0, {successCallback: this.searchUpdateWrapper(value, status)})
 
     }
-    parseQueryString(search){
+
+    parseQueryString(search) {
         return search.substring(1)
             .split('&')
-            .map((param)=>(param.split('=')))
-            .map((splitParam)=>({[splitParam[0]]:splitParam[1]?splitParam[1].split(',').map((val)=>decodeURIComponent(val)):undefined}))
-            .reduce((prev,item)=>Object.assign(item,prev),{})
+            .map((param) => (param.split('=')))
+            .map((splitParam) => ({[splitParam[0]]: splitParam[1] ? splitParam[1].split(',').map((val) => decodeURIComponent(val)) : undefined}))
+            .reduce((prev, item) => Object.assign(item, prev), {})
     }
 
-    setFilter(filter){
+    setFilter(filter) {
         this.closeAllDropdowns()
-        this.client.setFilter(filter,this.searchUpdateWrapper())
-        this.setState({filter:filter})
+        this.client.setFilter(filter, this.searchUpdateWrapper())
+        this.setState({filter: filter})
     }
 
-    mortensButton2(){
-        User.getUser('user001').addToPantry('fish','none',1)
+    mortensButton2() {
+        User.getUser('user001').addToPantry('fish', 'none', 1)
     }
 
-    mortensButton(){
+    mortensButton() {
         this.setState({morten: this.user.client.getUsername()});
         //User.getUser('user001').getPreferences(console.log)
         // console.log(this.state.loadedRecipes.get("Split Pea Soup").Difficulty)
@@ -280,56 +316,57 @@ class Search extends Component {
 
     }
 
-    toggleThumbnails(){
-        this.setState({ viewThumbnails: !this.state.viewThumbnails })
+    toggleThumbnails() {
+        this.setState({viewThumbnails: !this.state.viewThumbnails})
     }
-    addFromPantry(e){
+
+    addFromPantry(e) {
         console.log("Adding from user pantry . . .")
 
-        let update_failed_fn = (item)=>{
+        let update_failed_fn = (item) => {
             //this item couldn't be updated -- probably not found in database
             //return null: the promise.all doesn't care what values we get
             return null;
         };
 
-        let filter_failed_results_fn = (items)=>{
-            return items.filter((item)=>!!item); //check if the item is valid
+        let filter_failed_results_fn = (items) => {
+            return items.filter((item) => !!item); //check if the item is valid
         };
 
-        let sort_results_and_update_fn = (items)=>{
-            this.client.sortRecipeMap(this.searchUpdateWrapper(items,ADD_MULTIPLE))
+        let sort_results_and_update_fn = (items) => {
+            this.client.sortRecipeMap(this.searchUpdateWrapper(items, ADD_MULTIPLE))
         };
 
-        User.getUser(this.user.client.getUsername()).getUserData('pantry').then((data)=>{
+        User.getUser(this.user.client.getUsername()).getUserData('pantry').then((data) => {
             Promise.all(
-
                 //get an array of update promises
-                this.massUpdateSearch(Object.keys(data),1/* ADD */)
+                this.massUpdateSearch(Object.keys(data), 1/* ADD */)
                 //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
-                    .map((updatePromise)=>updatePromise.catch(update_failed_fn))
+                    .map((updatePromise) => updatePromise.catch(update_failed_fn))
             )
-                .then( filter_failed_results_fn )
-                .then( sort_results_and_update_fn )
-                .catch((err)=>console.error(err))
+                .then(filter_failed_results_fn)
+                .then(sort_results_and_update_fn)
+                .catch((err) => console.error(err))
         })
     }
 
-    getGlyph(name){
-        return (<span className={"glyphicon glyphicon-"+name}></span>);
+    getGlyph(name) {
+        return (<span className={"glyphicon glyphicon-" + name}></span>);
     }
 
-    getFilterButton(message,icon,filter,largest){
-        let glyph = (<span className={"glyphicon glyphicon-"+icon+(largest?" pad-icon":"")}></span>);
-        if(!largest){
+    getFilterButton(message, icon, filter, largest) {
+        let glyph = (<span className={"glyphicon glyphicon-" + icon + (largest ? " pad-icon" : "")}></span>);
+        if (!largest) {
             glyph = (<span className="pull-right">{glyph}</span>);
         }
-        return (<div className={'dropdown-item'+(filter===this.state.filter?' disabled':'')} onClick={(e)=>this.setFilter(filter)}>{message}{glyph}</div>);
+        return (<div className={'dropdown-item' + (filter === this.state.filter ? ' disabled' : '')}
+                     onClick={(e) => this.setFilter(filter)}>{message}{glyph}</div>);
 
     }
 
-    clearSearch(e){
+    clearSearch(e) {
         this.props.history.push('/Search')
-        this.client.clear(this.searchUpdateWrapper(null,CLEAR_SEARCH));
+        this.client.clear(this.searchUpdateWrapper(null, CLEAR_SEARCH));
         this.closeAllDropdowns();
     }
 
@@ -343,107 +380,139 @@ class Search extends Component {
                     <div id='searchbar-toolbar-container'>
                         <form onSubmit={this.handleSubmit} ref="form">
                             <div className='input-group'>
-                                <div className={this.dropdownState('ingredients','input-group-btn')} onClick={this.blockPropagation}>
-                                    <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
+                                <div className={this.dropdownState('ingredients', 'input-group-btn')}
+                                     onClick={this.blockPropagation}>
+                                    <button className='btn btn-default dropdown-toggle' type='button'
+                                            data-toggle="dropdown"
+                                            onClick={(e) => this.toggleDropdown(e, 'ingredients')}>
                                         <span className="glyphicon glyphicon-list"></span>
                                     </button>
                                     <div className="dropdown-menu">
-                                        <div className='dropdown-item' onClick={this.addFromPantry}>Add From Pantry<span className="pull-right"><span className="glyphicon glyphicon-download-alt"></span></span></div>
+                                        <div className='dropdown-item' onClick={this.addFromPantry}>Add From Pantry<span
+                                            className="pull-right"><span
+                                            className="glyphicon glyphicon-download-alt"></span></span></div>
                                         <div role="separator" className="dropdown-divider"></div>
-                                        <div className='dropdown-item' onClick={this.clearSearch}>Clear All<span className="pull-right"><span className="glyphicon glyphicon-trash"></span></span></div>
+                                        <div className='dropdown-item' onClick={this.clearSearch}>Clear All<span
+                                            className="pull-right"><span
+                                            className="glyphicon glyphicon-trash"></span></span></div>
                                         <div role="separator" className="dropdown-divider"></div>
                                         <div className="dropdown-header">Added Ingredients</div>
                                         {[...this.state.ingredients].map(
-                                            (ingredient)=>
-                                                (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,-1)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+                                            (ingredient) =>
+                                                (<div className='dropdown-item'
+                                                      onClick={(e) => this.removeIngredient(ingredient, -1)}>{ingredient}<span
+                                                    className="pull-right hover-option"><span
+                                                    className="glyphicon glyphicon-remove"></span></span></div>)
                                         )}
-                                        {this.state.ingredients.size>0?'':<div className="dropdown-item"><i>You haven't added any ingredients!</i></div>}
+                                        {this.state.ingredients.size > 0 ? '' :
+                                            <div className="dropdown-item"><i>You haven't added any ingredients!</i>
+                                            </div>}
                                         <div className="dropdown-header">Excluded Ingredients</div>
                                         {[...this.state.excluded].map(
-                                            (ingredient)=>
-                                                (<div className='dropdown-item' onClick={(e)=>this.removeIngredient(ingredient,2)}>{ingredient}<span className="pull-right hover-option"><span className="glyphicon glyphicon-remove"></span></span></div>)
+                                            (ingredient) =>
+                                                (<div className='dropdown-item'
+                                                      onClick={(e) => this.removeIngredient(ingredient, 2)}>{ingredient}<span
+                                                    className="pull-right hover-option"><span
+                                                    className="glyphicon glyphicon-remove"></span></span></div>)
                                         )}
-                                        {this.state.excluded.size>0?'':<div className="dropdown-item"><i>You haven't excluded any ingredients!</i></div>}
+                                        {this.state.excluded.size > 0 ? '' :
+                                            <div className="dropdown-item"><i>You haven't excluded any ingredients!</i>
+                                            </div>}
 
                                     </div>
                                 </div>
-                                <SearchBar client={this.client} callback={this.addIngredient} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
+                                <SearchBar client={this.client} callback={this.addIngredient} id='searchbar'
+                                           ref={(searchbar) => {
+                                               this.searchbar = searchbar
+                                           }}/>
                                 <span className='input-group-btn'>
                                     <button className='btn btn-success' type='button submit' title="Include Ingredient">
                                         <span className="glyphicon glyphicon-plus-sign"></span>
                                     </button>
                                 </span>
                                 <span className='input-group-btn'>
-                                    <button className='btn btn-danger' type='button' onClick={this.handleReject} title="Exclude Ingredient">
+                                    <button className='btn btn-danger' type='button' onClick={this.handleReject}
+                                            title="Exclude Ingredient">
                                         <span className="glyphicon glyphicon-ban-circle"></span>
                                     </button>
                                 </span>
-                                <div className={this.dropdownState('filters','input-group-btn')+' no-wrap-dropdown'} onClick={this.blockPropagation}>
-                                    <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')} title="Filter">
+                                <div className={this.dropdownState('filters', 'input-group-btn') + ' no-wrap-dropdown'}
+                                     onClick={this.blockPropagation}>
+                                    <button className='btn btn-info dropdown-toggle' type='button'
+                                            onClick={(e) => this.toggleDropdown(e, 'filters')} title="Filter">
                                         <span className="glyphicon glyphicon-filter"></span>
                                     </button>
                                     <div className="dropdown-menu dropdown-menu-right">
-                                        {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
-                                        {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
-                                        {this.getFilterButton('Filter by Best Match','signal','best_match')}
-                                        {this.getFilterButton('Filter by Time','time','time_filter')}
-                                        {this.getFilterButton('Filter by Cost','piggy-bank','cost_filter')}
-                                        {this.getFilterButton('Filter by Rating','star','rating_filter')}
-                                        {this.getFilterButton('Filter by Difficulty','sunglasses','difficulty_filter')}
-                                        {this.getFilterButton('Filter by Cookware','cutlery','cookware_filter')}
+                                        {this.getFilterButton('Import Preferences', 'download-alt', 'custom')}
+                                        {this.getFilterButton('Filter by Least Additional', 'ok', 'least_additional', true)}
+                                        {this.getFilterButton('Filter by Best Match', 'signal', 'best_match')}
+                                        {this.getFilterButton('Filter by Time', 'time', 'time_filter')}
+                                        {this.getFilterButton('Filter by Cost', 'piggy-bank', 'cost_filter')}
+                                        {this.getFilterButton('Filter by Rating', 'star', 'rating_filter')}
+                                        {this.getFilterButton('Filter by Difficulty', 'sunglasses', 'difficulty_filter')}
+                                        {this.getFilterButton('Filter by Cookware', 'cutlery', 'cookware_filter')}
                                     </div>
                                 </div>
                                 <span className='input-group-btn'>
-                                    <button className='btn btn-warning' type='button' onClick={this.toggleThumbnails} title="Toggle View Mode">
-                                        <span className={this.state.viewThumbnails ? "glyphicon glyphicon-font" : "glyphicon glyphicon-picture"}></span>
+                                    <button className='btn btn-warning' type='button' onClick={this.toggleThumbnails}
+                                            title="Toggle View Mode">
+                                        <span
+                                            className={this.state.viewThumbnails ? "glyphicon glyphicon-font" : "glyphicon glyphicon-picture"}></span>
                                     </button>
                                 </span>
                             </div>
-                    </form>
-                    {this.state.viewThumbnails ? 
-                    <div className="container-fluid search-results">
-                        <div className="row">
-                        {this.state.sorted.map((recipe)=>{
-                            let data = this.state.loadedRecipes.get(recipe[0]);
-                            if(data){
-                                return(
-                                <SearchThumbnail data={data} />
-                                );
-                            }
-                        })     
-                        }
-                        {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
-                        </div>
-                    </div> : 
-                     <ul className="list-group search-results">
-                        {this.state.sorted.map((recipe)=>(
-                            <li className="list-group-item">
-                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
-                                {(()=>{// (IIFE) --> conditionally display recipe info, if it is loaded
-                                    let data = this.state.loadedRecipes.get(recipe[0]);
-                                    if(data){
-                                        return ([
-                                            <div>Difficulty: {data.Difficulty == "Undefined"? "Medium": data.Difficulty}</div>,
-                                            <div>Rating: 
-                                                {(()=>{ 
-                                                    let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
-                                                    for(let i=0;i<this.recipeHelper.maxRating;i++){
-                                                        result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);
-                                                    }
-                                                    return result;
-                                                })()}
-                                            </div>,
-                                            <div>{this.getGlyph('time')} <span>{data.TimeCost == "Undefined"? "1 h" :data.TimeCost}</span></div>,
-                                        ])
+                        </form>
+                        {this.state.viewThumbnails ?
+                            <div className="container-fluid search-results">
+                                <div className="row">
+                                    {this.state.sorted.map((recipe) => {
+                                        let data = this.state.loadedRecipes.get(recipe[0]);
+                                        if (data) {
+                                            return (
+                                                <SearchThumbnail data={data}/>
+                                            );
+                                        }
+                                    })
                                     }
-                                })()}
-                            </li>
-                        ))}
-                        {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
-                    </ul>
-                    
-                    }
-                </div>
+                                    {this.state.sorted.length ? null : (
+                                        <li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
+                                </div>
+                            </div> :
+                            <ul className="list-group search-results">
+                                {this.state.sorted.map((recipe) => (
+                                    <li className="list-group-item">
+                                        <a href={'/Recipes/' + recipe[0]}>{recipe[0]}</a>
+                                        {(() => {// (IIFE) --> conditionally display recipe info, if it is loaded
+                                            let data = this.state.loadedRecipes.get(recipe[0]);
+                                            if (data) {
+                                                return ([
+                                                    <div>
+                                                        Difficulty: {data.Difficulty == "Undefined" ? "Medium" : data.Difficulty}</div>,
+                                                    <div>Rating:
+                                                        {(() => {
+                                                            let result = [],
+                                                                intRating = Math.floor(RecipeHelper.getAvgRating(data));
+                                                            for (let i = 0; i < this.recipeHelper.maxRating; i++) {
+                                                                result.push(<span
+                                                                    className={"glyphicon glyphicon-star " + (i < intRating ? 'good-rating' : '')}></span>);
+                                                            }
+                                                            return result;
+                                                        })()}
+                                                    </div>,
+                                                    <div>{this.getGlyph('time')}
+                                                        <span>{data.TimeCost == "Undefined" ? "1 h" : data.TimeCost}</span>
+                                                    </div>,
+                                                ])
+                                            }
+                                        })()}
+                                    </li>
+                                ))}
+                                {this.state.sorted.length ? null : (
+                                    <li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
+                            </ul>
+
+                        }
+                    </div>
             </div>
             </div>
         );

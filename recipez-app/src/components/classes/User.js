@@ -47,23 +47,23 @@ class User {
         this.verified = false;
     }
 
-    reload(){
+    reload() {
         this.loadStream = new Promise(this.loadUserData)
     }
 
-    createUser(username,callback){
+    createUser(username, callback) {
         this.loadStream = Promise.resolve({ //create a new user data object locally
-            username:       username,
-            cookbook:       {},
-            cookware:       new Set(['oven']), //this can't be empty
-            exclude:        new Set(['beer']),
-            shoppingList:   new Set(['beets']),
-            pantry:         {shrimp: {unit: 'Protein', amount: '1'}},
+            username: username,
+            cookbook: {},
+            cookware: new Set(['oven']), //this can't be empty
+            exclude: new Set(['beer']),
+            shoppingList: new Set(['beets']),
+            pantry: {shrimp: {unit: 'Protein', amount: '1'}},
         })
-        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
-            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
-        })
-        this.loadStream.then((data)=>console.log(data.payload))
+            .then((data) => { //attempt to push the data to the database, which will break the chain if something goes wrong
+                return new Promise((pass, fail) => this.client.putDBItem('User', this.client.packItem(data, User.UserDataPrototype), () => fail(data), () => pass(data)))
+            })
+        this.loadStream.then((data) => console.log(data.payload))
         this.loadStream.then(callback)
     }
 
@@ -85,9 +85,9 @@ class User {
                     username:   response.payload[0].username.S,
                     cookbook:   response.payload[0].cookbook.M,
                     cookware:   new Set(response.payload[0].cookware.SS),
-                    exclude:    new Set(response.payload[0].exclude.SS),
+                    exclude: new Set(response.payload[0].exclude.SS),
                     shoppingList: new Set(response.payload[0].shoppingList.SS),
-                    pantry:     this.client.unpackMap(response.payload[0].pantry.M)
+                    pantry: this.client.unpackMap(response.payload[0].pantry.M)
                 }
                 // alert(JSON.stringify(this.client.unpackItem(response.payload[0],User.UserDataPrototype)))
                 resolve(this.client.unpackItem(response.payload[0],User.UserDataPrototype))
@@ -127,7 +127,7 @@ class User {
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
                 //set cookbook[recipeObject.Name] = (data)
-                this.client.buildMapUpdateExpression('cookbook',recipeObject.Name,{S:JSON.stringify(recipeObject)})),
+                this.client.buildMapUpdateExpression('cookbook', recipeObject.Name, {S: JSON.stringify(recipeObject)})),
             (response)=>{ //if the request succeeds, 'add' to the local use data by transforming it in a then clause
                 if(response.status){
                     this.addUserData((data)=>{
@@ -148,7 +148,7 @@ class User {
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
                 //set cookbook[recipeName] = 'none'
-                this.client.buildMapUpdateExpression('cookbook',recipeName,{S:'none'})),
+                this.client.buildMapUpdateExpression('cookbook', recipeName, {S: 'none'})),
             (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
                 if(response.status){
                     this.addUserData((data)=>{
@@ -173,7 +173,10 @@ class User {
      * }
      */
     getPantry(callback){
-        return this.getUserData('pantry').then(response=>{alert(JSON.stringify('get pantry error: '+response));callback(response)})
+        return this.getUserData('pantry').then(response => {
+            alert(JSON.stringify('get pantry error: ' + response));
+            callback(response)
+        })
     }
 
 
@@ -185,12 +188,12 @@ class User {
                 this.client.getUsername(),
                 this.client.buildMapUpdateExpression('pantry',ingredient,{M:{amount:{N:amount.toString()},unit:{S:unit}}})),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
-                        data.pantry[ingredient] = {amount:amount,unit:unit};
+                if (response.status) {
+                    this.addUserData((data) => {
+                        data.pantry[ingredient] = {amount: amount, unit: unit};
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
@@ -204,12 +207,12 @@ class User {
                 this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('pantry', ingredient)),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
+                if (response.status) {
+                    this.addUserData((data) => {
                         delete data.pantry[ingredient];
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
@@ -220,26 +223,26 @@ class User {
     }
 
 
-    addToCookbook(recipe, info){
+    addToCookbook(recipe, info) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildMapUpdateExpression('cookbook', recipe, {S:info})),
+                this.client.buildMapUpdateExpression('cookbook', recipe, {S: info})),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
-                        data.cookbook[recipe] = {info:info};
+                if (response.status) {
+                    this.addUserData((data) => {
+                        data.cookbook[recipe] = {info: info};
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
     }
 
-    removeFromCookbook(recipe){
+    removeFromCookbook(recipe) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -247,12 +250,12 @@ class User {
                 this.client.getUsername(),
                 this.client.buildRemoveElementUpdateExpression('cookbook', recipe)),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
+                if (response.status) {
+                    this.addUserData((data) => {
                         delete data.cookbook[recipe];
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
@@ -264,26 +267,26 @@ class User {
         return this.getUserData('cookware').then(callback).catch(console.error);
     }
 
-    addToCookware(item){
+    addToCookware(item) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildStringSetAppendUpdateExpression('cookware', {SS:[item]})),
+                this.client.buildStringSetAppendUpdateExpression('cookware', {SS: [item]})),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
-                        data.cookware[item] = {item:item};
+                if (response.status) {
+                    this.addUserData((data) => {
+                        data.cookware[item] = {item: item};
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
     }
 
-    removeFromCookware(item){
+    removeFromCookware(item) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -291,44 +294,44 @@ class User {
                 this.client.getUsername(),
                 this.client.buildRemoveSetElementUpdateExpression('cookware', item)),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
+                if (response.status) {
+                    this.addUserData((data) => {
                         delete data.cookware[item];
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
     }
 
 
-    getExclusionList(callback){
+    getExclusionList(callback) {
         return this.getUserData('exclude').then(callback).catch(console.error);
 
     }
 
-    addToExclusionList(ingredient){
+    addToExclusionList(ingredient) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildStringSetAppendUpdateExpression('exclude', {SS:[ingredient]})),
+                this.client.buildStringSetAppendUpdateExpression('exclude', {SS: [ingredient]})),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
-                        data.exclude[ingredient] = {ingredient:ingredient};
+                if (response.status) {
+                    this.addUserData((data) => {
+                        data.exclude[ingredient] = {ingredient: ingredient};
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
     }
 
 
-    removeFromExclusionList(ingredient){
+    removeFromExclusionList(ingredient) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -336,42 +339,42 @@ class User {
                 this.client.getUsername(),
                 this.client.buildRemoveSetElementUpdateExpression('exclude', ingredient)),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
+                if (response.status) {
+                    this.addUserData((data) => {
                         delete data.exclude[ingredient];
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
     }
 
-    getShoppingList(callback){
+    getShoppingList(callback) {
         return this.getUserData('shoppingList').then(callback).catch(console.error);
 
     }
 
-    addToShoppingList(item){
+    addToShoppingList(item) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
                 'username',
                 this.client.getUsername(),
-                this.client.buildStringSetAppendUpdateExpression('shoppingList', {SS:[item]})),
+                this.client.buildStringSetAppendUpdateExpression('shoppingList', {SS: [item]})),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
-                        data.shoppingList[item] = {item:item};
+                if (response.status) {
+                    this.addUserData((data) => {
+                        data.shoppingList[item] = {item: item};
                         return data
                     })
-                }else {
+                } else {
                     console.error(response.payload)
                 }
             })
     }
 
-    removeFromShoppingList(item){
+    removeFromShoppingList(item) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -379,35 +382,35 @@ class User {
                 this.client.getUsername(),
                 this.client.buildRemoveSetElementUpdateExpression('shoppingList', item)),
             (response) => {
-                if(response.status){
-                    this.addUserData((data)=>{
+                if (response.status) {
+                    this.addUserData((data) => {
                         delete data.shoppingList[item];
                         return data;
                     })
-                }else {
+                } else {
                     console.error(response.payload);
                 }
             })
     }
 
 
-    getPlanner(callback){
+    getPlanner(callback) {
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
         this.getUserData('planner').then(callback).catch(console.error)
     }
 
-    setPlanner(planner,callback){
-        let packed = this.client.packItem(planner,User.PlannerPrototype);
+    setPlanner(planner, callback) {
+        let packed = this.client.packItem(planner, User.PlannerPrototype);
         console.log(JSON.stringify(packed));
         this.client.updateItem(
             this.client.buildUpdateRequest(
-                'User','username',this.client.getUsername(),
-                this.client.buildSetUpdateExpression('planner',{M:packed})),
-            (response)=>{
-                if(response.status){
-                    this.addUserData((data)=>{
+                'User', 'username', this.client.getUsername(),
+                this.client.buildSetUpdateExpression('planner', {M: packed})),
+            (response) => {
+                if (response.status) {
+                    this.addUserData((data) => {
                         data.planner = planner;
                         return data;
                     })
@@ -421,24 +424,28 @@ class User {
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-        return {"Good Old Fashioned Pancakes":
-            {target:{type:'ingredient',id:'blueberry'},
-                text:'use frozen blueberries for that dank artifical taste'}}
+        return {
+            "Good Old Fashioned Pancakes":
+                {
+                    target: {type: 'ingredient', id: 'blueberry'},
+                    text: 'use frozen blueberries for that dank artifical taste'
+                }
+        }
 
     }
 
-    getPreferences(callback){
+    getPreferences(callback) {
         this.getUserData('preferences').then(callback);
     }
 
-    setPreferences(preferences,callback){
+    setPreferences(preferences, callback) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
-                'User','username',this.client.getUsername(),
-                this.client.buildSetUpdateExpression('preferences',{SS:Array.from(preferences)})),
-            (response)=>{
-                if(response.status){
-                    this.addUserData((data)=>{
+                'User', 'username', this.client.getUsername(),
+                this.client.buildSetUpdateExpression('preferences', {SS: Array.from(preferences)})),
+            (response) => {
+                if (response.status) {
+                    this.addUserData((data) => {
                         data.preferences = preferences;
                         return data;
                     })
@@ -489,24 +496,24 @@ class User {
     }
 }
 
- User.MealPrototype = {
-     _NAME: "Meal",
-     recipes: { type: 'L' ,inner:{ type:'S'} },
-     startHr: {type: 'N'},
-     startMin: {type: 'N'},
-     endHr: {type: 'N'},
-     endMin: {type: 'N'}
- }
+User.MealPrototype = {
+    _NAME: "Meal",
+    recipes: {type: 'L', inner: {type: 'S'}},
+    startHr: {type: 'N'},
+    startMin: {type: 'N'},
+    endHr: {type: 'N'},
+    endMin: {type: 'N'}
+}
 
- User.DayPrototype = {
-     _NAME: "Day",
-     mealData: {type: 'L' ,inner:{ type: User.MealPrototype._NAME} }
- }
+User.DayPrototype = {
+    _NAME: "Day",
+    mealData: {type: 'L', inner: {type: User.MealPrototype._NAME}}
+}
 
- User.PlannerPrototype = {
-     _NAME: "Planner",
-     days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
- }
+User.PlannerPrototype = {
+    _NAME: "Planner",
+    days: {type: 'L', inner: {type: User.DayPrototype._NAME}},
+}
 
 
 User.PantryItemPrototype = {
@@ -523,10 +530,10 @@ User.UserDataPrototype = {
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
-    planner:{type:User.PlannerPrototype._NAME},
-    shoppingList:{type:'SS'},
-    exclude:{type:'SS'},
-    preferences:{type:'SS'},
+    planner: {type: User.PlannerPrototype._NAME},
+    shoppingList: {type: 'SS'},
+    exclude: {type: 'SS'},
+    preferences: {type: 'SS'},
 }
 DBClient.getClient().registerPrototype(User.UserDataPrototype)
 

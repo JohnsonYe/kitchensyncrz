@@ -37,7 +37,7 @@ import { OffCanvas, OffCanvasMenu, OffCanvasBody } from 'react-offcanvas';
 
 
 class App extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.componentWillMount = this.componentWillMount.bind(this);
         this.componentWillUnmount = this.componentWillUnmount.bind(this);
@@ -58,11 +58,11 @@ class App extends Component {
                 this.client.authenticated = true;
             }
         }
-        catch(e) {
+        catch (e) {
             // alert('app mounted: '+e);
         }
 
-        this.setState({ isAuthenticating: false});
+        this.setState({isAuthenticating: false});
     }
 
 
@@ -86,11 +86,11 @@ class App extends Component {
 
     closeNav(e) {
         e.stopPropagation();
-        this.setState( {isMenuOpened: false });
+        this.setState({isMenuOpened: false});
     }
 
     toggleFunMode() {
-        this.setState( {funMode: !this.state.funMode} );
+        this.setState({funMode: !this.state.funMode});
     }
 
     handleLogout = event => {
@@ -104,7 +104,9 @@ class App extends Component {
 
     render() {
         var imgsrc = "http://www.free-icons-download.net/images/a-kitchen-icon-80780.png";
-        {this.state.funMode? imgsrc="http://vignette1.wikia.nocookie.net/epicrapbattlesofhistory/images/c/c2/Peanut-butter-jelly-time.gif/revision/latest?cb=20141129150614":null}
+        {
+            this.state.funMode ? imgsrc = "http://vignette1.wikia.nocookie.net/epicrapbattlesofhistory/images/c/c2/Peanut-butter-jelly-time.gif/revision/latest?cb=20141129150614" : null
+        }
         
         return (
             !this.state.isAuthenticating &&
@@ -113,12 +115,12 @@ class App extends Component {
                     <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isMenuOpened} position="left">
                         <OffCanvasBody className="navbar-icon">
                             <a href="#" onClick={this.handleClick.bind(this)}>
-                                {this.state.isMenuOpened ?                                 
-                                //set to null if you want banana man to kill himself
-                                <img className="ks-icon" src={imgsrc} />
-                                //null
-                                :
-                                <img className="ks-icon" src={imgsrc} />
+                                {this.state.isMenuOpened ?
+                                    //set to null if you want banana man to kill himself
+                                    <img className="ks-icon" src={imgsrc}/>
+                                    //null
+                                    :
+                                    <img className="ks-icon" src={imgsrc}/>
                                 }
                             </a>
                         </OffCanvasBody>
@@ -141,9 +143,9 @@ class App extends Component {
                                 </li>
                                 <li>
                                     {
-                                        this.client.authenticated ? 
-                                        <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> : 
-                                        <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                        this.client.authenticated ?
+                                            <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> :
+                                            <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
                                     }
                                 </li>
                             </ul>
@@ -158,8 +160,8 @@ class App extends Component {
                     <Route exact path='/Planner' component={Planner} />
                     <Route exact path='/Recipes/:recipe' component={Recipe} />
                     <Route exact path='/Recipes/:user/:recipe' component={Recipe} />
-                    <Route exact path='/Register' component={Register} />
-                    <Route exact path='/SignIn' component={SignIn} />
+                    <Route exact path='/Register' component={Register}/>
+                    <Route exact path='/SignIn' component={SignIn}/>
                     <Footer />
                     <div className="row">
                     <span className="col-2 pull-right fun-button">

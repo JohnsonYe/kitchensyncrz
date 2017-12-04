@@ -391,14 +391,16 @@ class PreviewCard extends Component{
         ;
         let image;
         if (this.props.src.Image) {
-            image = this.props.src.Image[0];
+            let imageArray = Array.from(this.props.src.Image);
+            image = imageArray[0];
+
         } else {
-            image = require("./gary.jpg");
+            image = require("./no-photo.png");
         }
         console.log("this is iamge");
         console.log(image);
         return (
-            <div className={"col-md-3"}>
+            <div className={"col-md-3 mb-3"}>
                 <div className="card recipes">
                     <Link to={this.props.personal ? '/Recipes/'+this.props.src.Author+'/'+this.props.src.Name : '/Recipes/'+this.props.src.Name}>
 

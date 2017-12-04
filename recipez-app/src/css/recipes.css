@@ -4,7 +4,7 @@ h1 {
     text-align: center;
 }
 
-.PageHeader{
+.PageHeader {
     font-family: "Georgia", serif;
     font-size: 45px;
     text-align: center;
@@ -42,25 +42,25 @@ h2 {
     margin: auto;
 }
 
-#forksize{
+#forksize {
     padding-right: 1.5em;
 }
 
-.CarouselSize{
+.CarouselSize {
     height: 350px;
     border-radius: 25px;
 }
 
-.CarouselSize img{
+.CarouselSize img {
     border-radius: 25px;
     height: 350px;
 }
 
-.Ingredient h2{
+.Ingredient h2 {
     padding: 0px 50px;
-   /* margin: auto;*/
+    /* margin: auto;*/
 }
 
-.Direction{
+.Direction {
     padding: 10px 50px;
 }

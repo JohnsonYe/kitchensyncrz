@@ -13,7 +13,7 @@ import RecipeHelper from '../classes/RecipeHelper';
 import MealEditor from '../pages/plannerPages/editMealPage';
 
 class SearchThumbail extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             quickView: false
@@ -22,15 +22,15 @@ class SearchThumbail extends Component {
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this.heart = this.heart.bind(this);
-        
+
     }
 
     open() {
-        this.setState( {quickView: true} );
+        this.setState({quickView: true});
     }
 
     close() {
-        this.setState( {quickView: false} );
+        this.setState({quickView: false});
     }
 
     // add to cookbook/ favorite
@@ -39,52 +39,53 @@ class SearchThumbail extends Component {
     }
 
     render() {
-        var imgsrc= "http://www.maktabatulmadina.net/img/uploaded/730.jpg";
-        imgsrc = this.props.data.Image ? Array.from(this.props.data.Image)[0]: imgsrc;
+        var imgsrc = "http://www.maktabatulmadina.net/img/uploaded/730.jpg";
+        imgsrc = this.props.data.Image ? Array.from(this.props.data.Image)[0] : imgsrc;
         // alert(this.props.data.Image);
-        
+
         var ingredients = this.props.data.Ingredients.map((ingredient) => <li><span>{ingredient}</span></li>)
         var directions = this.props.data.Directions.map((step) => <li>{step}</li>)
-        
-        return(
-            <div className="col-lg-3 col-md-4 col-sm-6 search-thumbnail" >
+
+        return (
+            <div className="col-lg-3 col-md-4 col-sm-6 search-thumbnail">
                 {/* Need to check if recipe's img exists, if so use that */}
-                <a href={'/Recipes/'+ this.props.data.Name}>
+                <a href={'/Recipes/' + this.props.data.Name}>
                     <img src={imgsrc}
-                         className="card-img-top foodpic" />
+                         className="card-img-top foodpic"/>
                 </a>
 
-                {/* View Recipe, Favorite, and Plan Meal buttons */}  
+                {/* View Recipe, Favorite, and Plan Meal buttons */}
                 <div className="thumbnail-buttons row mx-auto">
                     <a href="javascript:undefined;" onClick={this.open} className="btn btn-dark col-4 quickview"
-                        title="Quick View">
+                       title="Quick View">
                         <img className="view"
-                                width="18"
-                                height="18"
-                                src="http://icons.iconarchive.com/icons/blackvariant/button-ui-system-apps/1024/Preview-2-icon.png" />
+                             width="18"
+                             height="18"
+                             src="http://icons.iconarchive.com/icons/blackvariant/button-ui-system-apps/1024/Preview-2-icon.png"/>
                     </a>
                     <Modal show={this.state.quickView} onHide={this.close}>
                         <Modal.Header><h3>{this.props.data.Name}</h3></Modal.Header>
                         <Modal.Body>
                             <img className="modal-foodpic" src={imgsrc} width="100%"/>
-                            <p>Difficulty: {this.props.data.Difficulty == "Undefined"?"Medium": this.props.data.Difficulty}</p>
+                            <p>
+                                Difficulty: {this.props.data.Difficulty == "Undefined" ? "Medium" : this.props.data.Difficulty}</p>
                             <p>Rating: {RecipeHelper.getAvgRating(this.props.data)}</p>
                             <h3>Ingredients:</h3>
                             <ul>{ingredients}</ul>
                             <h3>Directions:</h3>
                             <ol>{directions}</ol>
-                            <br />
-                            <p>View Full Recipe <a href={"/Recipes/"+ this.props.data.Name}>Here</a>.</p>
-                                                                            
+                            <br/>
+                            <p>View Full Recipe <a href={"/Recipes/" + this.props.data.Name}>Here</a>.</p>
+
                         </Modal.Body>
                     </Modal>
                     <a href="javascript:undefined;" onClick={this.heart} className="btn btn-dark col-4"
-                        title="Save to CookBook">
+                       title="Save to CookBook">
                         <img className="heart"
-                                width="18"
-                                height="18"
-                                src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png" />
-                    
+                             width="18"
+                             height="18"
+                             src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png"/>
+
                     </a>
                     <div className="col-4">
                         {/*<MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
@@ -97,9 +98,11 @@ class SearchThumbail extends Component {
                         instead of score */}
                     <h4 className="card-title">{this.props.data.Name}</h4>
                     {
-                        this.props.data.TimeCost == "Undefined" ? 
-                        <p className="card-text"><span className="glyphicon glyphicon-time"/><span>{"1 h"}</span></p> :
-                        <p className="card-text"><span className="glyphicon glyphicon-time"/><span>{this.props.data.TimeCost}</span></p>
+                        this.props.data.TimeCost == "Undefined" ?
+                            <p className="card-text"><span className="glyphicon glyphicon-time"/><span>{"1 h"}</span>
+                            </p> :
+                            <p className="card-text"><span
+                                className="glyphicon glyphicon-time"/><span>{this.props.data.TimeCost}</span></p>
                     }
                 </div>
             </div>

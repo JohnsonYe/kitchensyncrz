@@ -89,7 +89,7 @@ class PersonalRecipes extends Component{
 
     close(){
         this.setState({
-           modal: false,
+            modal: false,
         });
 
     }
@@ -195,7 +195,7 @@ class PersonalRecipes extends Component{
                         value={this.state.url}
                         placeholder="Enter Image URL"
                         onChange={this.handleImgChange}
-                        />
+                    />
                     <FormControl.Feedback />
                 </FormGroup>
             </form>
@@ -205,13 +205,16 @@ class PersonalRecipes extends Component{
         return(
             <div>
 
-                <div className={"btn btn-success"} onClick={this.open}>
-                    Create Recipe
+                <div className={"row"}>
+
+                    <div className={"btn btn-success ml-4 mb-4"} onClick={this.open}>
+                        Create Recipe
+                    </div>
                 </div>
                 <div className={"container-fluid"}>
-                <div className={"row"}>
-                    {recipeCards}
-                </div>
+                    <div className={"row"}>
+                        {recipeCards}
+                    </div>
                 </div>
 
                 <Modal show={this.state.modal} onHide={this.close}>

@@ -5,7 +5,7 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
- // import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
+// import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
 
  /**
   * THIS IS A SINGLETON CLASS.
@@ -67,9 +67,9 @@ var MAX_REQUEST_LENGTH = 100;
             'S': (s,p)=>s.S,
             'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
             'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev),{}),
-            'SS':(ss,p)=>new Set(ss.SS),
+            'SS': (ss, p) => new Set(ss.SS),
             'N': (n,p)=>n.N,
-            'SET':(s,p)=>new Set(s),
+            'SET': (s, p) => new Set(s),
         }
 
         /**
@@ -80,21 +80,21 @@ var MAX_REQUEST_LENGTH = 100;
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':ss}),
-            'N': (n,p)=>({'N':n+''}),
+            'N': (n, p) => ({'N': n + ''}),
         }
 
 
     }
 
-    putDBItem(tableName,item,errCallback,successCallback){
-        db.putItem({TableName:tableName,Item:item},(err,data)=>{
-            if(err){
-                errCallback({status:false, payload: err});                
-            } else {
-                successCallback({status:true,  payload: data});                
-            }
-        })
-    }
+     putDBItem(tableName, item, errCallback, successCallback) {
+         db.putItem({TableName: tableName, Item: item}, (err, data) => {
+             if (err) {
+                 errCallback({status: false, payload: err});
+             } else {
+                 successCallback({status: true, payload: data});
+             }
+         })
+     }
 
     /*
      * Retrieve an object containing database items matching the given key list
@@ -106,58 +106,61 @@ var MAX_REQUEST_LENGTH = 100;
      * handle callback: function handle to send items to
      */
     getDBItems(tableName,keyField,keys,target){
-        if(keys.length > MAX_REQUEST_LENGTH){
-            console.log('Recieved request with more than 100 keys! ('+keys.length+')')
-            Promise.all((()=>{ //create a promise group out of max size batch requests
-                let pos = 0,requests = [];
-                while(pos < keys.length){ //split key array into size 100 chunks
-                    requests.push(keys.slice(pos,pos+MAX_REQUEST_LENGTH));
-                    pos+=MAX_REQUEST_LENGTH
+        if (keys.length > MAX_REQUEST_LENGTH) {
+            console.log('Recieved request with more than 100 keys! (' + keys.length + ')')
+            Promise.all((() => { //create a promise group out of max size batch requests
+                let pos = 0, requests = [];
+                while (pos < keys.length) { //split key array into size 100 chunks
+                    requests.push(keys.slice(pos, pos + MAX_REQUEST_LENGTH));
+                    pos += MAX_REQUEST_LENGTH
                 }
-                console.log('Split request into '+requests.length+' sub-requests')
+                console.log('Split request into ' + requests.length + ' sub-requests')
                 //map the chunk array to a promise array, containing a DBItemPromise for each chunk
-                return requests.map((request)=>this.getDBItemPromise(tableName,keyField,request)) 
+                return requests.map((request) => this.getDBItemPromise(tableName, keyField, request))
             })())
-            .catch((err)=>target({status:false,payload:err})) //abort if any request fails
-            //-->|we shouldn't expect a very large request to fail because the user will not be directly
-            //-->|creating 100+ item batch requests
-            //flatten (reduce) the payload array to a single array and pass it to the callback
-            .then((payload)=>target({status:true,payload:payload.reduce((prev,next)=>prev.concat(next),[])}))
+                .catch((err) => target({status: false, payload: err})) //abort if any request fails
+                //-->|we shouldn't expect a very large request to fail because the user will not be directly
+                //-->|creating 100+ item batch requests
+                //flatten (reduce) the payload array to a single array and pass it to the callback
+                .then((payload) => target({
+                    status: true,
+                    payload: payload.reduce((prev, next) => prev.concat(next), [])
+                }))
 
             return;
         }
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
-            if(err){ //the call failed for some reason --> probably invalid keys (not strings)
-                target({status:false, payload: err + ' --> make sure your query keys are strings!' });
-            } else if(data.Responses[tableName].length == 0) { //no results, but the call went through
-                target({status:false, payload: 'Item: ' + JSON.stringify(keys) + ' not found!'});
+            if (err) { //the call failed for some reason --> probably invalid keys (not strings)
+                target({status: false, payload: err + ' --> make sure your query keys are strings!'});
+            } else if (data.Responses[tableName].length == 0) { //no results, but the call went through
+                target({status: false, payload: 'Item: ' + JSON.stringify(keys) + ' not found!'});
             } else { //everythng looks good, index into the response
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
     }
 
-    /**
-     * [get a Promise object containing the database items requested]
-     * @param  {[String]} tableName [name of table to get items from]
-     * @param  {[String]} keyField  [name of field used as database key]
-     * @param  {[JSON]} keys      [keys to fetch items with]
-     * @return {[Promise]}           [Promise object with pending DB response]
-     */
-    getDBItemPromise(tableName,keyField,keys){
-        if(keys.length > MAX_REQUEST_LENGTH){
-            console.error('Recieved request with more than 100 keys!('+keys.length+')')
-        }
-        return new Promise((pass,fail)=>{
-            this.getDBItems(tableName,keyField,keys,(response)=>{
-                if(response.status){//call succeeded, pass
-                    pass(response.payload)
-                } else { //call failed, fail
-                    fail(response.payload)
-                }
-            });
-        });
-    }
+     /**
+      * [get a Promise object containing the database items requested]
+      * @param  {[String]} tableName [name of table to get items from]
+      * @param  {[String]} keyField  [name of field used as database key]
+      * @param  {[JSON]} keys      [keys to fetch items with]
+      * @return {[Promise]}           [Promise object with pending DB response]
+      */
+     getDBItemPromise(tableName, keyField, keys) {
+         if (keys.length > MAX_REQUEST_LENGTH) {
+             console.error('Recieved request with more than 100 keys!(' + keys.length + ')')
+         }
+         return new Promise((pass, fail) => {
+             this.getDBItems(tableName, keyField, keys, (response) => {
+                 if (response.status) {//call succeeded, pass
+                     pass(response.payload)
+                 } else { //call failed, fail
+                     fail(response.payload)
+                 }
+             });
+         });
+     }
 
     /*
      * Construct an SQS object to retrieve a list of keys from a table
@@ -231,9 +234,9 @@ var MAX_REQUEST_LENGTH = 100;
 
     buildStringSetAppendUpdateExpression(attrName,value){
         return {
-                expr: 'ADD #attr :item',
+            expr: 'ADD #attr :item',
                 names:{"#attr":attrName},
-                values:{":item":value}
+            values: {":item": value}
             }
     }
 
@@ -246,13 +249,13 @@ var MAX_REQUEST_LENGTH = 100;
         }
     }
 
-    buildRemoveSetElementUpdateExpression(attrName,elemName){
-        return {
-            expr: 'DELETE '+attrName+" :v",
-            names:undefined,
-            values:{":v": {"SS": [elemName]}}
-        }
-    }
+     buildRemoveSetElementUpdateExpression(attrName, elemName) {
+         return {
+             expr: 'DELETE ' + attrName + " :v",
+             names: undefined,
+             values: {":v": {"SS": [elemName]}}
+         }
+     }
 
 
 
@@ -291,8 +294,8 @@ var MAX_REQUEST_LENGTH = 100;
             ClientId: up.APP_CLIENT_ID
         });
 
-        const user = new CognitoUser({ Username: username, Pool: userPool });
-        const authenticationData = { Username: username, Password: password };
+        const user = new CognitoUser({Username: username, Pool: userPool});
+        const authenticationData = {Username: username, Password: password};
         const authenticationDetails = new AuthenticationDetails(authenticationData);
 
         return new Promise((resolve, reject) =>
@@ -301,7 +304,6 @@ var MAX_REQUEST_LENGTH = 100;
                 onSuccess: result => resolve(),
                 onFailure: err => reject(err)
             })
-
         );
 
     }
@@ -340,7 +342,7 @@ var MAX_REQUEST_LENGTH = 100;
 
      getUserToken(currentUser) {
          return new Promise((resolve, reject) => {
-             currentUser.getSession(function(err, session) {
+             currentUser.getSession(function (err, session) {
                  if (err) {
                      reject(err);
                      return;
@@ -375,8 +377,8 @@ var MAX_REQUEST_LENGTH = 100;
          var attributeList = [];
 
          var dataEmail = {
-             Name : 'email',
-             Value : email
+             Name: 'email',
+             Value: email
          };
 
          //var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
@@ -396,7 +398,7 @@ var MAX_REQUEST_LENGTH = 100;
 
      confirmUser(user, confirmationCode) {
          return new Promise((resolve, reject) =>
-             user.confirmRegistration(confirmationCode, true, function(err, result) {
+             user.confirmRegistration(confirmationCode, true, function (err, result) {
                  if (err) {
                      reject(err);
                      return;
@@ -424,7 +426,7 @@ var MAX_REQUEST_LENGTH = 100;
      getAwsCredentials(userToken) {
          const authenticator = `cognito-idp.${up.REGION}.amazonaws.com/${up.USER_POOL_ID}`;
 
-         AWS.config.update({ region: up.REGION });
+         AWS.config.update({region: up.REGION});
 
          AWS.config.credentials = new AWS.CognitoIdentityCredentials({
              IdentityPoolId: up.IDENTITY_POOL_ID,
@@ -452,7 +454,7 @@ var MAX_REQUEST_LENGTH = 100;
         return client_style_map
     }
 
-    registerPrototype(proto, ){
+     registerPrototype(proto,) {
         if(!proto._NAME){
             throw new TypeError('No _NAME specified for prototype: ' + JSON.stringify(proto))
         }
@@ -460,7 +462,7 @@ var MAX_REQUEST_LENGTH = 100;
         this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
         this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
 
-        console.log("Registered prototype: "+proto._NAME)
+         console.log("Registered prototype: " + proto._NAME)
     }
 
     getPrototype(key,object){
@@ -481,9 +483,9 @@ var MAX_REQUEST_LENGTH = 100;
                 //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                 //function's execution in code not being developed for database interaction
                 //for now, developers working with the database must be careful with adding new fields
-                unpacked[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                unpacked[key] = e + ' :: NO PROTOTYPE FOUND FOR THIS ITEM: ' + key + '; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE' +
                     ' SPECIFICATION IS CORRECT';
-                    //alert(key)
+                //alert(key)
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })
@@ -509,8 +511,8 @@ var MAX_REQUEST_LENGTH = 100;
                     //function's execution in code not being developed for database interaction
                     //for now, developers working with the database must be careful with adding new fields
                     // alert(e+':'+prototype[key])
-                    console.error('Error packing item: '+e+' :: '+key)
-                    prev[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
+                    console.error('Error packing item: ' + e + ' :: ' + key)
+                    prev[key] = e + ' :: NO PROTOTYPE FOUND FOR THIS ITEM: ' + key + '; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE' +
                         ' SPECIFICATION IS CORRECT';
                     // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
                 }
@@ -527,10 +529,10 @@ var MAX_REQUEST_LENGTH = 100;
         alert(JSON.stringify(response))
     }
 
-    alertAndPass(object){
-        alert('got here');
-        return object
-    }
+     alertAndPass(object) {
+         alert('got here');
+         return object
+     }
 
  }
 

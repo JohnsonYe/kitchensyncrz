@@ -96,6 +96,7 @@
 .preview-card-button{
   font-size:50%;
 }
+
 .navbar-icon {
   width: 20%;
 }
@@ -111,8 +112,6 @@
   position: relative;
   height: auto;
 
-
-
   .btn-dark {
     border: solid 1px #e0eff9;
   }
@@ -120,7 +119,7 @@
   /* Must match thumbnail background with btn-dark border color */
 }
 
-.search-results{
+.search-results {
   padding-top: 10px
 }
 
@@ -149,6 +148,7 @@
   height: 250px;
 
 }
+
 .header {
   position: relative;
   display: block;
@@ -158,7 +158,8 @@
 
   .logo {
     position: absolute;
-    top: 50%; left: 15px;
+    top: 50%;
+    left: 15px;
     @include translateY(-50%);
   }
 
@@ -171,7 +172,8 @@
 
   nav {
     position: absolute;
-    top: 50%; right: 15px;
+    top: 50%;
+    right: 15px;
     @include translateY(-50%);
 
     ul li {
