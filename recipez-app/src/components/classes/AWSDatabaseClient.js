@@ -5,20 +5,38 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
+ // import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
 
  /**
   * THIS IS A SINGLETON CLASS.
   * DONT MAKE NEW DBCLIENT OBJECTS. USE THE STATIC METHOD DBClient.getClient() to retrieve a common instance
   */
 
+import {
+    CognitoUserPool,
+    AuthenticationDetails,
+    CognitoUser
+} from "amazon-cognito-identity-js";
+
+const up = {
+    USER_POOL_ID: "us-east-2_SHrX2V3xU",
+    APP_CLIENT_ID: "5ome294mpcicna669ebfieplfi",
+    REGION: "us-east-2",
+    IDENTITY_POOL_ID: "us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa",
+};
+
 var creds = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: 'us-east-2:7da319d0-f8c8-4c61-8c2a-789a751341aa',
 });
 AWS.config.update({region:'us-east-2',credentials:creds});
+
 var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
 
+var MAX_REQUEST_LENGTH = 100;
+
+var appClientID = '1qnpej4u0hul8mq0djs9a5r8me';
 var MAX_REQUEST_LENGTH = 100;
 
  class DBClient {
@@ -30,6 +48,14 @@ var MAX_REQUEST_LENGTH = 100;
         this.unpackItem = this.unpackItem.bind(this);
         this.login = this.login.bind(this);
         this.getUsername = this.getUsername.bind(this);
+        this.getUserToken = this.getUserToken.bind(this);
+        this.getCurrentUser = this.getCurrentUser.bind(this);
+        this.authUser = this.authUser.bind(this);
+        this.signOutUser = this.signOutUser.bind(this);
+        this.register = this.register.bind(this);
+        this.confirmUser = this.confirmUser.bind(this);
+        this.authenticateUser = this.authenticateUser.bind(this);
+        this.getAwsCredentials = this.getAwsCredentials.bind(this);
         this.user = 'user001' //use this to test until authentication / user creation are ready
 
         this.authenticated = false;
@@ -41,9 +67,9 @@ var MAX_REQUEST_LENGTH = 100;
             'S': (s,p)=>s.S,
             'L': (l,p)=>l.L.map((item)=>this.protoUnpack[p.type](item,p.inner)),
             'M': (m,p)=>Object.entries(m.M).reduce((prev,item)=>Object.assign({[item[0]]:this.protoUnpack[p.type](item[1],p.inner)},prev),{}),
-            'SS':(ss,p)=>ss.SS,
+            'SS':(ss,p)=>new Set(ss.SS),
             'N': (n,p)=>n.N,
-            'SET':(s,p)=>new Set(s)
+            'SET':(s,p)=>new Set(s),
         }
 
         /**
@@ -56,6 +82,18 @@ var MAX_REQUEST_LENGTH = 100;
             'SS':(ss,p)=>({'SS':ss}),
             'N': (n,p)=>({'N':n+''}),
         }
+
+
+    }
+
+    putDBItem(tableName,item,errCallback,successCallback){
+        db.putItem({TableName:tableName,Item:item},(err,data)=>{
+            if(err){
+                errCallback({status:false, payload: err});                
+            } else {
+                successCallback({status:true,  payload: data});                
+            }
+        })
     }
 
     /*
@@ -65,11 +103,11 @@ var MAX_REQUEST_LENGTH = 100;
      *
      * string tableName: name of the table to retrieve items from
      * [string] keys: list of ingredient names to use as DB keys
-     * handle target: function handle to send items to
+     * handle callback: function handle to send items to
      */
     getDBItems(tableName,keyField,keys,target){
         if(keys.length > MAX_REQUEST_LENGTH){
-            console.log('Recieved request with more than 100 keys!')
+            console.log('Recieved request with more than 100 keys! ('+keys.length+')')
             Promise.all((()=>{ //create a promise group out of max size batch requests
                 let pos = 0,requests = [];
                 while(pos < keys.length){ //split key array into size 100 chunks
@@ -89,11 +127,11 @@ var MAX_REQUEST_LENGTH = 100;
             return;
         }
         db.batchGetItem(this.buildBatchRequest(tableName,keyField,keys),function(err,data){
-            if(err){
-                target({status:false, payload: err});
-            } else if(data.Responses[tableName].length == 0) {
-                target({status:false, payload: 'Item not found!'});
-            } else {
+            if(err){ //the call failed for some reason --> probably invalid keys (not strings)
+                target({status:false, payload: err + ' --> make sure your query keys are strings!' });
+            } else if(data.Responses[tableName].length == 0) { //no results, but the call went through
+                target({status:false, payload: 'Item: ' + JSON.stringify(keys) + ' not found!'});
+            } else { //everythng looks good, index into the response
                 target({status:true,  payload: data.Responses[tableName]});
             }
         })
@@ -108,12 +146,11 @@ var MAX_REQUEST_LENGTH = 100;
      */
     getDBItemPromise(tableName,keyField,keys){
         if(keys.length > MAX_REQUEST_LENGTH){
-            console.error('Recieved request with more than 100 keys!')
+            console.error('Recieved request with more than 100 keys!('+keys.length+')')
         }
         return new Promise((pass,fail)=>{
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
-                    // alert('got here')
                     pass(response.payload)
                 } else { //call failed, fail
                     fail(response.payload)
@@ -249,8 +286,24 @@ var MAX_REQUEST_LENGTH = 100;
      * log the user in to allow them to upload to DB and view user-specific data
      */
     login(username,password) {
-        this.user = username
-        return this.authenticated = true
+        const userPool = new CognitoUserPool({
+            UserPoolId: up.USER_POOL_ID,
+            ClientId: up.APP_CLIENT_ID
+        });
+
+        const user = new CognitoUser({ Username: username, Pool: userPool });
+        const authenticationData = { Username: username, Password: password };
+        const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+        return new Promise((resolve, reject) =>
+            user.authenticateUser(authenticationDetails, {
+
+                onSuccess: result => resolve(),
+                onFailure: err => reject(err)
+            })
+
+        );
+
     }
 
     isLoggedIn(){
@@ -260,6 +313,129 @@ var MAX_REQUEST_LENGTH = 100;
     getUsername(){
         return this.user
     }
+
+
+     async authUser() {
+         if (
+             AWS.config.credentials &&
+             Date.now() < AWS.config.credentials.expireTime - 60000
+         ) {
+             return true;
+         }
+
+         const currentUser = this.getCurrentUser();
+
+         if (currentUser === null) {
+             return false;
+         }
+
+         const userToken = await this.getUserToken(currentUser);
+
+         await this.getAwsCredentials(userToken);
+         this.user = currentUser.getUsername();
+         //alert("getting new creds");
+
+         return true;
+     }
+
+     getUserToken(currentUser) {
+         return new Promise((resolve, reject) => {
+             currentUser.getSession(function(err, session) {
+                 if (err) {
+                     reject(err);
+                     return;
+                 }
+                 resolve(session.getIdToken().getJwtToken());
+             });
+         });
+     }
+
+     getCurrentUser() {
+         const userPool = new CognitoUserPool({
+             UserPoolId: up.USER_POOL_ID,
+             ClientId: up.APP_CLIENT_ID
+         });
+         return userPool.getCurrentUser();
+     }
+
+     signOutUser() {
+         const currentUser = this.getCurrentUser();
+
+         if (currentUser !== null) {
+             currentUser.signOut();
+         }
+     }
+
+     register(username, password, email) {
+         const userPool = new CognitoUserPool({
+             UserPoolId: up.USER_POOL_ID,
+             ClientId: up.APP_CLIENT_ID
+         });
+
+         var attributeList = [];
+
+         var dataEmail = {
+             Name : 'email',
+             Value : email
+         };
+
+         //var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+         attributeList.push(dataEmail);
+
+         return new Promise((resolve, reject) =>
+             userPool.signUp(username, password, attributeList, null, (err, result) => {
+                 if (err) {
+                     reject(err);
+                     return;
+                 }
+
+                 resolve(result.user);
+             })
+         );
+     }
+
+     confirmUser(user, confirmationCode) {
+         return new Promise((resolve, reject) =>
+             user.confirmRegistration(confirmationCode, true, function(err, result) {
+                 if (err) {
+                     reject(err);
+                     return;
+                 }
+                 resolve(result);
+             })
+         );
+     }
+
+     authenticateUser(user, email, password) {
+         const authenticationData = {
+             Username: user,
+             Password: password
+         };
+         const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+         return new Promise((resolve, reject) =>
+             user.authenticateUser(authenticationDetails, {
+                 onSuccess: result => resolve(),
+                 onFailure: err => reject(err)
+             })
+         );
+     }
+
+     getAwsCredentials(userToken) {
+         const authenticator = `cognito-idp.${up.REGION}.amazonaws.com/${up.USER_POOL_ID}`;
+
+         AWS.config.update({ region: up.REGION });
+
+         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+             IdentityPoolId: up.IDENTITY_POOL_ID,
+             Logins: {
+                 [authenticator]: userToken
+             }
+         });
+
+         return AWS.config.credentials.getPromise();
+     }
+
 
     unpackFormatting(aws_response) {
 
@@ -276,10 +452,11 @@ var MAX_REQUEST_LENGTH = 100;
         return client_style_map
     }
 
-    registerPrototype(proto){
+    registerPrototype(proto, ){
         if(!proto._NAME){
             throw new TypeError('No _NAME specified for prototype: ' + JSON.stringify(proto))
         }
+
         this.protoUnpack[proto._NAME] = ((object,outertype)=>this.unpackItem(object.M,proto));
         this.protoPack[proto._NAME] = ((object,outertype)=>({M:this.packItem(object,proto)}));
 
@@ -296,7 +473,7 @@ var MAX_REQUEST_LENGTH = 100;
         }
         //unpack an item from AWS
         // alert(JSON.stringify(item)+'\n'+JSON.stringify(prototype))
-        var unpacked = {}
+        var unpacked = {};
         Object.keys(item).forEach((key)=>{
             try{
                 unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
@@ -306,6 +483,7 @@ var MAX_REQUEST_LENGTH = 100;
                 //for now, developers working with the database must be careful with adding new fields
                 unpacked[key] = e+' :: NO PROTOTYPE FOUND FOR THIS ITEM: '+key+'; IF YOU ADDED THIS FIELD, PLEASE CHECK THAT YOUR PROTOTYPE'+
                     ' SPECIFICATION IS CORRECT';
+                    //alert(key)
                 // throw new TypeError(e.message + ': ' + key + '\nPlease check that data prototype defines this field')
             }
         })

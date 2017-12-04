@@ -40,7 +40,8 @@ class SearchThumbail extends Component {
 
     render() {
         var imgsrc= "http://www.maktabatulmadina.net/img/uploaded/730.jpg";
-        {this.props.data.Image ? imgsrc=this.props.data.Image[0] : null}
+        imgsrc = this.props.data.Image ? Array.from(this.props.data.Image)[0]: imgsrc;
+        // alert(this.props.data.Image);
         
         var ingredients = this.props.data.Ingredients.map((ingredient) => <li><span>{ingredient}</span></li>)
         var directions = this.props.data.Directions.map((step) => <li>{step}</li>)
@@ -86,8 +87,8 @@ class SearchThumbail extends Component {
                     
                     </a>
                     <div className="col-4">
-                        <MealEditor url={this.props.data.Image[0]} recipe={this.props.data.Name} 
-                        duration={this.props.data.TimeCost} />
+                        {/*<MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
+                        duration={this.props.data.TimeCost} />*/}
                     </div>
                 </div>
 

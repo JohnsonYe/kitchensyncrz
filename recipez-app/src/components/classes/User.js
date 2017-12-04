@@ -15,8 +15,12 @@ import DBClient from './AWSDatabaseClient'
 
 class User {
     constructor(){
-        this.client = DBClient.getClient()
-        this.client.registerPrototype(User.PantryItemPrototype)
+        this.client = DBClient.getClient();
+
+        //Planner data
+        this.client.registerPrototype(User.PlannerPrototype);
+        this.client.registerPrototype(User.DayPrototype);
+        this.client.registerPrototype(User.MealPrototype);
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -39,12 +43,28 @@ class User {
         //         'username',this.client.getUsername(),
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
-        this.loadStream = new Promise(this.loadUserData)
+        this.reload();
         this.verified = false;
     }
 
-    getMort(){
-        return this.client.getUsername;
+    reload(){
+        this.loadStream = new Promise(this.loadUserData)
+    }
+
+    createUser(username,callback){
+        this.loadStream = Promise.resolve({ //create a new user data object locally
+            username:       username,
+            cookbook:       {},
+            cookware:       new Set(['oven']), //this can't be empty
+            exclude:        new Set(['beer']),
+            shoppingList:   new Set(['beets']),
+            pantry:         {shrimp: {unit: 'Protein', amount: '1'}},
+        })
+        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
+            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
+        })
+        this.loadStream.then((data)=>console.log(data.payload))
+        this.loadStream.then(callback)
     }
 
     /**
@@ -55,14 +75,10 @@ class User {
      *      cookbook: <Set<String>> user's favorited/saved recipe list
      *      cookware: <Set<String>> user's available cookware
      *      planner:  <???> TODO work with planner team on data organization
-     * }
+     *
      */
     loadUserData(resolve,reject){
-        if(this.userData.username === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
-            // alert('rejected!')
-            reject('User is not logged in!')
-            return
-        }
+        console.log(this.client.getUsername())
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
                 this.userData = {
@@ -99,7 +115,7 @@ class User {
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -107,7 +123,7 @@ class User {
 
     saveCustomRecipe(recipeObject){
         //pack the recipe into JSON format and add it to the user's recipe map
-        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below
             this.client.buildUpdateRequest( //construct the params syntax according to the action we want
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
@@ -121,14 +137,14 @@ class User {
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
 
     saveExternalRecipe(recipeName){
         //save just the recipe name to the cookbook so we know to load it froma public recipe page
-        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below
             this.client.buildUpdateRequest( //construct the params syntax according to the action we want
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
@@ -143,7 +159,7 @@ class User {
                     })
                 } else {
                     //the request failed, what should we do?
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -159,7 +175,7 @@ class User {
      * }
      */
     getPantry(callback){
-        return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('pantry').then(response=>{alert(JSON.stringify('get pantry error: '+response));callback(response)})
     }
 
 
@@ -177,7 +193,7 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -196,14 +212,13 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
 
     getCookbook(callback){
-        return this.getUserData('cookbook').then(response=>{callback(response)})
-        /*alert(JSON.stringify(response));*/
+        return this.getUserData('cookbook').then(callback).catch(console.error);
     }
 
 
@@ -221,7 +236,7 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -240,7 +255,7 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -248,7 +263,7 @@ class User {
 
 
     getCookware(callback){
-        return this.getUserData('cookware').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('cookware').then(callback).catch(console.error);
     }
 
     addToCookware(item){
@@ -265,7 +280,7 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -284,14 +299,14 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
 
 
     getExclusionList(callback){
-        return this.getUserData('exclude').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('exclude').then(callback).catch(console.error);
 
     }
 
@@ -309,7 +324,7 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -329,13 +344,13 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
 
     getShoppingList(callback){
-        return this.getUserData('shoppingList').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('shoppingList').then(callback).catch(console.error);
 
     }
 
@@ -353,7 +368,7 @@ class User {
                         return data
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload)
                 }
             })
     }
@@ -369,20 +384,39 @@ class User {
                 if(response.status){
                     this.addUserData((data)=>{
                         delete data.shoppingList[item];
-                        return data
+                        return data;
                     })
                 }else {
-                    alert(response.payload)
+                    console.error(response.payload);
                 }
             })
     }
 
 
-    getPlanner(){
+    getPlanner(callback){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-        return {Monday:['cook'],Tuesday:['eat'],Wednesday:['sleep'],Thursday:['grocery shopping']}
+        this.getUserData('planner').then(callback).catch(console.error)
+    }
+
+    setPlanner(planner,callback){
+        let packed = this.client.packItem(planner,User.PlannerPrototype);
+        console.log(JSON.stringify(packed));
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User','username',this.client.getUsername(),
+                this.client.buildSetUpdateExpression('planner',{M:packed})),
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.planner = planner;
+                        return data;
+                    })
+                } else {
+                    console.error(response.payload);
+                }
+            })
     }
 
     getNotes(){
@@ -393,6 +427,27 @@ class User {
             {target:{type:'ingredient',id:'blueberry'},
                 text:'use frozen blueberries for that dank artifical taste'}}
 
+    }
+
+    getPreferences(callback){
+        this.getUserData('preferences').then(callback);
+    }
+
+    setPreferences(preferences,callback){
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User','username',this.client.getUsername(),
+                this.client.buildSetUpdateExpression('preferences',{SS:Array.from(preferences)})),
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.preferences = preferences;
+                        return data;
+                    })
+                } else {
+                    console.error(response.payload);
+                }
+            })
     }
 
     /**
@@ -407,8 +462,11 @@ class User {
     /**
      * apply a function to the user data chain before serving it to future requests
      */
-    addUserData(transform){
+    addUserData(transform,callback){
         this.loadStream = this.loadStream.then(transform);
+        if(callback){
+            callback(this.loadStream)
+        }
     }
 
     /**
@@ -433,11 +491,32 @@ class User {
     }
 }
 
+ User.MealPrototype = {
+     _NAME: "Meal",
+     recipes: { type: 'L' ,inner:{ type:'S'} },
+     startHr: {type: 'N'},
+     startMin: {type: 'N'},
+     endHr: {type: 'N'},
+     endMin: {type: 'N'}
+ }
+
+ User.DayPrototype = {
+     _NAME: "Day",
+     mealData: {type: 'L' ,inner:{ type: User.MealPrototype._NAME} }
+ }
+
+ User.PlannerPrototype = {
+     _NAME: "Planner",
+     days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
+ }
+
+
 User.PantryItemPrototype = {
     _NAME:'PANTRYITEM',
     amount:{type:'N'},
     unit:{type:'S'}
 }
+DBClient.getClient().registerPrototype(User.PantryItemPrototype)
 
 
 User.UserDataPrototype = {
@@ -446,13 +525,15 @@ User.UserDataPrototype = {
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
+    planner:{type:User.PlannerPrototype._NAME},
     shoppingList:{type:'SS'},
-    planner:{},
-    exclude:{type:'SS'}
+    exclude:{type:'SS'},
+    preferences:{type:'SS'},
 }
+DBClient.getClient().registerPrototype(User.UserDataPrototype)
 
 var static_user = new User();
 
-User.getUser = (username) => static_user.verify(username);
+User.getUser = (username) => static_user;
 
 export default User;

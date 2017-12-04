@@ -78,7 +78,7 @@ class Autocomplete{
     }
 
     search(node,str,idx){
-        if(idx >= str.length){//find some completions
+        if(idx === str.length){//find some completions
             return this.dfs(node,str.split(''))
         }
         let curr = str.charAt(idx);
@@ -96,9 +96,9 @@ class Autocomplete{
             }
         } else {
             if(node.c){
-                return this.search(node.c,str,idx+1)
+                return this.search(node.c,str,idx+1);
             } else {
-                if(idx+1==str.length){
+                if(idx+1===str.length){
                     return [str]
                 }
                 return []
@@ -115,6 +115,9 @@ class Autocomplete{
             result = result.concat(this.dfs(node.l,base))
         }
         base.push(node.v)
+        if(node.e!==undefined){
+            result = result.concat(base.join(''))
+        }
         if(node.c){
             // console.log(JSON.stringify(base))
             result = result.concat(this.dfs(node.c,base))
@@ -135,37 +138,10 @@ class Autocomplete{
     chainBuild(str,idx){
         // alert(str.substring(idx+1).split('').reduce((prev,next)=>{return prev.center=this.getNode(next)},this.getNode(str.charAt(idx))))
         var buildRoot = this.getNode(str.charAt(idx))
-        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot)
+        str.substring(idx+1).split('').reduce((prev,next)=>{return prev.c=this.getNode(next)},buildRoot).e = '';
         return buildRoot
     }
 }
-
-/**
- * AUTOCOMPLETE BUILDER -- run this in node to compile trees into JSON offline, then zip them and push to database with scanner.py in scripts
- */
-// fs = require('fs');
-// csvPath = '../../scripts/ingredient.csv';
-// jsonPath = 'Ingredient.tst'
-// fs.readFile(csvPath,'utf8',(err,data)=>{
-//     if(err){
-//         console.log(err)
-//         return
-//     }
-//     // console.log(JSON.stringify(data))
-//     // var auto = new Autocomplete(['cat','cast','category','cart','cats'])
-//     var auto = new Autocomplete(data.split(','),null)
-//     // var auto = new Autocomplete(null,data)
-//     console.log(JSON.stringify(auto))
-//     console.log(auto.getCompletion('ca'))
-//     fs.writeFile('Ingredient.tst',JSON.stringify(auto.root),(err)=>{
-//         if(err){
-//             console.log(err)
-//             return
-//         }
-//         console.log('saved successfully!')
-//     })
-// })
-
 
 
 export default Autocomplete;
