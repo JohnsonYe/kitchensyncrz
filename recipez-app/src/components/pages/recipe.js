@@ -67,7 +67,7 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item">
+        var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item col-sm-5">
                 <span className="ingredient-box">
                     <button onClick={(e)=>this.User.addToShoppingList(ingredient)} className="shopping button" type="button" class="btn btn-circle" id="shoppoing_cart">
                         <i class="glyphicon glyphicon-shopping-cart"/>
@@ -117,14 +117,17 @@ class Recipe extends Component {
 
                 <div class="container">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-8">
                             {/*show picture*/}
-                            <div>
-                                {carouselInstance}
+                            {carouselInstance}
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="row" className="row-height-for-time">
+                                <h2><i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}
+                                <h2><i class="glyphicon glyphicon-wrench"/>&nbsp;&nbsp;{this.state.data.Difficulty}</h2></h2>
                             </div>
-
-                            {/*====button group====*/}
                             <div class="row">
+                            {/*====button group====*/}
                                 <div class="btn=group btn-group-lg">
                                     {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
                                     <button onClick={(e)=>User.getUser(this.User.client.getUsername()).getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">
@@ -134,22 +137,24 @@ class Recipe extends Component {
                                     <button onClick={(e)=>User.getUser(this.User.client.getUsername()).deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-trash"/>  remove from cookbook  </button>
                                 </div>
-                            </div>
-                            <div class="col">
-                                <h2><i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}</h2>
-                            </div>
                             {/*====button group====*/}
+                            </div>
                         </div>
-                        <div class="col-sm-6" className="Ingredient">
-                            <h2>Ingredients:</h2>
-                            <ul>{ingredients}</ul>
-                        </div>
-                    </div>
-                    <h2 className="Direction">Directions:</h2>
-                    <ol>{directions}</ol>
-                </div>
 
-                <div class="container">
+                        <div class="col">
+                        <div class="row">
+                            <div class="col-sm-6" className="Ingredient">
+                                <h2>Ingredients:</h2>
+                                <ul>{ingredients}</ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <h2 className="Direction">Directions:</h2>
+                        </div>
+                        <div class="row">
+                            <ol>{directions}</ol>
+                        </div></div>
+                    </div>
                     <div>
                         {/* Nav bar content here */}
                         <div className="container">
