@@ -141,7 +141,7 @@ class App extends Component {
                         <OffCanvasMenu className="navbar-menu">
                             <ul>
                                 <li className="first">
-                                    <Link to="/">Home</Link>
+                                    <Link to="/" onClick={this.handleClick.bind(this)}>Home</Link>
                                 </li>
                                 <li>
                                     <Link to="/Search">Browse</Link>

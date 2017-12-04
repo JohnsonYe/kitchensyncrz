@@ -15,6 +15,8 @@ import React, { Component } from 'react';
 import MealEditor from "./editMealPage"
 import PlannerHelper from "../../classes/Planner";
 import User from '../../classes/User';
+import ShoppingList from "./ShoppingList";
+import RecipeHelper from "../../classes/RecipeHelper";
 
 
 /**Lets the user know what recipe is up next to cook will be placed in Daily Meal Planner*/
@@ -30,7 +32,7 @@ function UpNextCard(props){
                 />
             </div>
             <div className="card-img-overlay">
-                <h3 className="card-title text-white">Up next {props.recipe}</h3>
+                <h3 className="card-title text-white">Up next: {props.recipe}</h3>
             </div>
         </div>
     );
@@ -81,9 +83,32 @@ class Planner extends Component {
 
         user.getPlanner((planner)=>{
             this.setState({mealData:planner});
+            let recipeHelper = new RecipeHelper();
+            //figure out what recipe to display in upnext
+            let date = new Date();
+            let curHr = date.getHours(),
+                today = date.getDay(),
+                index = 0;
+
+            let meals = this.plannerHelper.getDayMealList(this.state.mealData, today);
+            for(let i = 0; i < meals.length ;i++) {
+                let hr = this.plannerHelper.getMealStartTime(this.state.mealData, today, i);
+                hr = parseInt(hr);
+                if( hr <= curHr) {
+                    index = i;
+                }
+            }
+
+            this.setState({ nextMeal: this.plannerHelper.getMealRecipeName(this.state.mealData, today, index)});
+
+            recipeHelper.loadRecipe(this.plannerHelper.getMealRecipeName(this.state.mealData, today, index), (data) => {
+                if(data&&data.Image) {
+                    this.setState({nextImg: Array.from(data.Image)[0]});
+                }
+            });
         });
 
-        this.removeMeal = this.removeMeal.bind(this);
+
         this.loadNumMeals = this.loadNumMeals.bind(this);
         this.loadTotalMeals = this.loadTotalMeals.bind(this);
         this.renderMeal = this.renderMeal.bind(this);
@@ -98,13 +123,6 @@ class Planner extends Component {
 
     /** Functionality Methods **/
 
-
-    /** TODO Removes card from Daily Meal Planner*/
-    removeMeal() {
-        if( this.state.numMeals > 0) {
-            this.plannerHelper.removeMeal(this.state.mealData,0,0);
-        }
-    }
 
     /** Pass to modal and call after they save or remove something*/
     update(planner) {
@@ -238,6 +256,7 @@ class Planner extends Component {
                     </div>
                 </div>
                 <div className="col-9">
+                    <ShoppingList />
                 </div>
             </div>
         );
@@ -263,6 +282,7 @@ class Planner extends Component {
 
         return total;
     }
+
 
     /** Driver */
     render() {

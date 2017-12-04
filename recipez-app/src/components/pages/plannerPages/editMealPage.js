@@ -13,6 +13,7 @@ import {Button, Modal, DropdownButton, MenuItem, ButtonToolbar} from 'react-boot
 import PlannerHelper from '../../classes/Planner';
 import User from '../../classes/User';
 import RecipeHelper from "../../classes/RecipeHelper";
+import {Link} from "react-router-dom";
 
 
 function Duration(props) {
@@ -236,6 +237,7 @@ class MealEditor extends Component {
 
     /** creates/overwrites meal to the meal */
     update(transform) {
+        this.close();
         var user = User.getUser();
         user.getPlanner((planner)=>{
             planner = transform(planner);
@@ -405,13 +407,13 @@ class MealEditor extends Component {
                 <Modal.Header>{this.props.recipe}</Modal.Header>
                 <Modal.Body>
                     <figure>
-                        <a href ={"/Recipes/" + this.props.recipe}>
+                        <Link to={"/Recipes/" + this.props.recipe}>
                             <img
                                 className="img-fluid"
                                 src={this.state.img}
                                 alt="No Image"
                             />
-                        </a>
+                        </Link>
                     </figure>
 
                     <figcaption>

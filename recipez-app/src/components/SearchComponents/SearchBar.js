@@ -6,6 +6,7 @@
  */
 import React, {Component} from 'react';
 import Autocomplete from '../classes/Autocomplete'
+import Util from '../classes/Util'
 
 class SearchBar extends Component{
     constructor(props){
@@ -34,6 +35,8 @@ class SearchBar extends Component{
         this.getSearchHighlight = this.getSearchHighlight.bind(this);
 
         this.getCounter = this.getCounter.bind(this);
+
+        this.getDropDownButtons = this.getDropDownButtons.bind(this);
     }
 
 
@@ -71,6 +74,7 @@ class SearchBar extends Component{
     handleChange(e){
         // alert(e.target.value)
         // this.props.callback(e.target.value)
+        this.query = (this.state.selection >= 0)?this.state.completions[this.state.selection]:e.target.value;
         this.setState({value:e.target.value})
         if(e.target.value.length>0){
             this.props.client.autocomplete(e.target.value,this.autocomplete)
@@ -120,11 +124,12 @@ class SearchBar extends Component{
      *                                      error  ->user will exclude ingredient from search]
      */
     getSearchHighlight(){
-        return (this.state.value&&this.state.value.length?(this.state.shiftDown?'has-error':'has-success'):'')
+        return (this.state.value&&this.state.value.length?(this.state.shiftDown&&this.props.canExclude?'has-error':'has-success'):'')
     }
 
     getValue(){
-        return this.query;
+        console.log('searchbar returned: ' + this.query)
+        return this.query.trim();
     }
 
     getStatus(){
@@ -136,6 +141,26 @@ class SearchBar extends Component{
         return (function(){
             return i++;
         })
+    }
+
+    getDropDownButtons(){
+        if(this.props.canExclude){
+            return (
+                <span className='pull-right'>
+                    <span className='btn-group group-spacer' role='group'>
+                        <button type='submit' className='btn btn-success btn-sm'>
+                            <span className='glyphicon glyphicon-plus-sign'></span>
+                        </button>
+                        <button type='submit' 
+                                className='btn btn-danger btn-sm' 
+                                onMouseOver={(e)=>this.setState({shiftDown:true})}
+                                onMouseOut={(e)=>this.setState({shiftDown:false})}>
+                            <span className='glyphicon glyphicon-ban-circle'></span>
+                        </button> 
+                    </span>                           
+                </span>
+            )  
+        }      
     }
 
     render(){
@@ -171,19 +196,7 @@ class SearchBar extends Component{
                              key={count}>
                             <p>
                                 {key}
-                                <span className='pull-right'>
-                                    <span className='btn-group' role='group'>
-                                        <button type='submit' className='btn btn-success btn-sm'>
-                                            <span className='glyphicon glyphicon-plus-sign'></span>
-                                        </button>
-                                        <button type='submit' 
-                                                className='btn btn-danger btn-sm' 
-                                                onMouseOver={(e)=>this.setState({shiftDown:true})}
-                                                onMouseOut={(e)=>this.setState({shiftDown:false})}>
-                                            <span className='glyphicon glyphicon-ban-circle'></span>
-                                        </button> 
-                                    </span>                           
-                                </span>
+                                {this.getDropDownButtons()}
                             </p>
                         </div>)})}
                 </div>
@@ -194,12 +207,12 @@ class SearchBar extends Component{
 }
 
 SearchBar.InternalClient = class{
-    constructor(keyList){
-        this.autocomplete = new Autocomplete().loadList(keyList);
+    constructor(treeName){
+        this.auto = Util.loadCompiledAutocompleteTree(treeName,'internal client');
     }
 
     autocomplete(base,callback){
-        callback(this.autocomplete.getCompletion(base));
+        this.auto.then((auto)=>callback(auto.getCompletion(base)));
     }
 }
 

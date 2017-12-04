@@ -156,6 +156,34 @@ class User {
             })
     }
 
+    publishRecipe(recipeName){
+        alert('dont fucking use publishRecipe')
+        //remove the recipe JSON from the user's cookbook
+        let set_external_expression = this.client.buildRemoveElementUpdateExpression('cookbook',recipeName);
+
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+            this.client.buildUpdateRequest( //construct the params syntax according to the action we want
+                'User', //table to get item from
+                'username',this.client.getUsername(), //keyfield and specific key
+                //set cookbook[recipeName] = 'none'
+                this.client.buildMapUpdateExpression('cookbook',recipeName,{S:'none'})), 
+            (response)=>{ //if the request succeeds, 'add' to the local user data by transforming it in a then clause
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.cookbook[recipeName]='none';
+                        return data;
+                    })
+                } else {
+                    //the request failed, what should we do?
+                    console.error(response.payload)
+                }
+            })
+
+        //pull the recipe object from the local user data
+        this.getUserData('cookbook').then((data)=>{})
+
+    }
+
     /**
      * get a Pantry Object:
      * {
@@ -171,7 +199,7 @@ class User {
     }
 
 
-    addToPantry(ingredient,unit,amount){
+    addToPantry(ingredient,unit,amount,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -183,11 +211,11 @@ class User {
                     this.addUserData((data)=>{
                         data.pantry[ingredient] = {amount:amount,unit:unit};
                         return data
-                    })
-                }else {
-                    console.error(response.payload)
-                }
-            })
+                },callback)
+             }else {
+                console.error(response.payload)
+            }
+        })
     }
 
     removeFromPantry(ingredient){
@@ -346,7 +374,7 @@ class User {
 
     }
 
-    addToShoppingList(item){
+    addToShoppingList(item,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -356,16 +384,16 @@ class User {
             (response) => {
                 if(response.status){
                     this.addUserData((data)=>{
-                        data.shoppingList[item] = {item:item};
+                        data.shoppingList.add(item);
                         return data
-                    })
-                }else {
-                    console.error(response.payload)
-                }
-            })
+                },callback)
+             }else {
+                console.error(response.payload)
+            }
+        })
     }
 
-    removeFromShoppingList(item){
+    removeFromShoppingList(item,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -375,13 +403,13 @@ class User {
             (response) => {
                 if(response.status){
                     this.addUserData((data)=>{
-                        delete data.shoppingList[item];
+                        data.shoppingList.delete(item);
                         return data;
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload);
                 }
-            })
+        })
     }
 
 
@@ -448,7 +476,7 @@ class User {
      * @return {[type]}      [description]
      */
     getUserData(name){
-        return this.loadStream.then((data)=>data[name]).catch((e)=>'Failed to fetch loaded data!');
+        return this.loadStream.then((data)=>data[name]).catch((e)=>{console.error(e);return e});
     }
 
     /**
@@ -457,7 +485,7 @@ class User {
     addUserData(transform,callback){
         this.loadStream = this.loadStream.then(transform);
         if(callback){
-            callback(this.loadStream)
+            callback(this.loadStream);
         }
     }
 
@@ -526,6 +554,7 @@ User.UserDataPrototype = {
 DBClient.getClient().registerPrototype(User.UserDataPrototype)
 
 var static_user = new User();
+
 
 User.getUser = (username) => static_user;
 
