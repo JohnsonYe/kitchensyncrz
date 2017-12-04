@@ -144,6 +144,7 @@
   object-fit: cover;
   min-width: 100%;
   min-height: 400px;
+  max-height: 400px;
 }
 
 .modal-foodpic {
@@ -189,4 +190,8 @@
 .planner-hover:hover{
   border:solid 1px black;
   cursor:pointer;
+}
+
+.padding-down{
+  padding-bottom:100px;
 }

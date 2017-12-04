@@ -394,7 +394,7 @@ class PreviewCard extends Component{
         ;
         let image;
         if (this.props.src.Image) {
-            image = this.props.src.Image[0];
+            image = Array.from(this.props.src.Image)[0];
 
         } else {
             image = require("./no-photo.png");

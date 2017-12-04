@@ -7,7 +7,7 @@
 
 import React from 'react';
 import SearchBar from '../SearchComponents/SearchBar'
-
+import User from '../classes/User'
 
 //Creates the well and button object that shows up on the screen
 export const AddItem = ({item, remove, addOut}) => {
@@ -96,7 +96,7 @@ export const AddRestock = ({item, remove, addBack}) => {
                     <div className='input-group-btn'>
                         <button className = "btn btn-info"
                                 type = "button"
-                                onClick = {()=> {} }
+                                onClick = {()=> User.getUser().addToShoppingList(item,()=>remove(item)) }
                                 title = "Add to Shopping List"
                         >
                             <span className = "glyphicon glyphicon-shopping-cart"/>

@@ -67,8 +67,9 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
-        var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item">
-                <span className="ingredient-box">
+        var ingredients = this.state.data.Ingredients.map((ingredient) =>(
+            <li class="list-group-item col-sm-5">
+                <span>
                     <button onClick={(e) => this.user.addToShoppingList(ingredient)} className="shopping button"
                             type="button" class="btn btn-circle" id="shoppoing_cart">
                         <i class="glyphicon glyphicon-shopping-cart"/>
@@ -76,11 +77,14 @@ class Recipe extends Component {
                     &nbsp;&nbsp;
                     {ingredient}
                 </span>
-        </li>)
+            </li>
+        ));
 
-        var directions = this.state.data.Directions.map((step) => <li class="list-group-item"><i class="fa fa-cutlery"
-                                                                                                 id="forksize"/>{step}
-        </li>)
+        var directions = this.state.data.Directions.map((step) =>(
+            <li class="list-group-item">
+                <i class="glyphicon glyphicon-cutlery" id="forksize"/>{step}
+            </li>
+        ));
 
         // alert(JSON.stringify(this.state.data))
         var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) =>
@@ -132,44 +136,44 @@ class Recipe extends Component {
 
                 <div class="container">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-8">
                             {/*show picture*/}
                             <div>
                                 {carouselInstance}
                             </div>
-
+                        </div>
                             {/*====button group====*/}
-                            <div class="row">
-                                <div class="btn=group btn-group-lg">
-                                    {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
-                                    <button
-                                        onClick={(e) => this.user.getUserData('cookbook').then((data) => alert(JSON.stringify(data)))}
-                                        type={"button"} class="btn btn-outline-primary">
-                                        <i class="glyphicon glyphicon-check"/> check
-                                    </button>
-                                    <button
-                                        onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
-                                        type={"button"} class="btn btn-outline-primary">
-                                        <i class="glyphicon glyphicon-book"/> add to cookbook
-                                    </button>
-                                    <button
-                                        onClick={(e) => this.user.deleteRecipe(this.state.data.Name)}
-                                        type={"button"} class="btn btn-outline-primary">
-                                        <i class="glyphicon glyphicon-trash"/> remove from cookbook
-                                    </button>
+                            <div className='col-sm-3'>
+                                <div className='row padding-down'>
+                                    <h2>
+                                        <i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;
+                                    </h2>
+                                    <h2>    
+                                        <i class="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}
+                                    </h2>
+                                </div>
+                                <div className='row'>
+                                    <div class="btn=group btn-group-lg">
+                                        {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
+                                        <button
+                                            onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
+                                            type={"button"} class="btn btn-outline-primary">
+                                            <i class="glyphicon glyphicon-book"/> add to cookbook
+                                        </button>
+                                        <button
+                                            onClick={(e) => this.user.deleteRecipe(this.state.data.Name)}
+                                            type={"button"} class="btn btn-outline-primary">
+                                            <i class="glyphicon glyphicon-trash"/> remove from cookbook
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col">
-                                <h2><i
-                                    class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;
-                                    <i class="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}</h2>
-                            </div>
+
                             {/*====button group====*/}
-                        </div>
-                        <div class="col-sm-6" className="Ingredient">
-                            <h2>Ingredients:</h2>
-                            <ul>{ingredients}</ul>
-                        </div>
+                    </div>
+                    <div class="col-sm-6" className="Ingredient" float='left'>
+                        <h2>Ingredients:</h2>
+                        <ul>{ingredients}</ul>
                     </div>
                     <h2 className="Direction">Directions:</h2>
                     <ol>{directions}</ol>
