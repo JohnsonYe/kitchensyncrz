@@ -22,7 +22,7 @@ class Cookbook extends Component {
             <div>
 
                 <div className="jumbotron">
-                    <h1>Cookbook</h1>
+                    <h1 className="text-white">Cookbook</h1>
                 </div>
                 <div className="container">
 

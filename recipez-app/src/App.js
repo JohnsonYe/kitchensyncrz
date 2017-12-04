@@ -19,6 +19,8 @@ import {
     Link,
 } from 'react-router-dom'
 
+//Jun
+import KSLogo from './Image/SplashScreen/LogoFinal2.png';
 
 //Components Pages
 import Footer from './components/footerComponent/footer';
@@ -119,7 +121,7 @@ class App extends Component {
     }
 
     render() {
-        var imgsrc = "http://www.free-icons-download.net/images/a-kitchen-icon-80780.png";
+        var imgsrc = KSLogo;
         {
             this.state.funMode ? imgsrc = "http://vignette1.wikia.nocookie.net/epicrapbattlesofhistory/images/c/c2/Peanut-butter-jelly-time.gif/revision/latest?cb=20141129150614" : null
         }

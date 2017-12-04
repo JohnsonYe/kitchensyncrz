@@ -337,7 +337,7 @@ class Search extends Component {
         return (
             <div onClick={this.closeAllDropdowns}>
             <div className="jumbotron">
-                <h1>Search</h1>
+                <h1 className="text-white">Search</h1>
             </div>
             <div className="container-fluid">
                 <div id='searchbar-toolbar-container'>

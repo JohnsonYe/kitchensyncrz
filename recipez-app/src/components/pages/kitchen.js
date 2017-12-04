@@ -563,7 +563,7 @@ class kitchen extends Component {
             <div>
 
                 <div className="jumbotron">
-                    <h1>Kitchen</h1>
+                    <h1 className="text-white">Kitchen</h1>
                 </div>
 
                 <div className="container">

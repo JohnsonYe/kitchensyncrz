@@ -289,7 +289,7 @@ class Planner extends Component {
         return (
             <div>
                 <div className="jumbotron jumbotron-fluid">
-                    <h1>Planner</h1>
+                    <h1 className="text-white">Planner</h1>
                 </div>
 
                 <div className="container-fluid">
