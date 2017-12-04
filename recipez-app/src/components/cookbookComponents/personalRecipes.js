@@ -63,12 +63,7 @@ class PersonalRecipes extends Component{
 
     createNewBlankRecipe(recipeName, imageURL) {
 
-        let images = new Set();
-        images.add(imageURL);
-        console.log('trying');
-        console.log(images);
-        let newRecipe = this.recipeHelper.createRecipe(recipeName, [], [], "", "", images);
-        console.log(newRecipe);
+        let newRecipe = this.recipeHelper.createRecipe(recipeName, [], [], "", "", [imageURL]);
         this.userInstance.saveCustomRecipe(newRecipe,this.getRecipeObjects);
         this.close();
 
@@ -130,6 +125,7 @@ class PersonalRecipes extends Component{
 
     updateRecipe(recipe) {
 
+        console.log(recipe);
         this.userInstance.saveCustomRecipe(recipe, () => {
 
         });

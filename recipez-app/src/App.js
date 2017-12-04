@@ -97,7 +97,7 @@ class App extends Component {
         //this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
-        // this.client.user = 'user001';
+        this.client.user = 'user001';
         User.getUser().reload();
         //alert(this.client.isLoggedIn());
     }
