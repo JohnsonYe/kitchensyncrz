@@ -16,7 +16,7 @@ import {Carousel} from 'react-bootstrap';
 
 class Recipe extends Component {
     constructor(props){
-        super(props)
+        super(props);
         this.state = {
             loaded:false,
             data:'Loading . . . ',
@@ -30,7 +30,7 @@ class Recipe extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         // this.reload = this.reload.bind(this);
-        this.User = User.getUser();
+        this.user = User.getUser();
     }
 
     setRecipeData(recipeObject,err){
@@ -55,7 +55,7 @@ class Recipe extends Component {
 
     handleSubmit(event) {
         alert('A comment was submitted: ' + this.state.value);
-        this.forceUpdate();
+        // this.forceUpdate();
         event.preventDefault();
     }
 
@@ -69,7 +69,7 @@ class Recipe extends Component {
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) => <li class="list-group-item">
                 <span className="ingredient-box">
-                    <button onClick={(e) => this.User.addToShoppingList(ingredient)} className="shopping button"
+                    <button onClick={(e) => this.user.addToShoppingList(ingredient)} className="shopping button"
                             type="button" class="btn btn-circle" id="shoppoing_cart">
                         <i class="glyphicon glyphicon-shopping-cart"/>
                     </button>
@@ -95,7 +95,7 @@ class Recipe extends Component {
             </li>)
 
         var updateComment = {
-            username: this.User.client.getUsername(),
+            username: this.user.client.getUsername(),
             Comment: this.state.value,
             Rating: '5',
             timestamp: '-1'
@@ -143,17 +143,17 @@ class Recipe extends Component {
                                 <div class="btn=group btn-group-lg">
                                     {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
                                     <button
-                                        onClick={(e) => User.getUser(this.User.client.getUsername()).getUserData('cookbook').then((data) => alert(JSON.stringify(data)))}
+                                        onClick={(e) => this.user.getUserData('cookbook').then((data) => alert(JSON.stringify(data)))}
                                         type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-check"/> check
                                     </button>
                                     <button
-                                        onClick={(e) => User.getUser(this.User.client.getUsername()).saveExternalRecipe(this.state.data.Name)}
+                                        onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
                                         type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-book"/> add to cookbook
                                     </button>
                                     <button
-                                        onClick={(e) => User.getUser(this.User.client.getUsername()).deleteRecipe(this.state.data.Name)}
+                                        onClick={(e) => this.user.deleteRecipe(this.state.data.Name)}
                                         type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-trash"/> remove from cookbook
                                     </button>

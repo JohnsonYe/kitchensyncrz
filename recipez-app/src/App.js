@@ -114,7 +114,7 @@ class App extends Component {
                 <div className="App">
                     <OffCanvas className="navbar" width='200' transitionDuration='300' isMenuOpened={this.state.isNavMenuOpened} position="left">
                         <OffCanvasBody className="navbar-icon">
-                            <a href="#" onClick={this.handleClick.bind(this)}>
+                            <div onClick={this.handleClick.bind(this)} style={{cursor:'pointer'}}>
                                 {this.state.isNavMenuOpened ?
                                     //set to null if you want banana man to kill himself
                                     <img className="ks-icon" src={imgsrc}/>
@@ -122,24 +122,24 @@ class App extends Component {
                                     :
                                     <img className="ks-icon" src={imgsrc}/>
                                 }
-                            </a>
+                            </div>
                         </OffCanvasBody>
                         <OffCanvasMenu className="navbar-menu">
                             <ul>
                                 <li className="first">
-                                    <Link to="/">Home</Link>
+                                    <Link to="/" onClick={this.closeNav}>Home</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Search">Browse</Link>
+                                    <Link to="/Search" onClick={this.closeNav}>Browse</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Cookbook">Cookbook</Link>
+                                    <Link to="/Cookbook" onClick={this.closeNav}>Cookbook</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Kitchen">Kitchen</Link>
+                                    <Link to="/Kitchen" onClick={this.closeNav}>Kitchen</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Planner">Planner</Link>
+                                    <Link to="/Planner" onClick={this.closeNav}>Planner</Link>
                                 </li>
                                 <li>
                                     {
