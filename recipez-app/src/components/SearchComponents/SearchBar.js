@@ -5,6 +5,7 @@
  * Description: modular searchbar component that provides autocomplete in a dropdown menu
  */
 import React, {Component} from 'react';
+import Util from '../classes/Util.js'
 import Autocomplete from '../classes/Autocomplete'
 
 class SearchBar extends Component{
@@ -195,11 +196,12 @@ class SearchBar extends Component{
 
 SearchBar.InternalClient = class{
     constructor(keyList){
-        this.autocomplete = new Autocomplete().loadList(keyList);
+        this.auto = Util.loadCompiledAutocompleteTree("Ingredients", "internal client" );
+        this.autocomplete = this.autocomplete.bind(this);
     }
 
     autocomplete(base,callback){
-        callback(this.autocomplete.getCompletion(base));
+        this.auto.then((auto)=>callback(auto.getCompletion(base)));
     }
 }
 

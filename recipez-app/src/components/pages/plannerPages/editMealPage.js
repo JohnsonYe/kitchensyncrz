@@ -19,7 +19,8 @@ function Duration(props) {
         <div>
             <div className="d-sm-inline-block">
                 <h4>{props.dur}</h4>
-            </div>&nbsp;
+            </div>
+            &nbsp;
             <div className="d-sm-inline-block">
                 <img
                     className="image-fluid"
@@ -37,26 +38,26 @@ function Duration(props) {
 function DaySelector(props) {
     return (
         <div className="mt-3">
-        <p>Select a day</p>
-        <DropdownButton
-            onSelect={props.handleClick}
-            title={props.btnTitle}
-            id="dropdown-no-caret"
-            noCaret>
-            <MenuItem eventKey="0">Sunday</MenuItem>
-            <MenuItem eventKey="1">Monday</MenuItem>
-            <MenuItem eventKey="2">Tuesday</MenuItem>
-            <MenuItem eventKey="3">Wednesday</MenuItem>
-            <MenuItem eventKey="4">Thursday</MenuItem>
-            <MenuItem eventKey="5">Friday</MenuItem>
-            <MenuItem eventKey="6">Saturday</MenuItem>
-        </DropdownButton>
+            <p>Select a day</p>
+            <DropdownButton
+                onSelect={props.handleClick}
+                title={props.btnTitle}
+                id="dropdown-no-caret"
+                noCaret>
+                <MenuItem eventKey="0">Sunday</MenuItem>
+                <MenuItem eventKey="1">Monday</MenuItem>
+                <MenuItem eventKey="2">Tuesday</MenuItem>
+                <MenuItem eventKey="3">Wednesday</MenuItem>
+                <MenuItem eventKey="4">Thursday</MenuItem>
+                <MenuItem eventKey="5">Friday</MenuItem>
+                <MenuItem eventKey="6">Saturday</MenuItem>
+            </DropdownButton>
         </div>
     );
 }
 
 function TimeSelector(props) {
-    return(
+    return (
         <div className="mt-3">
             <p>Select a starting time</p>
             <ButtonToolbar>
@@ -123,37 +124,37 @@ class MealEditor extends Component {
             hr,
             endTime = "calculating ...",
             day = 0,
-            days =  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-        if(this.props.data && this.props.day && this.props.mealIndex) {
+        if (this.props.data && this.props.day && this.props.mealIndex) {
             var strStartTime = this.plannerHelper.getMealStartTime(props.data, this.props.day, this.props.mealIndex);
             var colon = strStartTime.indexOf(":");
             console.log(strStartTime);
 
-            startHr = strStartTime.substring(0,colon);
+            startHr = strStartTime.substring(0, colon);
             startMin = strStartTime.substring(colon + 1, colon + 3);
-            endTime = this.plannerHelper.getMealEndTime(props.data ,this.props.day, this.props.mealIndex);
-            noon =  strStartTime.slice(-2);
+            endTime = this.plannerHelper.getMealEndTime(props.data, this.props.day, this.props.mealIndex);
+            noon = strStartTime.slice(-2);
             day = this.props.day;
 
         }
 
         //convert duration to min
         let dur = 0;
-        if(this.props.dur.length > 4) {
+        if (this.props.dur.length > 4) {
             let temp, temp2;
-            temp = this.props.dur.slice(0,2);
+            temp = this.props.dur.slice(0, 2);
             temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
 
             //total min
-            dur = parseInt(temp)*60 + parseInt(temp2);
-        }else {
+            dur = parseInt(temp) * 60 + parseInt(temp2);
+        } else {
             dur = parseInt(this.props.dur);
         }
 
         total = parseInt(startMin) + dur;
         hr = parseInt(startHr);
-        while( total >= 60) {
+        while (total >= 60) {
             total = total - 60;
             hr += 1;
         }
@@ -168,7 +169,7 @@ class MealEditor extends Component {
             hourOnBtn: startHr,
             minOnBtn: startMin,
             noonOnBtn: noon,
-            endtime: endHr+":"+endMin,
+            endtime: endHr + ":" + endMin,
             dur: dur  //duration in minutes
         };
 
@@ -187,22 +188,22 @@ class MealEditor extends Component {
 
     /** Updates day on button */
     handleDaySelection(evt) {
-        this.setState({ dayOnBtn: this.state.days[evt] });
+        this.setState({dayOnBtn: this.state.days[evt]});
     }
 
     /**Updates hour on button*/
     handleHourSelection(evt) {
-        this.setState( {hourOnBtn: evt} );
+        this.setState({hourOnBtn: evt});
     }
 
     /**Updates min on button*/
     handleMinSelection(evt) {
-        this.setState( {minOnBtn: evt} );
+        this.setState({minOnBtn: evt});
     }
 
     /** Updates noon on button */
     handleNoonSelection(evt) {
-        this.setState( {noonOnBtn: evt} );
+        this.setState({noonOnBtn: evt});
     }
 
 
@@ -219,19 +220,21 @@ class MealEditor extends Component {
     /** creates/overwrites meal to the meal */
     update(transform) {
         var user = User.getUser('user001');
-        user.getPlanner((planner)=>{
+        user.getPlanner((planner) => {
             planner = transform(planner);
             //if(thi.props.edit === true)
-                window.location.reload();
-            user.setPlanner(planner,()=> {console.log('success');});
+            window.location.reload();
+            user.setPlanner(planner, () => {
+                console.log('success');
+            });
         })
     }
 
     remove() {
-        let transform = (planner)=> {
+        let transform = (planner) => {
             this.plannerHelper.removeMeal(this.props.data,
-                                            this.props.day,
-                                            this.props.mealIndex);
+                this.props.day,
+                this.props.mealIndex);
             return this.props.data;
         };
         return transform;
@@ -242,20 +245,20 @@ class MealEditor extends Component {
             min = parseInt(this.state.minOnBtn);
 
         //convert to 24 hour
-        if(this.state.noonOnBtn === "pm") {
+        if (this.state.noonOnBtn === "pm") {
             hour = hour + 12;
-        }else if(this.state.noonOnBtn === "am" && hour === 12) {
+        } else if (this.state.noonOnBtn === "am" && hour === 12) {
             hour = hour - 12;
         }
 
-        let transform = (planner)=> {
+        let transform = (planner) => {
             this.plannerHelper.editMeal(this.props.data,
-                                        this.props.day,
-                                        this.props.mealIndex,
-                                        this.plannerHelper.createMeal(this.props.recipe,
-                                                                        this.state.dur,
-                                                                        hour,
-                                                                        min));
+                this.props.day,
+                this.props.mealIndex,
+                this.plannerHelper.createMeal(this.props.recipe,
+                    this.state.dur,
+                    hour,
+                    min));
             return this.props.data;
         };
         return transform;
@@ -266,36 +269,36 @@ class MealEditor extends Component {
             min = parseInt(this.state.minOnBtn);
 
         //convert to 24 hour
-        if(this.state.noonOnBtn === "pm" && hour != 12) {
+        if (this.state.noonOnBtn === "pm" && hour != 12) {
             hour = hour + 12;
-        }else if(this.state.noonOnBtn === "am" && hour === 12) {
+        } else if (this.state.noonOnBtn === "am" && hour === 12) {
             hour = hour - 12;
         }
 
-        let transform = (planner)=>{
-            this.plannerHelper.insertMeal( planner,
-                                            this.plannerHelper.createMeal(this.props.recipe,
-                                                                            this.state.dur,
-                                                                            hour,
-                                                                            min),
-                                            this.state.days.indexOf(this.state.dayOnBtn));
+        let transform = (planner) => {
+            this.plannerHelper.insertMeal(planner,
+                this.plannerHelper.createMeal(this.props.recipe,
+                    this.state.dur,
+                    hour,
+                    min),
+                this.state.days.indexOf(this.state.dayOnBtn));
             return planner;
         };
         return transform;
     }
 
     renderButtonToolBar() {
-        if(this.props.edit) {
+        if (this.props.edit) {
             return (
                 <ButtonToolbar>
-                    <Button onClick={(e)=>this.update(this.edit())}>Save</Button>
-                    <Button bsStyle="danger" onClick={(e)=>this.update(this.remove())}>Remove</Button>
+                    <Button onClick={(e) => this.update(this.edit())}>Save</Button>
+                    <Button bsStyle="danger" onClick={(e) => this.update(this.remove())}>Remove</Button>
                     <Button onClick={this.close}>Close</Button>
                 </ButtonToolbar>
             );
-        }else return(
+        } else return (
             <ButtonToolbar>
-                <Button onClick={(e)=>this.update(this.add())}>Add</Button>
+                <Button onClick={(e) => this.update(this.add())}>Add</Button>
                 <Button onClick={this.close}>Close</Button>
             </ButtonToolbar>
         );
@@ -312,17 +315,17 @@ class MealEditor extends Component {
             ),
             addButton = (
                 <a className="btn btn-light"
-                    onClick={this.open}>
+                   onClick={this.open}>
                     <img alt="planner"
                          width="18"
                          height="18"
-                         src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
+                         src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png"/>
                     Plan Meal
                 </a>
             ),
             button;
 
-        if(this.props.edit == true) {
+        if (this.props.edit == true) {
             button = editButton;
         }
         else {
@@ -332,49 +335,49 @@ class MealEditor extends Component {
         return (
             <div>
                 {button}
-            <Modal show={this.state.showEditor} onHide={this.close}>
-                <Modal.Header>{this.props.recipe}</Modal.Header>
-                <Modal.Body>
-                    <figure>
-                        <a href ={"/Recipes/" + this.props.recipe}>
-                            <img
-                                className="img-fluid"
-                                src={this.props.url}
-                                alt="No Image"
-                            />
-                        </a>
-                    </figure>
+                <Modal show={this.state.showEditor} onHide={this.close}>
+                    <Modal.Header>{this.props.recipe}</Modal.Header>
+                    <Modal.Body>
+                        <figure>
+                            <a href={"/Recipes/" + this.props.recipe}>
+                                <img
+                                    className="img-fluid"
+                                    src={this.props.url}
+                                    alt="No Image"
+                                />
+                            </a>
+                        </figure>
 
-                    <Duration dur={this.props.dur}/>
-                    <div className="border
+                        <Duration dur={this.props.dur}/>
+                        <div className="border
                                     border-dark
                                     border-top-0
                                     border-right-0
                                     border-left-0
                                     mb-2">
-                        <h2>Meal Info</h2>
-                    </div>
-                    <DaySelector
-                        handleClick={this.handleDaySelection}
-                        btnTitle={this.state.dayOnBtn}
-                    />
-                    <TimeSelector
-                        handleHour={this.handleHourSelection}
-                        handleMin={this.handleMinSelection}
-                        handleNoon={this.handleNoonSelection}
-                        hour={this.state.hourOnBtn}
-                        min={this.state.minOnBtn}
-                        noon={this.state.noonOnBtn}
-                    />
+                            <h2>Meal Info</h2>
+                        </div>
+                        <DaySelector
+                            handleClick={this.handleDaySelection}
+                            btnTitle={this.state.dayOnBtn}
+                        />
+                        <TimeSelector
+                            handleHour={this.handleHourSelection}
+                            handleMin={this.handleMinSelection}
+                            handleNoon={this.handleNoonSelection}
+                            hour={this.state.hourOnBtn}
+                            min={this.state.minOnBtn}
+                            noon={this.state.noonOnBtn}
+                        />
 
-                    <div className="mt-3">
-                    <p>Your meal should be ready at {this.state.endtime}.</p>
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    {this.renderButtonToolBar()}
-                </Modal.Footer>
-            </Modal>
+                        <div className="mt-3">
+                            <p>Your meal should be ready at {this.state.endtime}.</p>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        {this.renderButtonToolBar()}
+                    </Modal.Footer>
+                </Modal>
             </div>
         );
     }

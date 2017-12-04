@@ -16,8 +16,8 @@ import {
 import DBClient from "../../classes/AWSDatabaseClient";
 import User from "../../classes/User";
 
-class Register extends Component{
-    constructor(props){
+class Register extends Component {
+    constructor(props) {
         super(props);
 
         this.client = DBClient.getClient();
@@ -35,7 +35,7 @@ class Register extends Component{
 
     handleSubmit = async event => {
 
-        if(this.state.password == this.state.confirmpassword){
+        if (this.state.password == this.state.confirmpassword) {
             try {
                 const newUser = await this.client.register(this.state.userName, this.state.password, this.state.email);
                 this.setState({
@@ -44,10 +44,10 @@ class Register extends Component{
 
                 //alert("Registered!");
             } catch (e) {
-                alert('submit: '+e);
+                alert('submit: ' + e);
             }
         }
-        else{
+        else {
             alert("Passwords do not match! Please try again.");
         }
 
@@ -66,10 +66,10 @@ class Register extends Component{
             this.client.authenticated = true;
             this.client.user = this.state.userName;
             this.client.authUser();
-            this.user.createUser(this.state.userName,()=>User.getUser().reload());
+            this.user.createUser(this.state.userName, () => User.getUser().reload());
             this.props.history.push("/Search");
         } catch (e) {
-            alert('confirmation: '+e);
+            alert('confirmation: ' + e);
         }
     };
 
@@ -83,22 +83,22 @@ class Register extends Component{
     }
 
     handleKeyEnter = (e) => {
-        if(e.charCode === 13) {
-            if(!this.validateForm()){
+        if (e.charCode === 13) {
+            if (!this.validateForm()) {
                 alert("Please fill out all fields!");
             }
-            else{
+            else {
                 this.handleSubmit();
             }
         }
     };
 
     handleKeyEnterConfirmation = (e) => {
-        if(e.charCode === 13) {
-            if(!this.validateConfirmationForm()){
+        if (e.charCode === 13) {
+            if (!this.validateConfirmationForm()) {
                 alert("Please enter a code!");
             }
-            else{
+            else {
                 this.handleConfirmationSubmit();
             }
         }
@@ -106,7 +106,7 @@ class Register extends Component{
 
     renderConfirmationForm() {
 
-        return(
+        return (
             <div>
                 <div className="jumbotron">
                     <h1>Email Confirmation</h1>
@@ -120,14 +120,15 @@ class Register extends Component{
                                     <input type="password" value={this.state.confirmationCode}
                                            onChange={e => this.setState({confirmationCode: e.target.value})}
                                            onKeyPress={this.handleKeyEnterConfirmation}
-                                           className="form-control" id="pwd2" />
+                                           className="form-control" id="pwd2"/>
                                 </div>
                                 <button onClick={this.handleConfirmationSubmit}
                                         disabled={!this.validateConfirmationForm()}
-                                        type="submit" className="btn btn-primary .mx-auto">Confirm Email</button>
+                                        type="submit" className="btn btn-primary .mx-auto">Confirm Email
+                                </button>
                                 <p>Check your email for confirmation code.</p>
-                                <br />
-                                <br />
+                                <br/>
+                                <br/>
                             </div>
                         </div>
                     </div>
@@ -138,7 +139,7 @@ class Register extends Component{
 
     renderRegisterForm() {
 
-        return(
+        return (
             <div>
                 <div className="jumbotron">
                     <h1>Register</h1>
@@ -153,35 +154,36 @@ class Register extends Component{
                                            bsSize="large"
                                            onChange={e => this.setState({userName: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control" id="userName" />
+                                           className="form-control" id="userName"/>
                                 </div>
                                 <div className="form-group">
                                     <label for="email">Email Address:</label>
                                     <input type="text" value={this.state.email}
                                            onChange={e => this.setState({email: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control" id="email" />
+                                           className="form-control" id="email"/>
                                 </div>
                                 <div className="form-group .mx-auto">
                                     <label for="pwd">Password:</label>
                                     <input type="password" value={this.state.password}
                                            onChange={e => this.setState({password: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control" id="pwd" />
+                                           className="form-control" id="pwd"/>
                                 </div>
                                 <div className="form-group .mx-auto">
                                     <label for="pwd2">Confirm Password:</label>
                                     <input type="password" value={this.state.confirmpassword}
                                            onChange={e => this.setState({confirmpassword: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control" id="pwd2" />
+                                           className="form-control" id="pwd2"/>
                                 </div>
                                 <button onClick={this.handleSubmit}
                                         disabled={!this.validateForm()}
-                                        type="submit" className="btn-med btn-primary .mx-auto">Register</button>
-                                <br />
-                                <br />
-                                
+                                        type="submit" className="btn-med btn-primary .mx-auto">Register
+                                </button>
+                                <br/>
+                                <br/>
+
                                 <p>Already have an account? Click <Link to="/SignIn">here</Link> to Sign In!</p>
                             </div>
                         </div>
@@ -193,7 +195,7 @@ class Register extends Component{
 
     render() {
         return (
-            <div >
+            <div>
                 {this.state.newUser === null
                     ? this.renderRegisterForm()
                     : this.renderConfirmationForm()}

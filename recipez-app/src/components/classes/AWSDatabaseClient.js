@@ -5,7 +5,7 @@
  * Description: This file will serve as the database access client
  */
  import AWS from 'aws-sdk';
- // import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
+// import AWSCognito from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
 
  /**
   * THIS IS A SINGLETON CLASS.
@@ -79,7 +79,7 @@ var MAX_REQUEST_LENGTH = 100;
             'S': (s,p)=>({'S':s}),
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
-            'SS':(ss,p)=>({'SS':ss}),
+            'SS':(ss,p)=>({'SS':Array.from(ss)}),
             'N': (n,p)=>({'N':n+''}),
         }
 

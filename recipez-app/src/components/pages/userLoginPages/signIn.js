@@ -17,17 +17,17 @@ import DBClient from "../../classes/AWSDatabaseClient";
 import User from "../../classes/User";
 
 
-class SignIn extends Component{
+class SignIn extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.client = DBClient.getClient();
-        this.user = 
-        this.state = {
-            userName: '',
-            password: '',
-        }
+        this.user =
+            this.state = {
+                userName: '',
+                password: '',
+            }
     }
 
     handleSubmit = async event => {
@@ -39,7 +39,7 @@ class SignIn extends Component{
             //alert(this.client.getUsername());
             this.props.history.push("/Search");
         } catch (e) {
-            alert('signin submit: '+e);
+            alert('signin submit: ' + e);
         }
     };
 
@@ -48,11 +48,11 @@ class SignIn extends Component{
     }
 
     handleKeyEnter = (e) => {
-        if(e.charCode === 13) {
-            if(!this.validateForm()){
+        if (e.charCode === 13) {
+            if (!this.validateForm()) {
                 alert("Please fill out all the fields!");
             }
-            else{
+            else {
                 this.handleSubmit();
             }
         }
@@ -61,7 +61,7 @@ class SignIn extends Component{
 
     render() {
 
-        return(
+        return (
             <div>
                 <div className="jumbotron">
                     <h1>Sign In</h1>
@@ -75,22 +75,23 @@ class SignIn extends Component{
                                     <input type="text" value={this.state.userName}
                                            onChange={e => this.setState({userName: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control" id="userName" />
+                                           className="form-control" id="userName"/>
                                 </div>
                                 <div className="form-group">
                                     <label for="pwd">Password:</label>
                                     <input type="password" value={this.state.password}
                                            onChange={e => this.setState({password: e.target.value})}
                                            onKeyPress={this.handleKeyEnter}
-                                           className="form-control input-lg" id="pwd" />
+                                           className="form-control input-lg" id="pwd"/>
                                 </div>
                                 <button onClick={this.handleSubmit}
                                         disabled={!this.validateForm()}
-                                        type="submit" className="btn-med btn-primary">Login</button>
-                                <br />
-                                <br />
+                                        type="submit" className="btn-med btn-primary">Login
+                                </button>
+                                <br/>
+                                <br/>
                                 <p>Don’t have an account? Click <Link to="/Register">here</Link> to Register!</p>
-                                
+
                             </div>
                         </div>
                     </div>

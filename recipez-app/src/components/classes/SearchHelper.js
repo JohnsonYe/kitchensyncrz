@@ -8,6 +8,7 @@ import DBClient from "./AWSDatabaseClient"
 import RecipeHelper from "./RecipeHelper"
 import Autocomplete from '../classes/Autocomplete';
 import JSZip from 'jszip'
+import Util from "../classes/Util";
 
 
  class SearchHelper {
@@ -30,13 +31,15 @@ import JSZip from 'jszip'
 
         let zip = new JSZip();
         //I lOvE aSyNc ChAiNiNg CoMpOsItIoN
-        this.asyncCompletions = this.client.getDBItemPromise('Miscellaneous','Name',['IngredientsTree']) //async
-            .then((payload)=>payload[0].Data.B)
-            .then((binary)=>zip.loadAsync(binary,{base64:true})) //more async
-            .then((file)=>zip.file('Ingredients.tst').async('string')) //MORE ASYNC
-            .then((json)=>new Autocomplete().loadJSON(json))
-            .then((autocomplete)=>{console.log('Finished loading autocomplete in searchbar: ');return autocomplete})
+        // this.asyncCompletions = this.client.getDBItemPromise('Miscellaneous','Name',['IngredientsTree']) //async
+        //     .then((payload)=>payload[0].Data.B)
+        //     .then((binary)=>zip.loadAsync(binary,{base64:true})) //more async
+        //     .then((file)=>zip.file('Ingredients.tst').async('string')) //MORE ASYNC
+        //     .then((json)=>new Autocomplete().loadJSON(json))
+        //     .then((autocomplete)=>{console.log('Finished loading autocomplete in searchbar: ');return autocomplete})
             // .catch((err)=>err)
+            //
+        this.asyncCompletions = Util.loadCompiledAutocompleteTree('Ingredients','searchbar');
     }
 
     hasIngredient(ingredient){

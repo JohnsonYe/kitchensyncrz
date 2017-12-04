@@ -119,10 +119,10 @@ class Recipe extends Component {
                         <div class="col-sm-3">
                             <div class="row" className="row-height-for-time">
                                 <h2><i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}
-                                <h2><i class="glyphicon glyphicon-wrench"/>&nbsp;&nbsp;{this.state.data.Difficulty}</h2></h2>
+                                    <h2><i class="glyphicon glyphicon-wrench"/>&nbsp;&nbsp;{this.state.data.Difficulty}</h2></h2>
                             </div>
                             <div class="row">
-                            {/*====button group====*/}
+                                {/*====button group====*/}
                                 <div class="btn=group btn-group-lg">
                                     {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
                                     <button onClick={(e)=>User.getUser(this.User.client.getUsername()).getUserData('cookbook').then((data)=>alert(JSON.stringify(data)))} type={"button"} class="btn btn-outline-primary">
@@ -132,23 +132,23 @@ class Recipe extends Component {
                                     <button onClick={(e)=>User.getUser(this.User.client.getUsername()).deleteRecipe(this.state.data.Name)} type={"button"} class="btn btn-outline-primary">
                                         <i class="glyphicon glyphicon-trash"/>  remove from cookbook  </button>
                                 </div>
-                            {/*====button group====*/}
+                                {/*====button group====*/}
                             </div>
                         </div>
 
                         <div class="col">
-                        <div class="row">
-                            <div class="col-sm-6" className="Ingredient">
-                                <h2>Ingredients:</h2>
-                                <ul>{ingredients}</ul>
+                            <div class="row">
+                                <div class="col-sm-6" className="Ingredient">
+                                    <h2>Ingredients:</h2>
+                                    <ul>{ingredients}</ul>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <h2 className="Direction">Directions:</h2>
-                        </div>
-                        <div class="row">
-                            <ol>{directions}</ol>
-                        </div></div>
+                            <div class="row">
+                                <h2 className="Direction">Directions:</h2>
+                            </div>
+                            <div class="row">
+                                <ol>{directions}</ol>
+                            </div></div>
                     </div>
                     <div>
                         {/* Nav bar content here */}

@@ -4,8 +4,8 @@
  * Date Created: 11/7/2017
  * Description: This file will serve as the autocomplete engine for finding valid database keys
  */
-class Autocomplete{
-    constructor(binary){
+class Autocomplete {
+    constructor(binary) {
         this.insert = this.insert.bind(this)
         this.chainBuild = this.chainBuild.bind(this);
         this.getNode = this.getNode.bind(this);
@@ -120,7 +120,7 @@ class Autocomplete{
         }
         if(node.c){
             // console.log(JSON.stringify(base))
-            result = result.concat(this.dfs(node.c,base))
+            result = result.concat(this.dfs(node.c, base))
         } else {
             // console.log(base.join(''))
             result = result.concat(base.join(''))

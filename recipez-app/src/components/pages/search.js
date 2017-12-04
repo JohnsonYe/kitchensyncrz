@@ -40,7 +40,7 @@ class Search extends Component {
 
         this.planner = new PlannerHelper();
 
-        this.user = new User();
+        this.user = User.getUser();
 
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
@@ -131,7 +131,7 @@ class Search extends Component {
         this.ingredient = ingredient;
     }
     updateState(sortedResults,value,status){
-        
+
         this.setState({
             sorted:sortedResults,
             ...this.updateIngredientState(value,status)
