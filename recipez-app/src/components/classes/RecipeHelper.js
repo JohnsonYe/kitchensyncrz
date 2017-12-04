@@ -42,7 +42,7 @@ import User from '../classes/User';
       *      }
       * }
       */
-     createRecipe(name, ingredients, directions, duration, difficulty) {
+     createRecipe(name, ingredients, directions, duration, difficulty, imageURL) {
         return {
             Name: name,
             Author: this.client.getUsername(),
@@ -51,6 +51,7 @@ import User from '../classes/User';
             Reviews:{},
             TimeCost: duration,
             Difficulty: difficulty,
+            Image: [imageURL],
         }
     }
 

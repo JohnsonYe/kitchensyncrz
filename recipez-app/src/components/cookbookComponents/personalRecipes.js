@@ -61,18 +61,18 @@ class PersonalRecipes extends Component{
         });
     }
 
-    createNewBlankRecipe(recipeName){
+    createNewBlankRecipe(recipeName, imageURL) {
 
-        let newRecipe = this.recipeHelper.createRecipe(recipeName, "", "");
+        let newRecipe = this.recipeHelper.createRecipe(recipeName, [], [], 0, 0, imageURL);
         this.userInstance.saveCustomRecipe(newRecipe,this.getRecipeObjects);
         this.close();
 
     }
 
-    updateRecipe(recipeName, ingredients, directions) {
-        let updatedRecipe = this.recipeHelper.createRecipe(recipeName, ingredients, directions);
-        this.userInstance.saveCustomRecipe(updatedRecipe, () => this.getRecipeObjects());
-    }
+    // updateRecipe(recipeName, ingredients, directions) {
+    //     let updatedRecipe = this.recipeHelper.createRecipe(recipeName, ingredients, directions);
+    //     this.userInstance.saveCustomRecipe(updatedRecipe, () => this.getRecipeObjects());
+    // }
 
     // Had to change to arrow func to get it to bind properly... should work?
     removeRecipe = (recipeName) => {
@@ -107,7 +107,7 @@ class PersonalRecipes extends Component{
 
         this.recipeHelper.loadRecipe(recipeName,(recipe)=>{
             if (!recipe) {
-                this.createNewBlankRecipe(this.state.value);
+                this.createNewBlankRecipe(this.state.value, this.state.url);
                 this.setState({
                     validation: '',
                     value: '',

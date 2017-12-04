@@ -6,7 +6,7 @@
  */
 
 import React, {Component} from 'react';
-import {Modal, FormGroup, FormControl, ControlLabel, InputGroup} from 'react-bootstrap';
+import {Modal, FormGroup, FormControl, ControlLabel, InputGroup, Image} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import IngredientForm from './IngredientForm';
 import RecipeHelper from '../classes/RecipeHelper';
@@ -389,13 +389,23 @@ class PreviewCard extends Component{
                 </div>
             </div>
         ;
-
+        let image;
+        if (this.props.src.Image) {
+            image = this.props.src.Image[0];
+        } else {
+            image = require("./gary.jpg");
+        }
+        console.log("this is iamge");
+        console.log(image);
         return (
             <div className={"col-md-3"}>
                 <div className="card recipes">
                     <Link to={this.props.personal ? '/Recipes/'+this.props.src.Author+'/'+this.props.src.Name : '/Recipes/'+this.props.src.Name}>
 
-                        <img className="card-img-top" src={this.noImg} alt="Food"/>
+                        <div style={{backgroundColor: '#FFFFFF'}}>
+                            <Image style={{height: '200px', width: 'auto', margin: 'auto',}} responsive
+                                   className="card-img-top" src={image}/>
+                        </div>
                     </Link>
 
                     <div className="card-body">
