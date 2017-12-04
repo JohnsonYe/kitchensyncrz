@@ -90,8 +90,8 @@ class SearchThumbail extends Component {
                     
                     </a>
                     <div className="col-4">
-                        {/*<MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
-                        duration={this.props.data.TimeCost} />*/}
+                        <MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
+                        dur={this.props.data.TimeCost} />
                     </div>
                 </div>
 
