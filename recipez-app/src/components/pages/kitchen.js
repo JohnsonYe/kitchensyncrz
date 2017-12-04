@@ -145,6 +145,7 @@ class kitchen extends Component {
 
     internalClient(){
         return new SearchBar.InternalClient();
+
     }
 
     // Read the json file
