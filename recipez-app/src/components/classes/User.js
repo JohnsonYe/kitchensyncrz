@@ -78,6 +78,7 @@
             } else {
                 this.userData = null
                 // alert('rejected!')
+                console.error(response.payload)
                 reject('Failed to load user data!')
             }
             /*; alert(JSON.stringify(this.userData))*/})
