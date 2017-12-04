@@ -94,7 +94,7 @@ class App extends Component {
     }
 
     handleLogout = event => {
-        this.handleClick();
+        //this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
         this.client.user = 'user001';
@@ -143,7 +143,8 @@ class App extends Component {
                                     {
                                         this.client.authenticated ? 
                                         <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> : 
-                                        <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
+                                        <Link to='/SignIn' onClick={this.handleClick.bind(this)}
+                                        >Sign in</Link>
                                     }
                                 </li>
                             </ul>
