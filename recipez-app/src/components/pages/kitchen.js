@@ -172,7 +172,7 @@ class kitchen extends Component {
                 case("Grain"):
                     this.addFruit(key[0]);
                     break;
-                case("Other"):
+                case("from shopping list"):
                     this.addOther(key[0]);
                     break;
                 case("Restock"):
@@ -374,7 +374,7 @@ class kitchen extends Component {
     addOther(val){
         this.setState({other: this.state.other.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "Other", 1);
+        this.user.addToPantry(val, "from shopping list", 1);
     }
 
     removeOther(val){
@@ -503,7 +503,7 @@ class kitchen extends Component {
                 case "Grain":
                     this.addGrain(val);
                     break;
-                case "Other":
+                case "from shopping list":
                     this.addOther(val);
                     break;
                 default:
@@ -719,7 +719,7 @@ class kitchen extends Component {
                                                 Grain
                                             </NavItem>
                                             <NavItem eventKey="Other">
-                                                Other
+                                                Shopping List
                                             </NavItem>
                                         </Nav>
                                     </div>

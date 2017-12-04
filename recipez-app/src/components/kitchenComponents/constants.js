@@ -193,7 +193,7 @@ export const ItemForm = ( {addProtein,
                     case "Grain":
                         addGrain(this.searchbar.getValue());
                         break;
-                    case "Other":
+                    case "from shopping list":
                         addOther(this.searchbar.getValue());
                         break;
                     default:
