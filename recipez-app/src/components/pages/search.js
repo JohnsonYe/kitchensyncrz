@@ -451,7 +451,7 @@ class Search extends Component {
                      <ul className="list-group search-results">
                         {this.state.sorted.map((recipe)=>(
                             <li className="list-group-item">
-                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
+                                <Link to={'/Recipes/'+recipe[0]}>{recipe[0]}</Link>
                                 {(()=>{// (IIFE) --> conditionally display recipe info, if it is loaded
                                     let data = this.state.loadedRecipes.get(recipe[0]);
                                     if(data){

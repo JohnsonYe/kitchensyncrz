@@ -46,6 +46,7 @@ class User {
     }
 
     reload(){
+        console.log('reloaded user data: '+this.client.getUsername());
         this.loadStream = new Promise(this.loadUserData)
     }
 
