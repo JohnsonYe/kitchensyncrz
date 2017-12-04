@@ -95,9 +95,9 @@ class Search extends Component {
     }
     componentWillMount(){
         window.addEventListener('click', this.closeAllDropdowns);
-        this.startLoading();
         this.client.setRecipeLoaderSource(this.getRecipeLoader); //pass the client an anonymous function that gives it the most recent loader
         if(this.state.ingredients.size||this.state.excluded.size){
+            this.startLoading();
             //batch load all the ingredients from the URI
             this.client.batchLoadIngredients(Array.from(this.state.ingredients).concat(Array.from(this.state.excluded)))
             // use a promise.all to wait for all ingredients to load asynchronously
@@ -255,7 +255,7 @@ class Search extends Component {
         this.startLoading();
         this.closeAllDropdowns()
         if(filter === "custom"){ //special actions based on user preferences
-            
+            this.doneLoading();
         } else {
             this.client.setFilter(filter,this.searchUpdateWrapper());
         }

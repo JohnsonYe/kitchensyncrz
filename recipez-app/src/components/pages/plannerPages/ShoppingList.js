@@ -29,7 +29,7 @@ class ShoppingList extends Component{
     }
 
     handleTransition(e,name){
-        console.log(e.propertyName)
+        // console.log(e.propertyName)
         if(e.propertyName === 'margin-left'){
             if(this.state.buying === name){
                 this.buyShoppingListItem(name);
