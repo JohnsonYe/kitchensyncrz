@@ -26,7 +26,6 @@ class PlannerHelper{
         //if meals has not been instantiated
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
-            return true;
         }
 
         var startHr = meal.startHr,
@@ -89,7 +88,6 @@ class PlannerHelper{
         //if mealIndex is out of bound then add to the end
         if(mealIndex === meals.length) {
             data.days[day].mealData.push(meal);
-            return true;
         }
 
         let dstartHr = 0,
@@ -123,18 +121,15 @@ class PlannerHelper{
         if ( endHr < dstartHr) {
             console.log("pushed");
             data.days[day].mealData.splice(mealIndex, 0, meal);
-            return true;
         }
         else if( endHr === dstartHr ) {
             if( endMin < dstartMin) {
                 console.log("pushed");
                 data.days[day].mealData.splice(mealIndex, 0, meal);
             }
-            return true;
         }
         else {
             alert("Your meal cannot be added because it conflicts with another scheduled meal.");
-            return false;
         }
     }
      /**
@@ -185,11 +180,9 @@ class PlannerHelper{
      * @param meal - new meal object to replace the old one.
      */
     editMeal(data, day, mealIndex, meal, newDay) {
-        // check if meal exist
-        if(this.insertMeal(data, meal, newDay)) {
-            //alert("got here");
-            this.removeMeal(data, day, mealIndex);
-        }
+
+        this.removeMeal(data, day, mealIndex);
+        this.insertMeal(data, meal, newDay);
     }
 
 
