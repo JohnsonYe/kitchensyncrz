@@ -8,7 +8,7 @@
 import React, {Component} from 'react';
 import PreviewCard from './previewCard.js';
 import RecipeHelper from '../classes/RecipeHelper.js'
-import AndrewPreviewCard from './andrew_previewCard.js';
+// import AndrewPreviewCard from './andrew_previewCard.js';
 
 //TODO: Make some sort of function to automatically add and display preview cards
 class SavedRecipes extends Component{
@@ -64,7 +64,7 @@ class SavedRecipes extends Component{
          for( let recipe of this.state.recipeList){
              recipeCards.push(<PreviewCard src={recipe} removeFunc={this.removeRecipe} personal={0}/>);
         }
-
+        console.log(recipeCards);
         return(
             <div>
                 <div className={"row"}>

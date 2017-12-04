@@ -7,9 +7,10 @@
 
 import React, {Component} from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
-import AndrewPreviewCard from '../cookbookComponents/andrew_previewCard'
+// import AndrewPreviewCard from '../cookbookComponents/andrew_previewCard'
 import {FormGroup,FormControl,HelpBlock,ControlLabel,Modal} from 'react-bootstrap';
 import RecipeHelper from '../classes/RecipeHelper.js';
+
 
 // TODO: Some sort of function to automatically add and display preview cards
 class PersonalRecipes extends Component{
@@ -26,11 +27,14 @@ class PersonalRecipes extends Component{
         this.handleChange = this.handleChange.bind(this);
         this.updateRecipe = this.updateRecipe.bind(this);
 
+        this.handleImgChange = this.handleImgChange.bind(this);
+
         this.state = {
             recipeList: [],
             modal: false,
             value: '',
             validation:'',
+            url: '',
         };
 
         this.userInstance = props.userInstance;
@@ -128,6 +132,13 @@ class PersonalRecipes extends Component{
         this.setState({ value: e.target.value });
     }
 
+    handleImgChange(e){
+        this.setState({ url: e.target.url });
+    }
+
+
+
+
     render(){
 
         let recipeCards = [];
@@ -164,6 +175,25 @@ class PersonalRecipes extends Component{
             </form>
         ;
 
+        let imgForm =
+            <form onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                }
+            }}>
+                <FormGroup controlId="formBasicText">
+                    <FormControl
+                        type={"text"}
+                        url={this.state.url}
+                        placeholder="Enter Image URL"
+                        onChange={this.handleImgChange}
+                        />
+                    <FormControl.Feedback />
+                </FormGroup>
+            </form>
+
+
+
         return(
             <div>
 
@@ -185,6 +215,12 @@ class PersonalRecipes extends Component{
 
                     <Modal.Body>
                         {form}
+                        {imgForm}
+                        <img src={this.state.url}
+                             alt="URL Not Found"
+                             height={300}
+                             width={300} />
+
                     </Modal.Body>
                     <Modal.Footer>
                         <div>

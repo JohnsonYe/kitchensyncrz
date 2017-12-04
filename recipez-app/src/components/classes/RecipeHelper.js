@@ -151,7 +151,8 @@ import User from '../classes/User';
     Reviews:{type:'M',inner:{type:RecipeHelper.ReviewPrototype._NAME}},
     Author:{type:'S'},
     Difficulty:{type:'N'},
-    TimeCost:{type:'N'}
+    TimeCost:{type:'N'},
+     Image:{type:'SS'},
  }
 
  //============================================================================================
