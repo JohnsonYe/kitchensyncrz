@@ -129,7 +129,7 @@ class Recipe extends Component {
         return (
             <div>
                 <div className="jumbotron">
-                    <h1>Kitchen Sync</h1>
+                    <h1 className="text-white">Kitchen Sync</h1>
                 </div>
                 <h1 className="PageHeader">{this.state.data.Name}</h1>
                 <br/>

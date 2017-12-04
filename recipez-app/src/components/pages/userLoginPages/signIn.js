@@ -64,7 +64,7 @@ class SignIn extends Component {
         return (
             <div>
                 <div className="jumbotron">
-                    <h1>Sign In</h1>
+                    <h1 className="text-white">Sign In</h1>
                 </div>
                 <div className="container">
                     <div className="row">

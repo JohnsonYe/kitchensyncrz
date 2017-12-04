@@ -109,7 +109,7 @@ class Register extends Component {
         return (
             <div>
                 <div className="jumbotron">
-                    <h1>Email Confirmation</h1>
+                    <h1 className="text-white">Email Confirmation</h1>
                 </div>
                 <div className="container">
                     <div className="row">
@@ -142,7 +142,7 @@ class Register extends Component {
         return (
             <div>
                 <div className="jumbotron">
-                    <h1>Register</h1>
+                    <h1 className="text-white">Register</h1>
                 </div>
                 <div className="container">
                     <div className="row">
