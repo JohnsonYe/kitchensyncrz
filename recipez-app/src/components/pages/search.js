@@ -14,6 +14,7 @@ import PlannerHelper from '../classes/Planner';
 import User from '../classes/User';
 
 import SearchBar from '../SearchComponents/SearchBar';
+import SearchThumbnail from '../SearchComponents/SearchThumbnail';
 
 const CLEAR_SEARCH = 99;
 const ADD_MULTIPLE = 98;
@@ -35,9 +36,12 @@ class Search extends Component {
         this.mortensButton = this.mortensButton.bind(this);
         this.mortensButton2 = this.mortensButton2.bind(this);
 
+        this.toggleThumbnails = this.toggleThumbnails.bind(this);
+
         this.planner = new PlannerHelper();
 
-        this.user = User.getUser();
+        this.user = new User();
+
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.dropdownState = this.dropdownState.bind(this);
         this.closeAllDropdowns = this.closeAllDropdowns.bind(this);
@@ -45,6 +49,7 @@ class Search extends Component {
         this.handleReject = this.handleReject.bind(this);
         this.setFilter = this.setFilter.bind(this);
         this.getFilterButton = this.getFilterButton.bind(this);
+
         this.clearSearch = this.clearSearch.bind(this);
 
         this.updateLoader = this.updateLoader.bind(this);
@@ -65,6 +70,7 @@ class Search extends Component {
             dropdown:{ingredients:false,filters:false},
             sorted:[],
             loadedRecipes:new Map(),
+            viewThumbnails: true
         };
 
         this.recipeLoader = Promise.resolve(new Map()) //set up an async chain for loading recipe info
@@ -125,7 +131,7 @@ class Search extends Component {
         this.ingredient = ingredient;
     }
     updateState(sortedResults,value,status){
-
+        
         this.setState({
             sorted:sortedResults,
             ...this.updateIngredientState(value,status)
@@ -268,13 +274,15 @@ class Search extends Component {
         //this.user.addToExclusionList('corn')                                                              // THIS WORKS
         //this.user.removeFromExclusionList('corn')                                                         // THIS WORKS
 
-
         //this.user.getShoppingList(shoppingList=> this.setState({morten:JSON.stringify(shoppingList)}))    // THIS WORKS
         //this.user.addToShoppingList('milk')                                                               // THIS WORKS
         //this.user.removeFromShoppingList('milk')                                                          // THIS WORKS
 
     }
 
+    toggleThumbnails(){
+        this.setState({ viewThumbnails: !this.state.viewThumbnails })
+    }
     addFromPantry(e){
         console.log("Adding from user pantry . . .")
 
@@ -331,11 +339,6 @@ class Search extends Component {
                 <div className="jumbotron">
                     <h1>Search</h1>
                 </div>
-                <div>
-                    <h3>{this.state.morten}</h3>
-                    <button onClick={this.mortensButton}>Mortens Button</button>
-                    <button onClick={this.mortensButton2}>Mortens Button2</button>
-                </div>
                 <div className="container-fluid">
                     <div id='searchbar-toolbar-container'>
                         <form onSubmit={this.handleSubmit} ref="form">
@@ -364,23 +367,23 @@ class Search extends Component {
 
                                     </div>
                                 </div>
-                                <SearchBar form={this.refs.form} client={this.client} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
+                                <SearchBar client={this.client} callback={this.addIngredient} id='searchbar' ref={(searchbar)=>{this.searchbar = searchbar}}/>
                                 <span className='input-group-btn'>
-                                <button className='btn btn-success' type='button submit'>
-                                    <span className="glyphicon glyphicon-plus-sign"></span>
-                                </button>
-                            </span>
+                                    <button className='btn btn-success' type='button submit' title="Include Ingredient">
+                                        <span className="glyphicon glyphicon-plus-sign"></span>
+                                    </button>
+                                </span>
                                 <span className='input-group-btn'>
-                                <button className='btn btn-danger' type='button' onClick={this.handleReject}>
-                                    <span className="glyphicon glyphicon-ban-circle"></span>
-                                </button>
-                            </span>
+                                    <button className='btn btn-danger' type='button' onClick={this.handleReject} title="Exclude Ingredient">
+                                        <span className="glyphicon glyphicon-ban-circle"></span>
+                                    </button>
+                                </span>
                                 <div className={this.dropdownState('filters','input-group-btn')+' no-wrap-dropdown'} onClick={this.blockPropagation}>
-                                    <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')}>
+                                    <button className='btn btn-info dropdown-toggle' type='button' onClick={(e)=>this.toggleDropdown(e,'filters')} title="Filter">
                                         <span className="glyphicon glyphicon-filter"></span>
                                     </button>
                                     <div className="dropdown-menu dropdown-menu-right">
-                                        {this.getFilterButton('Import Preferences','download-alt','custom')}
+                                        {this.getFilterButton('Import Preferences','download-alt','custom')}                                    
                                         {this.getFilterButton('Filter by Least Additional','ok','least_additional',true)}
                                         {this.getFilterButton('Filter by Best Match','signal','best_match')}
                                         {this.getFilterButton('Filter by Time','time','time_filter')}
@@ -390,38 +393,58 @@ class Search extends Component {
                                         {this.getFilterButton('Filter by Cookware','cutlery','cookware_filter')}
                                     </div>
                                 </div>
+                                <span className='input-group-btn'>
+                                    <button className='btn btn-warning' type='button' onClick={this.toggleThumbnails} title="Toggle View Mode">
+                                        <span className={this.state.viewThumbnails ? "glyphicon glyphicon-font" : "glyphicon glyphicon-picture"}></span>
+                                    </button>
+                                </span>
                             </div>
-                        </form>
-                        {/*console.log(this.state.loadedRecipes)*/}
-                        <ul className="list-group">
-                            {this.state.sorted.map((recipe)=>(
-                                <li className="list-group-item">
-                                    <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
-                                    <span className='pull-right'>{'Score: '+JSON.stringify(recipe[1].map((n)=>n.toFixed(2)))}</span>
-                                    {(()=>{ //voodoo magic (IIFE) --> conditionally display recipe info, if it is loaded
-                                        let data = this.state.loadedRecipes.get(recipe[0]);
-                                        if(data){
-                                            return ([
-                                                <div>Difficulty: {data.Difficulty}</div>,
-                                                <div>Rating:
-                                                    {(()=>{ //more voodoo magic
-                                                        let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
-                                                        for(let i=0;i<this.recipeHelper.maxRating;i++){
-                                                            result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);
-                                                        }
-                                                        return result;
-                                                    })()}
-                                                </div>,
-                                                <div>{this.getGlyph('time')} <span>{data.TimeCost}</span></div>,
-                                            ])
-                                        }
-                                    })()}
-                                </li>
-                            ))}
-                            {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
-                        </ul>
-                    </div>
+                    </form>
+                    {this.state.viewThumbnails ? 
+                    <div className="container-fluid search-results">
+                        <div className="row">
+                        {this.state.sorted.map((recipe)=>{
+                            let data = this.state.loadedRecipes.get(recipe[0]);
+                            if(data){
+                                return(
+                                <SearchThumbnail data={data} />
+                                );
+                            }
+                        })     
+                        }
+                        {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
+                        </div>
+                    </div> : 
+                     <ul className="list-group search-results">
+                        {this.state.sorted.map((recipe)=>(
+                            <li className="list-group-item">
+                                <a href={'/Recipes/'+recipe[0]}>{recipe[0]}</a>
+                                {(()=>{// (IIFE) --> conditionally display recipe info, if it is loaded
+                                    let data = this.state.loadedRecipes.get(recipe[0]);
+                                    if(data){
+                                        return ([
+                                            <div>Difficulty: {data.Difficulty == "Undefined"? "Medium": data.Difficulty}</div>,
+                                            <div>Rating: 
+                                                {(()=>{ 
+                                                    let result = [],intRating = Math.floor(RecipeHelper.getAvgRating(data));
+                                                    for(let i=0;i<this.recipeHelper.maxRating;i++){
+                                                        result.push(<span className={"glyphicon glyphicon-star "+(i<intRating?'good-rating':'')}></span>);
+                                                    }
+                                                    return result;
+                                                })()}
+                                            </div>,
+                                            <div>{this.getGlyph('time')} <span>{data.TimeCost == "Undefined"? "1 h" :data.TimeCost}</span></div>,
+                                        ])
+                                    }
+                                })()}
+                            </li>
+                        ))}
+                        {this.state.sorted.length?null:(<li className='list-group-item'><i>{'No Recipes to Show'}</i></li>)}
+                    </ul>
+                    
+                    }
                 </div>
+            </div>
             </div>
         );
 

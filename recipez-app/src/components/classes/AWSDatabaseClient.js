@@ -34,6 +34,7 @@ var db = new AWS.DynamoDB();
 
 const UNAUTH_NAME = 'GUEST'
 
+var MAX_REQUEST_LENGTH = 100;
 
 var appClientID = '1qnpej4u0hul8mq0djs9a5r8me';
 var MAX_REQUEST_LENGTH = 100;

@@ -44,7 +44,7 @@ class Register extends Component{
 
                 //alert("Registered!");
             } catch (e) {
-                alert(e);
+                alert('submit: '+e);
             }
         }
         else{
@@ -69,7 +69,7 @@ class Register extends Component{
             this.user.createUser(this.state.userName,()=>User.getUser().reload());
             this.props.history.push("/Search");
         } catch (e) {
-            alert(e);
+            alert('confirmation: '+e);
         }
     };
 

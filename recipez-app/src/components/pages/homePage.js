@@ -5,6 +5,7 @@
  * Description: This file will serve as the Homepage Content
  */
 import React, { Component } from 'react';
+import SearchThumbnail from '../SearchComponents/SearchThumbnail';
 
 class Homepage extends Component {
     constructor(props){

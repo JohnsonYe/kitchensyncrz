@@ -180,7 +180,6 @@ class PlannerHelper{
      * @param meal - new meal object to replace the old one.
      */
     editMeal(data, day, mealIndex, meal, newDay) {
-
         this.removeMeal(data, day, mealIndex);
         this.insertMeal(data, meal, newDay);
     }
