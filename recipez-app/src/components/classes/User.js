@@ -47,24 +47,25 @@ class User {
     }
 
     createUser(username,callback){
+
         this.loadStream = Promise.resolve({ //create a new user data object locally
             username:       username,
             cookbook:       {},
-            cookware:       new Set(['dirt']), //this can't be empty
+            cookware:       new Set(['oven']), //this can't be empty
             exclude:        new Set(['mercury']),
-            pantry:         {},
-            planner:        {},
-            preferences:    new Set(['e']),
+            pantry:         {mercury: {unit: 'none', amount: '1'}},
+            planner:        {days: (()=>{let l = [];for(let i=0;i<7;i++)l.push({mealData: []});return l})()},
+            preferences:    new Set(['mercury']),
             shoppingList:   new Set(['mercury']),
-            
+
         })
         .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
             return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
         })
         this.loadStream.then((data)=>console.log(data.payload))
         this.loadStream.then(callback)
-    }
-
+        this.loadStream.catch(console.error)
+        }
     /**
      * this.userData:
      * {
@@ -468,6 +469,30 @@ class User {
     }
 }
 
+
+ User.MealPrototype = {
+     _NAME: "Meal",
+     recipes: { type: 'L' ,inner:{ type:'S'} },
+     startHr: {type: 'N'},
+     startMin: {type: 'N'},
+     endHr: {type: 'N'},
+     endMin: {type: 'N'}
+ }
+
+ User.DayPrototype = {
+     _NAME: "Day",
+     mealData: {type: 'L' ,inner:{ type: User.MealPrototype._NAME} }
+ }
+
+ User.PlannerPrototype = {
+     _NAME: "Planner",
+     days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
+ }
+DBClient.getClient().registerPrototype(User.PlannerPrototype)
+DBClient.getClient().registerPrototype(User.DayPrototype)
+DBClient.getClient().registerPrototype(User.MealPrototype)
+
+
 User.PantryItemPrototype = {
     _NAME:'PANTRYITEM',
     amount:{type:'N'},
@@ -483,7 +508,7 @@ User.UserDataPrototype = {
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
     shoppingList:{type:'SS'},
-    planner:{},
+    planner:{type:User.PlannerPrototype._NAME},
     exclude:{type:'SS'},
     preferences:{type:'SS'},
 }
