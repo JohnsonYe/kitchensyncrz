@@ -1,140 +1,321 @@
 /**
  * Title: Planner.js
- * Authors: Alexander Haggart, Andrew Sanchez(backend implementation)
+ * Authors: Andrew Sanchez(backend implementation)
  * Date Created: 11/13/2017
- * Description: This file will assist in database transactions involving the planner feature
+ * Description: This file will assist in database transactions involving the planner feature.
  */
-import DBClient from "./AWSDatabaseClient"
 
 class PlannerHelper{
-    constructor(){
-        var now = new Date(); // Andrew added
-        this.client = DBClient.getClient()
-        this.addMeal = this.addMeal.bind(this);
-        this.removeMeal = this.removeMeal.bind(this);
-        var mealData = [];
-        // this.addMeal('Monday.breakfast','chicken noodle soup',(e)=>alert(JSON.stringify(e.payload)));
+
+    removeMeal(data, day, mealIndex){
+        if(data.days[day].mealData[mealIndex]) {
+            data.days[day].mealData.splice(mealIndex, 1);
+        }
     }
 
-    addMeal(day,recipe,target){
-        this.client.updateItem(
-            this.client.buildUpdateRequest(
-                'User','username',this.client.getUsername(),
-                this.client.buildMapUpdateExpression('planner',day,{S:recipe})),
-                this.client.pushResponseToHandle(target));
-
-    }
-
-
-    removeMeal(day,recipe){
-
-    }
-
-     /**TEST ============================================================================*/
-     testMealData(){
-
-         var recipe1 = {
-                 name: "Spaghetti",
-                 duration: 30,
-                 link: "http://food.fnr.sndimg.com/content/dam/images/food/fullset/2014/9/23/1/FNM_110114-Spaghetti-with-Pecan-Herb-Pesto-Recipe_s4x3.jpg.rend.hgtvcom.616.462.suffix/1412282745840.jpeg",
-                 description: "I tell all my hoes ... rack it up"
-             },
-             recipe2 = {
-                 name: "Booty",
-                 duration: 120,
-                 link: "http://www.vermeer.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png",
-                 description: "Love is not just a verb"
-             };
-
-         var meal1 = this.createMeal(recipe1, 12, 30),
-             meal2 = this.createMeal(recipe2, 2, 45);
-
-         //Access Meal Data data[dayOfWeek][mealIndex]
-         var data = [
-             [],  //Sun
-             [meal1, meal2],  //Mon
-             [],  //Tue
-             [],  //Wed
-             [],  //Thur
-             [],  //Fri
-             []   //Sat
-         ];
-
-         return data;
-     }
-
-     /**
-      * This function creates a meal object that could be added to one of the entries in mealData.
-      * @param recipe - passing a in a recipe object will give us recipe name, duration, img link, and description (or index)
-      * @param start - the time you plan to start cooking this meal
-      * @return {recipe: *, startTime: *, endTime: *} a.k.a meal object
-      */
-     createMeal(recipe, startHr, startMin) {
-
-         /**TODO Anything that has to do with recipes is subject to change since I'm not sure how define recipe objects
-          */
-
-         var hr = 0,
-             endMin = 0,
-             endHr = 0,
-             total = 0;
-
-         total = startMin + recipe.duration;
-         hr = Math.floor(total/60);
-
-         endMin = total - (hr)*(60);
-         endHr = startHr + hr;
-
-         //check if hr passed to the next day
-         if( endHr >= 24) {
-             endHr = (24 - endHr)*(-1);  //converts to correct time
-         }
-
-         return {
-             recipe: recipe,
-             startHr: startHr ,
-             startMin: startMin,
-             endHr: endHr,
-             endMin: endMin
-         };
-     }
-     /** ======================================END OF TEST STUFF=======================================================*/
-
-     /**
-      * This function will retrieve the users mealData array that is currently in the DataBase
-      * @returns [] Array of meal
-      */
-     getMealData() {
-         return [];
-     }
-
-     /**
-      * Pushes the local mealData containing changes user made to Database
-      */
-     pushMealData() {
-     }
-    /**
-     * Adds a meal to mealData in order. Order is determined by start hour of recipe. Overlapping meal times are not
-     * allowed.
-     * @param day - index of day where the meal should be added (recall order is ... [Sun, Mon, Tue ...])
-     * @param mealObj - takes a meal object
-     * @return error - if meal trying to be added overlaps with the time of meal in mealData
+    /** Insert meal into planner
+     * @param day - tells what day to insert meal into
+     * @param meal - meal object to be inserted
+     * @return pass/fail 1 pass, -1 fail
      */
-    addMeal(day, mealObj){
+    insertMeal(data, meal, day) {
+        // create an array of just the current days meals for easy access
+        var meals = this.getDayMealList(data, day),
+            mealIndex = 0;
 
-        //update dataBase with changes
-        this.pushMealData();
+        //if meals has not been instantiated
+        if (meals.length == 0) {
+            data.days[day].mealData.push(meal);
+            return;
+        }
+
+        var startHr = meal.startHr,
+            startMin = meal.startMin,
+            endHr = meal.endHr,
+            endMin = meal.endMin;
+
+        //Handle Database Error
+        if(startMin === undefined) {
+            startMin = 0;
+        }
+
+        if(endMin === undefined) {
+            endMin = 0;
+        }
+
+        if(startHr === undefined) {
+            startHr = 0;
+        }
+
+        if(endHr === undefined) {
+            endHr = 0;
+        }
+
+        // Go through meals looking at each end times to ensure that this meals
+        // start time is greater than meal before's end time.
+        for (var i = 0; i < meals.length; i++) {
+            let dstartHr = meals[i].startHr,
+                dstartMin = meals[i].startMin,
+                dendHr = meals[i].endHr,
+                dendMin = meals[i].endMin;
+
+            //Handle Database Error
+            if(dstartMin === undefined) {
+                dstartMin = 0;
+            }
+
+            if(dendMin === undefined) {
+                dendMin = 0;
+            }
+
+            if(dstartHr === undefined) {
+                dstartHr = 0;
+            }
+
+            if(dendHr === undefined) {
+                dendHr = 0;
+            }
+
+            if (startHr > dendHr) {
+                mealIndex += 1;
+            }
+            else if (startHr === dendHr) {
+                if( startMin > dendMin ) {
+                    mealIndex += 1;
+                }
+            }
+        }
+        alert(JSON.stringify(mealIndex));
+
+        //if mealIndex is out of bound then add to the end
+        if(mealIndex === meals.length) {
+            data.days[day].mealData.push(meal);
+        }
+
+        let dstartHr = 0,
+            dstartMin = 0,
+            dendHr = 0,
+            dendMin = 0;
+
+        //handle Database error
+        if (meals[mealIndex].startHr  === undefined) {
+        } else {
+            dstartHr = meals[mealIndex].startHr;
+        }
+
+        if(meals[mealIndex].startMin === undefined) {
+        }
+        else {
+            dstartMin = meals[mealIndex].startMin;
+        }
+
+        if(meals[mealIndex].endHr === undefined) {
+        } else {
+            dendHr = meals[mealIndex].endHr;
+        }
+
+        if(meals[mealIndex].endMin === undefined) {
+        } else {
+            dendMin = meals[mealIndex].endMin;
+        }
+
+        // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
+        if ( endHr < dstartHr) {
+            console.log("pushed");
+            data.days[day].mealData.splice(mealIndex, 0, meal);
+        }
+        else if( endHr === dstartHr ) {
+            if( endMin < dstartMin) {
+                console.log("pushed");
+                data.days[day].mealData.splice(mealIndex, 0, meal);
+            }
+        }
+    }
+    /**
+     * This function creates a meal object that could be added to one of the entries in mealData.
+     * @param recipe - name of recipe for meal
+     * @param dur - a string of the minutes it takes to cook the meal
+     * @param startHr - start time of meal
+     * @param startMin - start min of meal
+     */
+    createMeal(recipe, dur, startHr, startMin) {
+
+        var hr = 0,
+            endMin = 0,
+            endHr = 0,
+            total = 0,
+            recipes = [];
+
+        recipes.push(recipe);
+        total = startMin + dur;
+        hr = startHr;
+
+        while( total >= 60) {
+            total = total - 60;
+            hr += 1;
+        }
+
+        endHr = hr;
+        endMin = total;
+
+        //check if hr passed to the next day
+        while( endHr >= 24) {
+            endHr = endHr - 24;  //converts to correct time
+        }
+
+        //create meal object
+        return {
+            recipes: recipes,
+            startHr: startHr ,
+            startMin: startMin,
+            endHr: endHr,
+            endMin: endMin
+        };
     }
 
-    /**
-     * Removes a meal from mealData according to the specified name of recipe or meal.
-     * @param day - index of day in mealData
-     * @param mealIndex -
+    /** This funtion will edit a meal and save the change to the database
+     * @param day - the day where
+     * @param mealIndex - the index of the meal you want to edit
+     * @param meal - new meal object to replace the old one.
      */
-    removeMeal(day, mealIndex) {
-        //update dataBase with changes
-        this.pushMealData();
+    editMeal(data, day, mealIndex, meal) {
+        // check if meal exist
+        this.removeMeal(data, day, mealIndex);
+        this.insertMeal(data, meal, day);
+    }
+
+
+    /** Gives the an array of meals for that day
+     * @param day - day you want the meal list of*/
+    getDayMealList(data, day) {
+        //alert(JSON.stringify(data));
+        return data.days[day].mealData;
+    }
+
+    getMealRecipeName(data, day, mealIndex){
+        //alert(JSON.stringify(data.days));
+        if(data.days[day].mealData[mealIndex].recipes) {
+            return data.days[day].mealData[mealIndex].recipes[0];
+
+        }else return "Unavailable";
+    }
+
+    /** Gives meals start time startHr: startMin
+     * @param day - day the meal wanted is in
+     * @param mealIndex - index of the meal you want
+     */
+    getMealStartTime(data, day, mealIndex) {
+
+        var hour = data.days[day].mealData[mealIndex].startHr,
+            min = data.days[day].mealData[mealIndex].startMin,
+            noon = "am";
+
+        if(hour === 12) {
+            noon = "pm";
+        }
+        else if(hour > 12) {
+            hour = (hour - 12);
+            noon = "pm"
+        }
+        else if(hour === undefined) {  //undefined
+            hour = 12;
+            noon = "am";
+        }
+
+        if(min < 10) {
+            min = "0"+min;
+        }else if (min === undefined){ //undefined
+            min = "00";
+        }
+
+        return hour + ":" + min + " " + noon ;
+    }
+
+    getMeal(data,day, mealIndex) {
+        return this.getDayMealList(data, day)[mealIndex];
+    }
+
+    /** gets duration string form*/
+    getDuration(meal) {
+        let startHr = meal.startHr,
+            startMin = meal.startMin,
+            endHr = meal.endHr,
+            endMin = meal.endMin;
+
+        if(meal.startMin === undefined) {
+            startMin = 0;
+        }
+
+        if(meal.endMin === undefined) {
+            endMin = 0;
+        }
+
+        if(meal.startHr === undefined) {
+            startHr = 0;
+        }
+
+        if(meal.endHr === undefined) {
+            endHr = 0;
+        }
+
+        let min = endMin - startMin;
+        let hr = endHr - startHr;
+
+        //alert(JSON.stringify(meal.endMin));
+
+        if(min === undefined) {
+            min = "0";
+        }
+
+        if(hr === undefined){
+            hr = "0";
+        }
+
+        if( endHr - startHr === 0) {
+            return (min) + " m";
+        }
+        else {
+            return (hr) + " h " + (min) + " m";
+        }
+    }
+
+
+    /** Gives meals end time startHr: startMin
+     * @param day - day the meal wanted is in
+     * @param mealIndex - index of the meal you want
+     */
+    getMealEndTime(data, day, mealIndex) {
+        var hour = data.days[day].mealData[mealIndex].endHr,
+            min = data.days[day].mealData[mealIndex].endMin,
+            noon = "am";
+
+        if(hour === 12) {
+            noon = "pm";
+        }
+        else if(hour > 12) {
+            hour = (hour - 12);
+            noon = "pm"
+        }
+        else if (hour === undefined){  //undefined
+            hour = 12;
+            noon = "am";
+        }
+
+        if(min < 10) {
+            min = "0"+min;
+        }else if(min === undefined){ //undefined
+            min = "00";
+        }
+
+        return hour + ":" + min + " " + noon ;
+    }
+
+    /** This function retrieves the number of meals for a specified day*/
+    getNumMeals(data, day){
+        if(data.days[day].mealData.length)
+            return data.days[day].mealData.length;
+        else return 0;
     }
 }
 
- export default PlannerHelper;
+export default PlannerHelper;

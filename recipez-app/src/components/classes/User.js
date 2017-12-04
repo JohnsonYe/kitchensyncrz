@@ -4,16 +4,22 @@
  * Date Created: 11/8/17
  * Description: This file will handle user data operations through the DBClient
  */
- import DBClient from './AWSDatabaseClient'
+import DBClient from './AWSDatabaseClient'
 
- /**
-  * SINGLETON CLASS --> USE User.getUser() to get the shared instance
-  */
+/**
+ * SINGLETON CLASS --> USE User.getUser() to get the shared instance
+ */
 
- class User {
+    // Trying to create new branch - Morten
+
+class User {
     constructor(){
-        this.client = DBClient.getClient()
-        this.client.registerPrototype(User.PantryItemPrototype)
+        this.client = DBClient.getClient();
+
+        //Planner data
+        this.client.registerPrototype(User.PlannerPrototype);
+        this.client.registerPrototype(User.DayPrototype);
+        this.client.registerPrototype(User.MealPrototype);
         this.loadUserData = this.loadUserData.bind(this);
         this.verify = this.verify.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
@@ -36,12 +42,28 @@
         //         'username',this.client.getUsername(),
         //         this.client.buildSetUpdateExpression('cookbook',{SS:["Good Old Fashioned Pancakes","Banana Banana Bread","The Best Rolled Sugar Cookies","To Die For Blueberry Muffins","Award Winning Soft Chocolate Chip Cookies"]})),
         //     this.client.alertResponseCallback)
-        this.loadStream = new Promise(this.loadUserData)
+        this.reload();
         this.verified = false;
     }
 
-    getMort(){
-        return this.client.getUsername;
+    reload(){
+        this.loadStream = new Promise(this.loadUserData)
+    }
+
+    createUser(username,callback){
+        this.loadStream = Promise.resolve({ //create a new user data object locally
+            username:       username,
+            cookbook:       {},
+            cookware:       new Set(['oven']), //this can't be empty
+            exclude:        new Set(['beer']),
+            shoppingList:   new Set(['beets']),
+            pantry:         {shrimp: {unit: 'Protein', amount: '1'}},
+        })
+        .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong
+            return new Promise((pass,fail)=>this.client.putDBItem('User',this.client.packItem(data,User.UserDataPrototype),()=>fail(data),()=>pass(data)))
+        })
+        this.loadStream.then((data)=>console.log(data.payload))
+        this.loadStream.then(callback)
     }
 
     /**
@@ -52,14 +74,10 @@
      *      cookbook: <Set<String>> user's favorited/saved recipe list
      *      cookware: <Set<String>> user's available cookware
      *      planner:  <???> TODO work with planner team on data organization
-     * }
+     *
      */
     loadUserData(resolve,reject){
-        if(this.userData.username === DBClient.UNAUTH_NAME){ //skip loading if the user is not signed in
-            // alert('rejected!')
-            reject('User is not logged in!')
-            return
-        }
+        console.log(this.client.getUsername())
         this.client.getDBItems('User','username',[this.client.getUsername()],(response)=>{
             if(response.status){
                 this.userData = {
@@ -90,6 +108,7 @@
             (response)=>{
                 if(response.status){
                     this.addUserData((data)=>{
+                        alert('Successfully remove from Cookbook')
                         delete data.cookbook[recipeName];
                         return data
                     })
@@ -103,7 +122,7 @@
 
     saveCustomRecipe(recipeObject){
         //pack the recipe into JSON format and add it to the user's recipe map
-        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below
             this.client.buildUpdateRequest( //construct the params syntax according to the action we want
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
@@ -124,7 +143,7 @@
 
     saveExternalRecipe(recipeName){
         //save just the recipe name to the cookbook so we know to load it froma public recipe page
-        this.client.updateItem( //basic update request, expects a complicated syntax that we build below 
+        this.client.updateItem( //basic update request, expects a complicated syntax that we build below
             this.client.buildUpdateRequest( //construct the params syntax according to the action we want
                 'User', //table to get item from
                 'username',this.client.getUsername(), //keyfield and specific key
@@ -155,7 +174,7 @@
      * }
      */
     getPantry(callback){
-         return this.getUserData('pantry').then(response=>{alert(JSON.stringify(response));callback(response)})
+        return this.getUserData('pantry').then(response=>{alert(JSON.stringify('get pantry error: '+response));callback(response)})
     }
 
 
@@ -171,11 +190,11 @@
                     this.addUserData((data)=>{
                         data.pantry[ingredient] = {amount:amount,unit:unit};
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     removeFromPantry(ingredient){
@@ -190,11 +209,11 @@
                     this.addUserData((data)=>{
                         delete data.pantry[ingredient];
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     getCookbook(callback){
@@ -214,11 +233,11 @@
                     this.addUserData((data)=>{
                         data.cookbook[recipe] = {info:info};
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     removeFromCookbook(recipe){
@@ -233,11 +252,11 @@
                     this.addUserData((data)=>{
                         delete data.cookbook[recipe];
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
 
@@ -258,11 +277,11 @@
                     this.addUserData((data)=>{
                         data.cookware[item] = {item:item};
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     removeFromCookware(item){
@@ -277,11 +296,11 @@
                     this.addUserData((data)=>{
                         delete data.cookware[item];
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
 
@@ -302,11 +321,11 @@
                     this.addUserData((data)=>{
                         data.exclude[ingredient] = {ingredient:ingredient};
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     removeFromExclusionList(ingredient){
@@ -321,11 +340,11 @@
                     this.addUserData((data)=>{
                         delete data.exclude[ingredient];
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     getShoppingList(callback){
@@ -345,11 +364,11 @@
                     this.addUserData((data)=>{
                         data.shoppingList[item] = {item:item};
                         return data
-                })
-             }else {
-                console.error(response.payload)
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload)
+                }
+            })
     }
 
     removeFromShoppingList(item){
@@ -364,11 +383,11 @@
                     this.addUserData((data)=>{
                         delete data.shoppingList[item];
                         return data;
-                })
-             }else {
-                console.error(response.payload);
-            }
-        })
+                    })
+                }else {
+                    console.error(response.payload);
+                }
+            })
     }
 
 
@@ -379,13 +398,32 @@
         this.getUserData('planner').then(callback).catch(console.error)
     }
 
+    setPlanner(planner,callback){
+        let packed = this.client.packItem(planner,User.PlannerPrototype);
+        console.log(JSON.stringify(packed));
+        this.client.updateItem(
+            this.client.buildUpdateRequest(
+                'User','username',this.client.getUsername(),
+                this.client.buildSetUpdateExpression('planner',{M:packed})),
+            (response)=>{
+                if(response.status){
+                    this.addUserData((data)=>{
+                        data.planner = planner;
+                        return data;
+                    })
+                } else {
+                    console.error(response.payload);
+                }
+            })
+    }
+
     getNotes(){
         /*
          * What should this object look like? We need to decide on formatting/nesting of data
          */
-         return {"Good Old Fashioned Pancakes":
-                    {target:{type:'ingredient',id:'blueberry'},
-                    text:'use frozen blueberries for that dank artifical taste'}}
+        return {"Good Old Fashioned Pancakes":
+            {target:{type:'ingredient',id:'blueberry'},
+                text:'use frozen blueberries for that dank artifical taste'}}
 
     }
 
@@ -449,31 +487,51 @@
             throw new Error('You don\'t have permission to view '+username+'\'s personal data.')
         }
     }
+}
+
+ User.MealPrototype = {
+     _NAME: "Meal",
+     recipes: { type: 'L' ,inner:{ type:'S'} },
+     startHr: {type: 'N'},
+     startMin: {type: 'N'},
+     endHr: {type: 'N'},
+     endMin: {type: 'N'}
  }
 
- User.PantryItemPrototype = {
+ User.DayPrototype = {
+     _NAME: "Day",
+     mealData: {type: 'L' ,inner:{ type: User.MealPrototype._NAME} }
+ }
+
+ User.PlannerPrototype = {
+     _NAME: "Planner",
+     days: {type: 'L' ,inner:{ type: User.DayPrototype._NAME} },
+ }
+
+
+User.PantryItemPrototype = {
     _NAME:'PANTRYITEM',
     amount:{type:'N'},
     unit:{type:'S'}
- }
- DBClient.getClient().registerPrototype(User.PantryItemPrototype)
+}
+DBClient.getClient().registerPrototype(User.PantryItemPrototype)
 
 
- User.UserDataPrototype = {
+User.UserDataPrototype = {
     _NAME:'USERDATA',
     username:{type:'S'},
     cookbook:{type:'M',inner:{type:'S'}},
     cookware:{type:'SS',inner:{type:'SET'}},
     pantry:{type:'M',inner:{type:User.PantryItemPrototype._NAME}},
+    planner:{type:User.PlannerPrototype._NAME},
     shoppingList:{type:'SS'},
-    planner:{},
     exclude:{type:'SS'},
     preferences:{type:'SS'},
- }
- DBClient.getClient().registerPrototype(User.UserDataPrototype)
+}
+DBClient.getClient().registerPrototype(User.UserDataPrototype)
 
- var static_user = new User();
+var static_user = new User();
 
- User.getUser = (username) => static_user/*.verify(username)*/;
+User.getUser = (username) => static_user;
 
- export default User;
+export default User;

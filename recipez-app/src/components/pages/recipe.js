@@ -74,7 +74,7 @@ class Recipe extends Component {
                     </button>&nbsp;&nbsp;
                     {ingredient}
                 </span>
-            </li>)
+        </li>)
 
         var directions = this.state.data.Directions.map((step) => <li class="list-group-item"><i class="fa fa-cutlery" id="forksize"/>{step}</li>)
 
@@ -94,15 +94,15 @@ class Recipe extends Component {
         const carouselInstance = (
             <Carousel>
                 <Carousel.Item className="CarouselSize">
-                    <img src={this.state.data.Image?this.state.data.Image[0]:defaultImage1} class="img-fluid"/>
+                    <img src={this.state.data.Image?Array.from(this.state.data.Image)[0]:defaultImage1} class="img-fluid"/>
                 </Carousel.Item>
 
                 <Carousel.Item className="CarouselSize">
-                    <img src={this.state.data.Image?this.state.data.Image[1]:defaultImage2} class="img-fluid "/>
+                    <img src={this.state.data.Image?Array.from(this.state.data.Image)[1]:defaultImage2} class="img-fluid "/>
                 </Carousel.Item>
 
                 <Carousel.Item className="CarouselSize">
-                    <img src={this.state.data.Image?this.state.data.Image[2]:defaultImage3} class="img-fluid "/>
+                    <img src={this.state.data.Image?Array.from(this.state.data.Image)[2]:defaultImage3} class="img-fluid "/>
                 </Carousel.Item>
             </Carousel>
         );
@@ -181,7 +181,7 @@ class Recipe extends Component {
                 </div>
 
             </div>
-            )
+        )
     }
 
 }

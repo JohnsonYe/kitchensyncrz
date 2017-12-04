@@ -176,7 +176,8 @@ DBClient.getClient().registerPrototype(RecipeHelper.ReviewPrototype)
     Author:{type:'S'},
     Difficulty:{type:'S'},
     TimeCost:{type:'S'},
-     Image:{type:'SS'},
+    Image:{type:'SS'}
+
  }
 DBClient.getClient().registerPrototype(RecipeHelper.RecipePrototype)
 
@@ -223,6 +224,55 @@ RecipeHelper.packRecipe = function(r){
     }
 
 }
+RecipeHelper.unpackReview = function(packedReview){
+    return Object.entries(packedReview.M).map((review) => ({
+                    username:   review[1].M.username.S,
+                    Comment:    review[1].M.Comment.S,
+                    Rating:     review[1].M.Rating.N,
+                    timestamp:  review[1].M.timestamp.N,
+                }))
+}
 
-//========================================================================
+RecipeHelper.packReview = function(revObj){
+    return {M:{
+            username:   {S:revObj.username},
+            Comment:    {S:revObj.Comment},
+            Rating:     {N:revObj.Rating},
+            timestamp:  {N:revObj.timestamp},
+        }}
+}
+
+RecipeHelper.RecipeReferencePrototype = {
+    _NAME:'RECIPE_REFERENCE',
+    Name:{type:'S'},
+    Importance:{type:'N'}
+ }
+DBClient.getClient().registerPrototype(RecipeHelper.RecipeReferencePrototype)
+
+ RecipeHelper.IngredientPrototype = {
+    _NAME:'INGREDIENT_BASE',
+    Name:{type:'S'},
+    recipes:{type:'L',inner:{'type':RecipeHelper.RecipeReferencePrototype._NAME}}
+ }
+DBClient.getClient().registerPrototype(RecipeHelper.IngredientPrototype)
+
+
+RecipeHelper.getAvgRating = function(recipe){
+    if(!recipe.Reviews){
+        return 0;
+    }
+    let reviews = Object.entries(recipe.Reviews).map((review)=>review[1]);
+    return reviews.reduce((prev,next)=>prev+next.Rating,0)/reviews.length;
+}
+
+RecipeHelper.getPrepTime = function(recipe){
+    if(!recipe.TimeCost ||recipe.TimeCost==='Undefined'){
+        return 360000;//600 hours to force these results to the bottom
+    }
+    let total = 0, tokens = recipe.TimeCost.split(/\s+/); //tokenize the string for parsing
+    //do nothing unless the previous token was a time unit specifier
+    tokens.reverse().reduce((prev,next)=>{total+=(prev==='m'?+next:(prev==='h'?+next*60:0));return next},0)
+    return total;
+}
+
  export default RecipeHelper;
