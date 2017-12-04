@@ -120,7 +120,7 @@ class Homepage extends Component {
 
                             <ButtonToolbar>
                                 <OverlayTrigger trigger="click" placement="bottom" overlay={popoverBottom}>
-                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Detail >></strong></button>
+                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Details >></strong></button>
                                 </OverlayTrigger>
                             </ButtonToolbar>
 
@@ -135,7 +135,7 @@ class Homepage extends Component {
 
                             <ButtonToolbar>
                                 <OverlayTrigger trigger="click" placement="bottom" overlay={popoverBottom1}>
-                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Detail >></strong></button>
+                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Details >></strong></button>
                                 </OverlayTrigger>
                             </ButtonToolbar>
 
@@ -150,7 +150,7 @@ class Homepage extends Component {
 
                             <ButtonToolbar>
                                 <OverlayTrigger trigger="click" placement="bottom" overlay={popoverBottom2}>
-                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Detail >></strong></button>
+                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Details >></strong></button>
                                 </OverlayTrigger>
                             </ButtonToolbar>
 
@@ -165,7 +165,7 @@ class Homepage extends Component {
 
                             <ButtonToolbar>
                                 <OverlayTrigger trigger="click" placement="bottom" overlay={popoverBottom3}>
-                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Detail >></strong></button>
+                                    <button className="btn btn-lg btn-primary mx-auto"><strong>Details >></strong></button>
                                 </OverlayTrigger>
                             </ButtonToolbar>
 
@@ -178,7 +178,7 @@ class Homepage extends Component {
                             <h2 className="featurette-heading">Check out our amazing features. <span
                                 class="text-muted">Kitchen Sync will blow your mind.</span>
                             </h2>
-                            <p className="lead"> Browse any recipes from our broad recipe database, make your own meal
+                            <p className="lead"> Browse any recipe from our broad recipe database, make your own meal
                                 with your own tools and ingredients! Don't waste your time looking for other cooking apps, when Kitchen Sync has
                                 everything you need! </p>
                         </Col>
@@ -192,7 +192,7 @@ class Homepage extends Component {
                             <h2 className="featurette-heading">Oh yeah, it's time to make your meal. <span
                                 className="text-muted">See for yourself.</span>
                             </h2>
-                            <p className="lead">Worry about the cost for cooking? Don't worry! Add your own pantries
+                            <p className="lead">Worried about the cost of cooking? Don't worry! Add your own pantries
                                 and ingredients to the Kitchen page and use our amazing filter by cost. Our database
                                 will show you recipes depending on cost filter.
                             </p>
@@ -208,7 +208,7 @@ class Homepage extends Component {
                                 className="text-muted">Checkmate.</span></h2>
                             <p className="lead">Are you too busy to cook? Don't worry! Use our amazing browse filters.
                                 Filter by time shows you best suitable recipes for you in a second. Best recipe
-                                application for student.</p>
+                                application for a student.</p>
                         </div>
                         <div className="col-md-5">
                             <Image className="featurette-image img-fluid mx-auto" src={breadImage} responsive />
