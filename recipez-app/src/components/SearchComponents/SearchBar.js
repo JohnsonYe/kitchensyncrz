@@ -83,18 +83,22 @@ class SearchBar extends Component{
         }  
     }
 
+    checkSelection(){
+        return (this.state.selection >= 0)&&(this.state.selection<this.state.completions.length);
+    }
+
     handleKeyDown(e){
         switch(e.keyCode){
             case 16/*SHIFT*/:
                 this.setState({shiftDown:true})
                 break;
             case 13/*ENTER*/:
-                this.query = (this.state.selection >= 0)?this.state.completions[this.state.selection]:this.state.value;
+                this.query = this.checkSelection()?this.state.completions[this.state.selection]:this.state.value;
                 //     e.stopPropagation();
                 //     this.selectCompletion(this.state.completions[this.state.selection])
                 break;
             case 8/*DELETE*/:
-                this.setState({selection:-1,value:this.state.completions[this.state.selection]})
+                this.setState({selection:-1,value:this.checkSelection()?this.state.completions[this.state.selection]:this.state.value})
                 break;
             case 40/*DOWN*/:
                 this.setState({selection:this.state.selection+1})
@@ -129,7 +133,9 @@ class SearchBar extends Component{
 
     getValue(){
         console.log('searchbar returned: ' + this.query)
-        return this.query.trim();
+        if(this.query)
+            return this.query.trim();
+        return '';
     }
 
     getStatus(){
