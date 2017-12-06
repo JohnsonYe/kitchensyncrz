@@ -26,6 +26,7 @@ class PlannerHelper{
         //if meals has not been instantiated
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
+            alert("Planner Updated");
         }
 
         let startHr = meal.startHr,
@@ -75,7 +76,6 @@ class PlannerHelper{
         // Go through meals looking at each end times to ensure that this meals
         // start time is greater than meal before's end time.
         while ( startHr >= dendHr && mealIndex != meals.length) {
-
             dstartHr = meals[mealIndex].startHr;
             dstartMin = meals[mealIndex].startMin;
             dendHr = meals[mealIndex].endHr;
@@ -101,7 +101,7 @@ class PlannerHelper{
             //check min
             if( startHr == dendHr){
                 if( startMin < dendMin ) {
-                    alert("Time Confliction");
+                    alert("Time confliction ... Please schedule a different time");
                     return false;
                 }
             }
@@ -111,14 +111,16 @@ class PlannerHelper{
         //if mealIndex is out of bound then add to the end
         if (mealIndex == meals.length) {
             data.days[day].mealData.push(meal);
+            alert("Planner Updated");
             return true;
         }
         // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
-        else if(endHr <= dstartHr) {
+        else if(endHr < dstartHr) {
             data.days[day].mealData.splice(mealIndex, 0, meal);
+            alert("Planner updated :D");
             return true;
         }else {
-            alert("Time Confliction");
+            alert("Time confliction ... Please schedule a different time");
             return false;
         }
     }
@@ -138,6 +140,7 @@ class PlannerHelper{
              recipes = [];
 
          recipes.push(recipe);
+
          total = startMin + dur;
          hr = startHr;
 
@@ -171,10 +174,13 @@ class PlannerHelper{
      */
     editMeal(data, day, mealIndex, meal, newDay) {
 
-        this.removeMeal(data, day, mealIndex);
+        var oldMeal = data.days[day].mealData[mealIndex];
 
-        if (this.insertMeal(data, meal, newDay) == false) {
-            this.insertMeal(data, meal, day);
+        this.removeMeal(data, day, mealIndex);
+        var result = this.insertMeal(data, meal, newDay);
+        //insert failed
+        if (result == false) {
+            this.insertMeal(data, oldMeal, day);
         }
     }
 

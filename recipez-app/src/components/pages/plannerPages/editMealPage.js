@@ -42,7 +42,7 @@ function DaySelector(props) {
         <div className="mt-3">
             <p>Select a day</p>
             <DropdownButton
-                onSelect={props.handleClick}
+                onSelect={(e)=>{props.handleClick(e);}}
                 title={props.btnTitle}
                 id="dropdown-no-caret"
                 noCaret>
@@ -64,7 +64,7 @@ function TimeSelector(props) {
             <p>Select a starting time</p>
             <ButtonToolbar>
                 <DropdownButton
-                    onSelect={props.handleHour}
+                    onSelect={(e)=>{props.handleHour(e);}}
                     title={props.hour}
                     noCaret>
                     <MenuItem eventKey="1">1</MenuItem>
@@ -82,7 +82,7 @@ function TimeSelector(props) {
                 </DropdownButton>
                 :
                 <DropdownButton
-                    onSelect={props.handleMin}
+                    onSelect={(e)=>{props.handleMin(e);}}
                     title={props.min}
                     noCaret>
                     <MenuItem eventKey="0">00</MenuItem>
@@ -99,7 +99,7 @@ function TimeSelector(props) {
                     <MenuItem eventKey="55">55</MenuItem>
                 </DropdownButton>
                 <DropdownButton
-                    onSelect={props.handleNoon}
+                    onSelect={(e)=>{props.handleNoon(e);}}
                     title={props.noon}
                     noCaret>
                     <MenuItem eventKey="am">am</MenuItem>
@@ -143,7 +143,7 @@ class MealEditor extends Component {
 
         //convert duration to min
         let dur = 0;
-        if (this.props.dur.length > 4) {
+        if (this.props.dur.includes("h")) {
             let temp, temp2;
             temp = this.props.dur.slice(0, 2);
             temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
@@ -154,17 +154,6 @@ class MealEditor extends Component {
             dur = parseInt(this.props.dur);
         }
 
-        total = parseInt(startMin) + dur;
-        hr = parseInt(startHr);
-
-        while (total >= 60) {
-            total = total - 60;
-            hr += 1;
-        }
-
-        endMin = total;
-        endHr = hr;
-
         this.state = {
             days: days,
             showEditor: false,
@@ -172,7 +161,7 @@ class MealEditor extends Component {
             hourOnBtn: startHr,
             minOnBtn: startMin,
             noonOnBtn: noon,
-            endtime: endHr+":"+endMin,
+            endtime: endTime,
             dur: dur,  //duration in minutes
             mealList: [],
             img: "http://travelmasters.ca/wp-content/uploads/2017/03/no-image-icon-4-1024x1024.png"
@@ -206,7 +195,6 @@ class MealEditor extends Component {
     /**Updates hour on button*/
     handleHourSelection(evt) {
         this.setState( {hourOnBtn: evt} );
-        this.updateEndTime();
     }
 
     /**Updates min on button*/
@@ -216,7 +204,6 @@ class MealEditor extends Component {
         }
 
         this.setState( {minOnBtn: evt} );
-        this.updateEndTime();
     }
 
     /** Updates noon on button */
@@ -243,7 +230,7 @@ class MealEditor extends Component {
             planner = transform(planner);
             //if(this.props.edit === true)
             //     window.location.reload();
-            user.setPlanner(planner,()=> {console.log('success');if(this.props.edit === true){this.props.update(planner);}});
+            user.setPlanner(planner,()=> {console.log('success');if(this.props.edit === true){this.props.update(planner); this.renderImg()}});
         })
     }
 
@@ -258,8 +245,23 @@ class MealEditor extends Component {
     }
 
     updateEndTime() {
-        let hour = parseInt(this.state.hourOnBtn),
-            min = parseInt(this.state.minOnBtn);
+        var hour = parseInt(this.state.hourOnBtn),
+            min = parseInt(this.state.minOnBtn),
+            noon = this.state.noonOnBtn;
+
+        //alert(JSON.stringify(hour));
+
+        if( noon == "am") {
+            if (hour == 12) {
+                hour = 0;
+            }
+        }
+        else if (noon == "pm" && hour == "12"){
+            hour = 12;
+        }
+        else {
+            hour = 12 + hour;
+        }
 
         let total = min + this.state.dur;
         let hr = hour;
@@ -274,7 +276,7 @@ class MealEditor extends Component {
             hr = hr - 24;  //converts to correct time
         }
 
-        this.setState( {endtime: hr+":"+total});
+        return hr+":"+total;
     }
 
     edit() {
@@ -288,6 +290,9 @@ class MealEditor extends Component {
             if (hour == 12) {
                 hour = 0;
             }
+        }
+        else if (noon == "pm" && hour == "12"){
+            hour = 12;
         }
         else {
             hour = 12 + hour;
@@ -319,6 +324,9 @@ class MealEditor extends Component {
                 hour = 0;
             }
         }
+        else if (noon == "pm" && hour == "12"){
+            hour = 12;
+        }
         else {
             hour = 12 + hour;
         }
@@ -332,7 +340,6 @@ class MealEditor extends Component {
                 this.state.days.indexOf(this.state.dayOnBtn));
             return planner;
         };
-        alert("Added");
         return transform;
     }
 
@@ -362,7 +369,6 @@ class MealEditor extends Component {
             }
         });
     }
-
 
     render() {
 
@@ -426,10 +432,11 @@ class MealEditor extends Component {
                             hour={this.state.hourOnBtn}
                             min={this.state.minOnBtn}
                             noon={this.state.noonOnBtn}
+                            update={this.updateEndTime}
                         />
 
                         <div className="mt-3">
-                            <p>Your meal should be ready at {this.state.endtime}.</p>
+                            <p>Your meal should be ready at {this.updateEndTime()}.</p>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
