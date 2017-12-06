@@ -190,12 +190,11 @@ class MealEditor extends Component {
         this.handleNoonSelection = this.handleNoonSelection.bind(this);
         this.renderButtonToolBar = this.renderButtonToolBar.bind(this);
         this.updateEndTime = this.updateEndTime.bind(this);
-        this.renderMealList = this.renderMealList.bind(this);
+        //this.renderMealList = this.renderMealList.bind(this);
         this.renderImg = this.renderImg.bind(this);
-        this.printMealList = this.printMealList.bind(this);
+        //this.printMealList = this.printMealList.bind(this);
 
         this.renderImg();
-        this.renderMealList();
     }
 
     /** Updates day on button */
@@ -317,6 +316,7 @@ class MealEditor extends Component {
                 this.state.days.indexOf(this.state.dayOnBtn));
             return planner;
         };
+        alert("Added");
         return transform;
     }
 
@@ -337,22 +337,6 @@ class MealEditor extends Component {
         );
     }
 
-    renderMealList() {
-
-        let user = User.getUser();
-
-        user.getPlanner((planner)=>{
-            let meals = this.plannerHelper.getDayMealList(planner, this.state.days.indexOf(this.state.dayOnBtn));
-            let recipes = [];
-
-            for(let i = 0; i < meals.length; i++) {
-                recipes.push(meals[i].recipe[0]);
-            }
-
-            this.setState({mealList: recipes});
-        });
-    }
-
     renderImg() {
         let recipeHelper = new RecipeHelper();
 
@@ -361,16 +345,6 @@ class MealEditor extends Component {
                 this.setState({img: Array.from(data.Image)[0]});
             }
         });
-    }
-
-    printMealList() {
-            return (
-                Object.keys(this.state.mealList).map((key) => {
-                    return (
-                        <li>{this.state.mealList[key]}</li>
-                    );
-                })
-            );
     }
 
 
@@ -415,12 +389,6 @@ class MealEditor extends Component {
                             />
                         </Link>
                     </figure>
-
-                    <figcaption>
-                        <ul>
-                        {this.printMealList()}
-                        </ul>
-                    </figcaption>
 
                     <Duration dur={this.props.dur}/>
                     <div className="border

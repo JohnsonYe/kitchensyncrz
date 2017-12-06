@@ -74,7 +74,7 @@ class PlannerHelper{
 
         // Go through meals looking at each end times to ensure that this meals
         // start time is greater than meal before's end time.
-        while ( startHr >= dendHr) {
+        while ( startHr >= dendHr && mealIndex != meals.length) {
 
             dstartHr = meals[mealIndex].startHr;
             dstartMin = meals[mealIndex].startMin;
@@ -111,11 +111,11 @@ class PlannerHelper{
         //if mealIndex is out of bound then add to the end
         if (mealIndex == meals.length) {
             data.days[day].mealData.push(meal);
+            return true;
         }
         // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
         else if(endHr <= dstartHr) {
             data.days[day].mealData.splice(mealIndex, 0, meal);
-            alert("Added");
             return true;
         }else {
             alert("Time Confliction");

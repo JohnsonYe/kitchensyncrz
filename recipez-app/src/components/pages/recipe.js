@@ -171,12 +171,16 @@ class Recipe extends Component {
 
                             {/*====button group====*/}
                     </div>
-                    <div class="col-sm-6" className="Ingredient" float='left'>
-                        <h2>Ingredients:</h2>
-                        <ul>{ingredients}</ul>
+                    <div class="row">
+                        <div class="col-sm-6" className="Ingredient" float='left'>
+                            <h2>Ingredients:</h2>
+                            <ul>{ingredients}</ul>
+                        </div>
                     </div>
-                    <h2 className="Direction">Directions:</h2>
-                    <ol>{directions}</ol>
+                    <div class="row">
+                        <h2 className="Direction">Directions:</h2>
+                        <ol>{directions}</ol>
+                    </div>
                 </div>
 
                 <div class="container">
