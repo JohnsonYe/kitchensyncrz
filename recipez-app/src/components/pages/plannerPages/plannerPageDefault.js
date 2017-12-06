@@ -81,32 +81,11 @@ class Planner extends Component {
             mealData:null,
         };
 
+        this.updateNextMealCard = this.updateNextMealCard.bind(this);
+
         user.getPlanner((planner)=>{
             this.setState({mealData:planner});
-            let recipeHelper = new RecipeHelper();
-            //figure out what recipe to display in upnext
-            let date = new Date();
-            let curHr = date.getHours(),
-                today = date.getDay(),
-                index = 0;
-
-            let meals = this.plannerHelper.getDayMealList(this.state.mealData, today);
-            for(let i = 0; i < meals.length ;i++) {
-                let hr = this.plannerHelper.getMealStartTime(this.state.mealData, today, i);
-                hr = parseInt(hr);
-                if( hr <= curHr) {
-                    index = i;
-                }
-            }
-
-            this.setState({ nextMeal: this.plannerHelper.getMealRecipeName(this.state.mealData, today, index)});
-
-            recipeHelper.loadRecipe(this.plannerHelper.getMealRecipeName(this.state.mealData, today, index), (data) => {
-                if(data&&data.Image) {
-                    this.setState({nextImg: Array.from(data.Image)[0]});
-                }
-            });
-
+            this.updateNextMealCard();
         });
 
 
@@ -124,9 +103,36 @@ class Planner extends Component {
 
     /** Functionality Methods **/
 
+    updateNextMealCard() {
+        let recipeHelper = new RecipeHelper();
+        //figure out what recipe to display in upnext
+        let date = new Date();
+        let curHr = date.getHours(),
+            today = date.getDay(),
+            index = 0;
+
+        let meals = this.plannerHelper.getDayMealList(this.state.mealData, today);
+        for(let i = 0; i < meals.length ;i++) {
+            let hr = this.plannerHelper.getMealStartTime(this.state.mealData, today, i);
+            hr = parseInt(hr);
+            if( hr <= curHr) {
+                index = i;
+            }
+        }
+
+        this.setState({ nextMeal: this.plannerHelper.getMealRecipeName(this.state.mealData, today, index)});
+
+        recipeHelper.loadRecipe(this.plannerHelper.getMealRecipeName(this.state.mealData, today, index), (data) => {
+            if(data&&data.Image) {
+                this.setState({nextImg: Array.from(data.Image)[0]});
+            }
+        });
+    }
+
     /** Pass to modal and call after they save or remove something*/
     update(planner) {
         this.setState( {mealData: planner} );
+        this.updateNextMealCard();
     }
 
 

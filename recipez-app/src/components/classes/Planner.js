@@ -26,9 +26,10 @@ class PlannerHelper{
         //if meals has not been instantiated
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
+            alert("Planner Updated");
         }
 
-        var startHr = meal.startHr,
+        let startHr = meal.startHr,
             startMin = meal.startMin,
             endHr = meal.endHr,
             endMin = meal.endMin;
@@ -50,13 +51,35 @@ class PlannerHelper{
             endHr = 0;
         }
 
+        let dstartHr = meals[0].startHr,
+            dstartMin = meals[0].startMin,
+            dendHr = meals[0].endHr,
+            dendMin = meals[0].endMin;
+
+        //Handle Database Error
+        if (dstartMin === undefined) {
+            dstartMin = 0;
+        }
+
+        if (dendMin === undefined) {
+            dendMin = 0;
+        }
+
+        if (dstartHr === undefined) {
+            dstartHr = 0;
+        }
+
+        if (dendHr === undefined) {
+            dendHr = 0;
+        }
+
         // Go through meals looking at each end times to ensure that this meals
         // start time is greater than meal before's end time.
-        for (var i = 0; i < meals.length; i++) {
-            let dstartHr = meals[i].startHr,
-                dstartMin = meals[i].startMin,
-                dendHr = meals[i].endHr,
-                dendMin = meals[i].endMin;
+        while ( startHr >= dendHr && mealIndex != meals.length) {
+            dstartHr = meals[mealIndex].startHr;
+            dstartMin = meals[mealIndex].startMin;
+            dendHr = meals[mealIndex].endHr;
+            dendMin = meals[mealIndex].endMin;
 
             //Handle Database Error
             if (dstartMin === undefined) {
@@ -75,61 +98,30 @@ class PlannerHelper{
                 dendHr = 0;
             }
 
-            if (startHr > dendHr) {
-                mealIndex += 1;
-            }
-            else if (startHr === dendHr) {
-                if (startMin > dendMin) {
-                    mealIndex += 1;
+            //check min
+            if( startHr == dendHr){
+                if( startMin < dendMin ) {
+                    alert("Time confliction ... Please schedule a different time");
+                    return false;
                 }
             }
+            mealIndex += 1;
         }
 
         //if mealIndex is out of bound then add to the end
-        if (mealIndex === meals.length) {
+        if (mealIndex == meals.length) {
             data.days[day].mealData.push(meal);
+            alert("Planner Updated");
+            return true;
         }
-
-        let dstartHr = 0,
-            dstartMin = 0,
-            dendHr = 0,
-            dendMin = 0;
-
-        //handle Database error
-        if (meals[mealIndex].startHr === undefined) {
-        } else {
-            dstartHr = meals[mealIndex].startHr;
-        }
-
-        if (meals[mealIndex].startMin === undefined) {
-        }
-        else {
-            dstartMin = meals[mealIndex].startMin;
-        }
-
-        if (meals[mealIndex].endHr === undefined) {
-        } else {
-            dendHr = meals[mealIndex].endHr;
-        }
-
-        if (meals[mealIndex].endMin === undefined) {
-        } else {
-            dendMin = meals[mealIndex].endMin;
-        }
-
         // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
-        if (endHr < dstartHr) {
-            console.log("pushed");
+        else if(endHr < dstartHr) {
             data.days[day].mealData.splice(mealIndex, 0, meal);
-        }
-        else if (endHr === dstartHr) {
-            if (endMin < dstartMin) {
-                console.log("pushed");
-                data.days[day].mealData.splice(mealIndex, 0, meal);
-            }
-        }
-        else {
-            alert("Your meal cannot be added because it conflicts with another scheduled meal.");
+            alert("Planner updated :D");
+            return true;
+        }else {
+            alert("Time confliction ... Please schedule a different time");
+            return false;
         }
     }
      /**
@@ -148,6 +140,7 @@ class PlannerHelper{
              recipes = [];
 
          recipes.push(recipe);
+
          total = startMin + dur;
          hr = startHr;
 
@@ -180,8 +173,15 @@ class PlannerHelper{
      * @param meal - new meal object to replace the old one.
      */
     editMeal(data, day, mealIndex, meal, newDay) {
+
+        var oldMeal = data.days[day].mealData[mealIndex];
+
         this.removeMeal(data, day, mealIndex);
-        this.insertMeal(data, meal, newDay);
+        var result = this.insertMeal(data, meal, newDay);
+        //insert failed
+        if (result == false) {
+            this.insertMeal(data, oldMeal, day);
+        }
     }
 
 
