@@ -156,6 +156,7 @@ class MealEditor extends Component {
 
         total = parseInt(startMin) + dur;
         hr = parseInt(startHr);
+
         while (total >= 60) {
             total = total - 60;
             hr += 1;
@@ -269,18 +270,28 @@ class MealEditor extends Component {
             hr += 1;
         }
 
+        //check if hr passed to the next day
+        while (hr >= 24) {
+            hr = hr - 24;  //converts to correct time
+        }
+
         this.setState( {endtime: hr+":"+total});
     }
 
     edit() {
         var hour = parseInt(this.state.hourOnBtn),
-            min = parseInt(this.state.minOnBtn);
+            min = parseInt(this.state.minOnBtn),
+            noon = this.state.noonOnBtn;
 
-        //convert to 24 hour
-        if (this.state.noonOnBtn === "pm") {
-            hour = hour + 12;
-        } else if (this.state.noonOnBtn === "am" && hour === 12) {
-            hour = hour - 12;
+            //alert(JSON.stringify(hour));
+
+        if( noon == "am") {
+            if (hour == 12) {
+                hour = 0;
+            }
+        }
+        else {
+            hour = 12 + hour;
         }
 
         let transform = (planner) => {
@@ -299,13 +310,18 @@ class MealEditor extends Component {
 
     add() {
         var hour = parseInt(this.state.hourOnBtn),
-            min = parseInt(this.state.minOnBtn);
+            min = parseInt(this.state.minOnBtn),
+            noon = this.state.noonOnBtn;
 
-        //convert to 24 hour
-        if (this.state.noonOnBtn === "pm" && hour != 12) {
-            hour = hour + 12;
-        } else if (this.state.noonOnBtn === "am" && hour === 12) {
-            hour = hour - 12;
+            //alert(JSON.stringify(hour));
+
+        if( noon == "am") {
+            if (hour == 12) {
+                hour = 0;
+            }
+        }
+        else {
+            hour = 12 + hour;
         }
 
         let transform = (planner) => {
