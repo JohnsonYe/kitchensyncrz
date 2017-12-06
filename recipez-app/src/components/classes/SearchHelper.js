@@ -219,6 +219,7 @@ import Util from "../classes/Util";
      */
     setRecipeLoaderSource(loaderSource){
         this.recipeLoaderSource = loaderSource;
+        loaderSource().then(console.log)
     }
 
     setFilter(filter,callback,nosort){
@@ -287,7 +288,7 @@ import Util from "../classes/Util";
     }
 
     timeFilter(unsorted,recipes){
-        return unsorted.sort((a,b)=>(RecipeHelper.getPrepTime(recipes.get(a[0])) - RecipeHelper.getPrepTime(recipes.get(b[0]))));
+        return unsorted.sort((a,b)=>{/*console.log("a: "+a[0]+" b: "+b[0]);*/return (RecipeHelper.getPrepTime(recipes.get(a[0])) - RecipeHelper.getPrepTime(recipes.get(b[0])))});
     }
 
     difficultyFilter(unsorted,recipes){

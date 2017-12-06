@@ -195,7 +195,7 @@ class MealEditor extends Component {
         this.printMealList = this.printMealList.bind(this);
 
         this.renderImg();
-        this.renderMealList();
+        // this.renderMealList();
     }
 
     /** Updates day on button */
@@ -418,7 +418,6 @@ class MealEditor extends Component {
 
                     <figcaption>
                         <ul>
-                        {this.printMealList()}
                         </ul>
                     </figcaption>
 

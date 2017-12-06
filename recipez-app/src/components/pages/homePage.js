@@ -76,7 +76,7 @@ class Homepage extends Component {
                                 approach this healthy and cost effective practice without any of the usual stress or
                                 problems associated with cooking. How does it manage to do this? Kitchen
                                 Sync is the cooking app that adapts to the user instead of forcing the user to adapt to it.</p>
-                            <p> <a className="btn btn-lg btn-primary" role="button"><Link className="text-white" to="/Register">Sign up today</Link></a>
+                            <p> <button className="btn btn-lg btn-primary" role="button"><Link className="text-white" to="/Register">Sign up today</Link></button>
                             </p>
                         </Col>
                         <Col sm={7}>

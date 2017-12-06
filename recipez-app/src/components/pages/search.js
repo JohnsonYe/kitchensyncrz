@@ -85,10 +85,11 @@ class Search extends Component {
     getRecipeLoader(){
         return this.recipeLoader;
     }
-    massUpdateSearch(items,action){
+    massUpdateSearch(items,action,shouldLoad){
         let getCallbacks = (item,pass,fail)=>{
             return ({
                 successCallback: ()=>{pass(item)},
+                outputCallback: shouldLoad?((ingredient)=>this.updateLoader(ingredient)):undefined,
                 failureCallback: ()=>{fail(item)},
             });
         };
@@ -300,7 +301,7 @@ class Search extends Component {
             Promise.all(
 
                 //get an array of update promises
-                this.massUpdateSearch(Object.keys(data),1/* ADD */)
+                this.massUpdateSearch(Object.keys(data),1/* ADD */,true)
                 //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
                     .map((updatePromise)=>updatePromise.catch(update_failed_fn))
             )
