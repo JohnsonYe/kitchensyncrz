@@ -42,7 +42,7 @@ function DaySelector(props) {
         <div className="mt-3">
             <p>Select a day</p>
             <DropdownButton
-                onSelect={(e)=>{props.handleClick(e);}}
+                onSelect={props.handleClick}
                 title={props.btnTitle}
                 id="dropdown-no-caret"
                 noCaret>
@@ -64,7 +64,7 @@ function TimeSelector(props) {
             <p>Select a starting time</p>
             <ButtonToolbar>
                 <DropdownButton
-                    onSelect={(e)=>{props.handleHour(e);}}
+                    onSelect={props.handleHour}
                     title={props.hour}
                     noCaret>
                     <MenuItem eventKey="1">1</MenuItem>
@@ -82,7 +82,7 @@ function TimeSelector(props) {
                 </DropdownButton>
                 :
                 <DropdownButton
-                    onSelect={(e)=>{props.handleMin(e);}}
+                    onSelect={props.handleMin}
                     title={props.min}
                     noCaret>
                     <MenuItem eventKey="0">00</MenuItem>
@@ -99,7 +99,7 @@ function TimeSelector(props) {
                     <MenuItem eventKey="55">55</MenuItem>
                 </DropdownButton>
                 <DropdownButton
-                    onSelect={(e)=>{props.handleNoon(e);}}
+                    onSelect={props.handleNoon}
                     title={props.noon}
                     noCaret>
                     <MenuItem eventKey="am">am</MenuItem>
@@ -120,10 +120,6 @@ class MealEditor extends Component {
         let startHr = "12",
             startMin = "00",
             noon = "pm",
-            endHr = 0,
-            endMin = 0,
-            total,
-            hr,
             endTime = "calculating ...",
             day = 0,
             days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -224,7 +220,6 @@ class MealEditor extends Component {
 
     /** creates/overwrites meal to the meal */
     update(transform) {
-        this.close();
         var user = User.getUser();
         user.getPlanner((planner)=>{
             planner = transform(planner);
@@ -379,7 +374,7 @@ class MealEditor extends Component {
                 </a>
             ),
             addButton = (
-                <a className="col-12"
+                <a className="btn btn-dark"
                     onClick={this.open}>
                     <img alt="planner"
                          width="18"

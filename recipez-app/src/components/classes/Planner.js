@@ -188,7 +188,6 @@ class PlannerHelper{
     /** Gives the an array of meals for that day
      * @param day - day you want the meal list of*/
     getDayMealList(data, day) {
-        //alert(JSON.stringify(data));
         return data.days[day].mealData;
      }
 
