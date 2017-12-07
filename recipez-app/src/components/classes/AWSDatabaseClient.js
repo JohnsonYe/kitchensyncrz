@@ -87,7 +87,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':Array.from(ss)}),
-            'N': /*(n,p)=>({'N':n.toString()})*/castToNumber,
+            'N': (n,p)=>({'N':n.toString()})/*castToNumber*/,
             'SET': (n,p)=>{alert('this isnt set up yet')},
         }
 
