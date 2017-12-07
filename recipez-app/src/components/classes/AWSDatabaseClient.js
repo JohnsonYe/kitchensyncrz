@@ -114,6 +114,10 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
      * handle callback: function handle to send items to
      */
     getDBItems(tableName,keyField,keys,target){
+        if(keys.length === 0){
+            console.log('Received a request with zero keys, skipping database request');
+            return;
+        }
         if(keys.length > MAX_REQUEST_LENGTH){
             console.log('Recieved request with more than 100 keys! ('+keys.length+')')
             Promise.all((()=>{ //create a promise group out of max size batch requests
@@ -153,9 +157,6 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
      * @return {[Promise]}           [Promise object with pending DB response]
      */
     getDBItemPromise(tableName,keyField,keys){
-        if(keys.length > MAX_REQUEST_LENGTH){
-            console.error('Recieved request with more than 100 keys!('+keys.length+')')
-        }
         return new Promise((pass,fail)=>{
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
