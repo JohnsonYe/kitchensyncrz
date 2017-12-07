@@ -69,6 +69,7 @@ class App extends Component {
         try {
             if (await this.client.authUser()) {
                 this.client.authenticated = true;
+                User.getUser().reload();
             }
         }
         catch (e) {
