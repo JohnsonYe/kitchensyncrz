@@ -425,7 +425,7 @@ class User {
 
     setPlanner(planner,callback){
         let packed = this.client.packItem(planner,User.PlannerPrototype);
-        console.log(JSON.stringify(packed));
+        console.log('packed: '+JSON.stringify(packed));
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User','username',this.client.getUsername(),
