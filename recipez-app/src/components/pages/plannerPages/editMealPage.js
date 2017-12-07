@@ -181,6 +181,8 @@ class MealEditor extends Component {
         //this.printMealList = this.printMealList.bind(this);
 
         this.renderImg();
+        // this.renderMealList();
+
     }
 
     /** Updates day on button */
@@ -225,7 +227,14 @@ class MealEditor extends Component {
             planner = transform(planner);
             //if(this.props.edit === true)
             //     window.location.reload();
-            user.setPlanner(planner,()=> {console.log('success');if(this.props.edit === true){this.props.update(planner); this.renderImg()}});
+            console.log('test pack: '+JSON.stringify(planner));
+            user.setPlanner(planner,()=> {
+                console.log('success');
+                if(this.props.edit === true){
+                    this.props.update(planner);
+                     this.renderImg();
+                 }
+             });
         })
     }
 
@@ -326,13 +335,12 @@ class MealEditor extends Component {
             hour = 12 + hour;
         }
 
+        
         let transform = (planner) => {
-            this.plannerHelper.insertMeal(planner,
-                this.plannerHelper.createMeal(this.props.recipe,
-                    this.state.dur,
-                    hour,
-                    min),
-                this.state.days.indexOf(this.state.dayOnBtn));
+            let meal = this.plannerHelper.createMeal(this.props.recipe,this.state.dur,hour,min);
+            console.log('created meal: '+JSON.stringify(meal));
+            this.plannerHelper.insertMeal(planner,meal,this.state.days.indexOf(this.state.dayOnBtn));
+            console.log('updated planner: '+JSON.stringify(planner));
             return planner;
         };
         return transform;
@@ -406,7 +414,6 @@ class MealEditor extends Component {
                             />
                         </Link>
                     </figure>
-
                     <Duration dur={this.props.dur}/>
                     <div className="border
                                     border-dark

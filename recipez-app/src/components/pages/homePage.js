@@ -20,6 +20,9 @@ import kitchenIcon from '../../Image/SplashScreen/kitchenFIanl.jpg';
 import calendarIcon from '../../Image/SplashScreen/calendarFinal2.jpg';
 import {Link} from "react-router-dom";
 
+import User from '../classes/User';
+import DBClient from '../classes/AWSDatabaseClient';
+
 const popoverBottom = (
     <Popover id="popover-positioned-bottom" title="About Browse">
         <strong>Browse</strong> allows you be able to use filter by required
@@ -57,6 +60,13 @@ const popoverBottom3 = (
 class Homepage extends Component {
 
     render() {
+        let packPlanner = ((planner)=>{
+            console.log(JSON.stringify(planner,User.PlannerPrototype));
+            console.log(JSON.stringify(DBClient.getClient().packItem(planner,User.PlannerPrototype)));
+        })
+        let mortensButton = ((e)=>{
+            User.getUser().getPlanner(packPlanner);
+        });
         return (
 
             <div>
@@ -66,6 +76,7 @@ class Homepage extends Component {
                         {/*<p className="banner-style"><Image src={bannerImage} responsive /></p>*/}
                     </div>
                 </Jumbotron>
+                <button className='btn btn-success' onClick={mortensButton}>Morten's Button</button>
                 <Grid>
                     <Row>
                         <Col sm={5} >
@@ -76,7 +87,7 @@ class Homepage extends Component {
                                 approach this healthy and cost effective practice without any of the usual stress or
                                 problems associated with cooking. How does it manage to do this? Kitchen
                                 Sync is the cooking app that adapts to the user instead of forcing the user to adapt to it.</p>
-                            <p> <a className="btn btn-lg btn-primary" role="button"><Link className="text-white" to="/Register">Sign up today</Link></a>
+                            <p> <button className="btn btn-lg btn-primary" role="button"><Link className="text-white" to="/Register">Sign up today</Link></button>
                             </p>
                         </Col>
                         <Col sm={7}>

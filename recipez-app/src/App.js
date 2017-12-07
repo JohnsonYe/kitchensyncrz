@@ -59,7 +59,7 @@ class App extends Component {
             this.setState({
                 transform:{
                     'left': e.pageX-this.state.cursorWidth/2,
-                    'top' : e.pageY-this.state.cursorHeight/2,
+                    'top' : e.pageY-this.state.cursorHeight/2 ,
                 }
             });
         });
@@ -69,6 +69,7 @@ class App extends Component {
         try {
             if (await this.client.authUser()) {
                 this.client.authenticated = true;
+                User.getUser().reload();
             }
         }
         catch (e) {
@@ -81,8 +82,8 @@ class App extends Component {
 
     componentWillMount() {
 
-        // window.addEventListener('click', this.closeNav);
-        // document.addEventListener('mousemove',this.moveCallback)
+        window.addEventListener('click', this.closeNav);
+        window.addEventListener('mousemove',this.moveCallback)
         this.setState({
             isNavMenuOpened: false,
             isAuthenticating: true,
@@ -90,8 +91,8 @@ class App extends Component {
     }
 
     componentWillUnmount() {
-        // window.removeEventListener('click', this.closeNav);
-        // document.removeEventListener('mousemove',this.moveCallback);
+        window.removeEventListener('click', this.closeNav);
+        window.removeEventListener('mousemove',this.moveCallback);
     }
 
     handleClick(e) {
@@ -183,12 +184,12 @@ class App extends Component {
                     <Footer />
                     <div className="row">
                     <span className="col-2 pull-right fun-button">
-                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Hello There</button>
+                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Morten's Button</button>
                     </span>
                     </div>
-                    {/*<div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
+                    <div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
                         <img src='/images/Peanut-butter-jelly-time.gif' width={this.state.cursorWidth+'px'} height={this.state.cursorHeight+'px'}/>
-                    </div>*/}
+                    </div>
                 </div>
             </Router>
         );

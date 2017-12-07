@@ -27,6 +27,7 @@ class PlannerHelper{
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
             alert("Planner Updated");
+            return true;
         }
 
         let startHr = meal.startHr,

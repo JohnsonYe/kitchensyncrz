@@ -72,6 +72,13 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
             'SET':(s,p)=>new Set(s),
         }
 
+        let castToNumber = ((n,p)=>{
+            let str = n.toString();
+            let obj = {'N':str};
+            console.log(n + '-->' + str + '-->' + JSON.stringify(obj));
+            return obj;
+        })
+
         /**
          * literal recursion hell
          */
@@ -80,7 +87,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':Array.from(ss)}),
-            'N': (n,p)=>({'N':n+''}),
+            'N': /*(n,p)=>({'N':n.toString()})*/castToNumber,
             'SET': (n,p)=>{alert('this isnt set up yet')},
         }
 
@@ -477,6 +484,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
         var unpacked = {};
         Object.keys(item).forEach((key)=>{
             try{
+                // console.log('unpacking: '+key)
                 unpacked[key] = this.protoUnpack[prototype[key].type](item[key],prototype[key].inner)
             } catch(e){ //found an undefined key, fail quietly for now
                 //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
@@ -501,10 +509,9 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
 
         return Object.keys(item).reduce((prev,key)=>{
                 try{
-                    if(item[key]){
+                        console.log('packing: '+key)
                         // alert(key+": "+JSON.stringify(prev[key]))
-                        prev[key] = this.protoPack[prototype[key].type](item[key],prototype[key].inner)
-                    }
+                        prev[key] = this.protoPack[prototype[key].type](item[key],prototype[key].inner);
                 } catch(e){ //found an undefined key, fail quietly for now
                     //normally we would throw an error so that developers know how to update prototypes, but database changes can affect this
                     //function's execution in code not being developed for database interaction

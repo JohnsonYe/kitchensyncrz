@@ -82,7 +82,7 @@ class ShoppingList extends Component{
 
     getListItemStyle(name){
         return {
-            'margin-left':(name===this.state.removing?'150%':(name===this.state.buying?'-150%':0)),
+            marginLeft:(name===this.state.removing?'150%':(name===this.state.buying?'-150%':0)),
             // 'margin-left': (name===this.state.buying?'-150%':0),
         };
     }
