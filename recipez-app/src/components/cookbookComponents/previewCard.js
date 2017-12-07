@@ -87,8 +87,8 @@ class PreviewCard extends Component{
             initial_directions += direction_line + '\n';
         }
         this.setState({
-            deletionModal: false,
-            editModal: false,
+            //deletionModal: false,
+            //editModal: false,
             ingredientList: initialIngredientList.slice(),
             workingIngredientList: initialIngredientList,
             ingredientToAdd: '',
@@ -429,7 +429,7 @@ class PreviewCard extends Component{
 
                 </div>
 
-                <Modal backdrop={'static'} show={this.state.deletionModal} onHide={this.deletionClose}>
+                <Modal /*backdrop={'static'}*/ show={this.state.deletionModal} onHide={this.deletionClose}>
                     <Modal.Header>
                         <Modal.Title>
                             {this.props.src.Name}
@@ -454,7 +454,7 @@ class PreviewCard extends Component{
                     </Modal.Footer>
 
                 </Modal>
-                <Modal bsSize={"large"} backdrop={'static'} show={this.state.editModal} onHide={this.editClose}>
+                <Modal bsSize={"large"} /*backdrop={'static'}*/ show={this.state.editModal} onHide={this.editClose}>
                     <Modal.Header>
                         <Modal.Title>
                             Editing recipe: "{this.props.src.Name}"
