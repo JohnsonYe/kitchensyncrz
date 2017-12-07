@@ -412,7 +412,7 @@ class Search extends Component {
                             let data = this.state.loadedRecipes.get(recipe[0]);
                             if(data){
                                 return(
-                                <SearchThumbnail data={data} />
+                                <SearchThumbnail key={recipe[0]} data={data} />
                                 );
                             }
                         })     

@@ -120,7 +120,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
                 let pos = 0,requests = [];
                 while(pos < keys.length){ //split key array into size 100 chunks
                     requests.push(keys.slice(pos,pos+MAX_REQUEST_LENGTH));
-                    pos+=MAX_REQUEST_LENGTH
+                    pos+=MAX_REQUEST_LENGTH;
                 }
                 console.log('Split request into '+requests.length+' sub-requests')
                 //map the chunk array to a promise array, containing a DBItemPromise for each chunk

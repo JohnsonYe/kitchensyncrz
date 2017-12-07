@@ -144,7 +144,7 @@ export const RestockList = ( {items, remove, addBack} ) => {
                      remove={remove}
                      addBack = {addBack} />));
 
-    return (<div> {itemNode}  </div>);
+    return (<div className='restocklist'> {itemNode} </div>);
 }
 
 
