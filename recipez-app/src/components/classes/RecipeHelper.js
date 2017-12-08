@@ -73,7 +73,7 @@ class RecipeHelper {
                         this.client.buildUpdateRequest(
                             'Recipes',
                             'Name', recipeName,
-                            this.client.buildMapUpdateExpression('Reviews', revObj.username, RecipeHelper.packReview(revObj))),
+                            this.client.buildMapUpdateExpression('Reviews', revObj.username, {M:this.client.packItem(revObj,RecipeHelper.ReviewPrototype)})),
                         callback)
                 } else {
                     //field creation failed (!) (?)

@@ -32,6 +32,8 @@ class Recipe extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
 
         this.getRatingComponent = this.getRatingComponent.bind(this);
+        this.getRatingSymbols = this.getRatingSymbols.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
         // this.reload = this.reload.bind(this);
         this.user = User.getUser();
     }
@@ -44,13 +46,17 @@ class Recipe extends Component {
             // alert(notFound)
             return
         }
+        let review = recipeObject.Reviews[this.user.client.getUsername()]
+        if(review){
+            this.setState({value:review.Comment,userRating:review.Rating})
+        }
         this.setState({data:recipeObject,loaded:true})
     }
 
     updateReviews(response){
         console.log('review update: '+JSON.stringify(response));
         this.client.loadRecipe(this.props.match.params.recipe, this.setRecipeData, this.props.match.params.user)
-        // this.setState({data:this.state.data})
+        this.setState({key:1})
     }
 
     handleChange(event) {
@@ -58,9 +64,14 @@ class Recipe extends Component {
     }
 
     handleSubmit(event) {
-        alert('A comment was submitted: ' + this.state.value);
+        // alert('A comment was submitted: ' + this.state.value);
         // this.forceUpdate();
         event.preventDefault();
+    }
+
+    handleSelect(key){
+        console.log('handling select');
+        this.setState({key});
     }
 
     getRatingComponent(){
@@ -69,7 +80,7 @@ class Recipe extends Component {
             return (()=>value++);
         })();
         let starSet = [];
-        let numToHighlight = (this.state.userRating&&this.state.numHighlighted===0)?this.state.userRating:this.state.numHighlighted;
+        let numToHighlight = (this.state.userRating>0&&this.state.numHighlighted===0)?this.state.userRating:this.state.numHighlighted;
         for(let i=0;i<5;i++){
             let base = (<span 
                             className='glyphicon glyphicon-star' 
@@ -82,6 +93,23 @@ class Recipe extends Component {
             starSet.push(base)
         }
         return (<div className='rating-component' onMouseLeave={(e)=>this.setState({numHighlighted:0})}>{starSet}</div>);
+    }
+
+    getRatingSymbols(numStars){
+        let starSet = [];
+        for(let i=0;i<5;i++){
+            let base = (<span 
+                            className='glyphicon glyphicon-star' 
+                            key={i+''} 
+                            onMouseOver={(e)=>this.setState({numHighlighted:i+1})}
+                            onClick={(e)=>{this.setState({userRating:i+1})}}/>);
+            if(i < numStars){
+                base = (<span className='good-rating'>{base}</span>);
+            }
+            starSet.push(base)
+        }
+
+        return (<span className='rating-component pull-right'>{starSet}</span>);
     }
 
     // reload() {
@@ -111,17 +139,32 @@ class Recipe extends Component {
             </li>
         ));
 
+        var editButton = ((user)=>(
+                <span className='btn btn-default btn-sm' title='edit' onClick={(e)=>this.setState({key:2})}>
+                    <span className='glyphicon glyphicon-pencil'/> {user}
+                </span>
+        ));
+
+        var otherUser = ((user)=>(
+            <span className='btn btn-default btn-sm disabled'>
+                <i className="glyphicon glyphicon-user"/> {user}
+            </span>
+        ));
+
         // alert(JSON.stringify(this.state.data))
         var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) =>
-            <li>
                 <div className="panel panel-default">
-                    <div className="panel-heading"><i
-                        className="glyphicon glyphicon-user"/>&nbsp;&nbsp;{review[1].username}&nbsp;<img src={'/star.jpg'}
-                                                                                                     height='21'
-                                                                                                     width='21'/></div>
-                    <div className="panel-body"><p>{review[1].Comment}</p></div>
+                    <div className="panel-heading">
+                        <span>
+                            {(this.user.client.getUsername()===review[1].username)?editButton(review[1].username):otherUser(review[1].username)}
+                            {this.getRatingSymbols(review[1].Rating)}
+                        </span>
+                    </div>
+                    <div className="panel-body">
+                        <p>{review[1].Comment}</p>
+                    </div>
                 </div>
-            </li>)
+            );
 
         var updateComment = {
             username: this.user.client.getUsername(),
@@ -129,25 +172,17 @@ class Recipe extends Component {
             Rating: this.state.userRating,
             timestamp: '-1',
         }
-        var defaultImage1 = "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ieqr7Lr2x6Ug/v0/800x-1.jpg"
-        var defaultImage2 = "https://s3-ap-northeast-1.amazonaws.com/sharingkyoto2017/articles/KVxqUS8KsRCmG7LTCyM2Tx4xNAdk6s09IKEa5yTU.jpeg"
-        var defaultImage3 = "http://cdn-api.skim.gs/images/view/54be909e3847cf000069016b"
+        var defaultImage = ["https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ieqr7Lr2x6Ug/v0/800x-1.jpg",
+                            "https://s3-ap-northeast-1.amazonaws.com/sharingkyoto2017/articles/KVxqUS8KsRCmG7LTCyM2Tx4xNAdk6s09IKEa5yTU.jpeg",
+                            "http://cdn-api.skim.gs/images/view/54be909e3847cf000069016b"];
         const carouselInstance = (
             <Carousel>
-                <Carousel.Item className="CarouselSize">
-                    <img src={this.state.data.Image ? Array.from(this.state.data.Image)[0] : defaultImage1}
-                         className="img-fluid"/>
-                </Carousel.Item>
-
-                <Carousel.Item className="CarouselSize">
-                    <img src={this.state.data.Image ? Array.from(this.state.data.Image)[1] : defaultImage2}
-                         className="img-fluid "/>
-                </Carousel.Item>
-
-                <Carousel.Item className="CarouselSize">
-                    <img src={this.state.data.Image ? Array.from(this.state.data.Image)[2] : defaultImage3}
-                         className="img-fluid "/>
-                </Carousel.Item>
+                {[0,1,2].map((key)=>(
+                    <Carousel.Item className="CarouselSize">
+                        <img src={this.state.data.Image ? Array.from(this.state.data.Image)[key] : defaultImage[key]}
+                             className="img-fluid"/>
+                    </Carousel.Item>
+                ))}
             </Carousel>
         );
 
@@ -180,7 +215,6 @@ class Recipe extends Component {
                                 <div className='row'>
                                     {this.props.match.params.user?null:
                                     <div className="btn=group btn-group-lg">
-                                        {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} className="btn btn-outline-primary">  UPDATE  </button>*/}
                                         <button
                                             onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
                                             type={"button"} className="btn btn-outline-primary">
@@ -194,7 +228,6 @@ class Recipe extends Component {
                                     </div>}
                                 </div>
                             </div>
-
                             {/*====button group====*/}
                     </div>
                     <div className="row">
@@ -216,15 +249,13 @@ class Recipe extends Component {
                     <div>
                         {/* Nav bar content here */}
                         <div className="container">
-                            <Tabs defaultActiveKey={1}>
+                            <Tabs activeKey={this.state.key} defaultActiveKey={1} onSelect={this.handleSelect}>
                                 <Tab eventKey={1} title={"Comments"}>
-                                    <ul>{reviews}</ul>
+                                    {reviews}
                                 </Tab>
                                 <Tab eventKey={2} title={"Rate and Comment"}>
                                     <form onSubmit={this.handleSubmit}>
                                         <div className="form-group">
-                                        {/*<label>Leave your comment:</label>*/}
-                                            {/*<i className="glyphicon glyphicon-pencil"/>*/}
                                             <textarea className="form-control" placeholder="Write a comment" name="comment"
                                                       rows="8" id="comment" value={this.state.value}
                                                       onChange={this.handleChange}/>
