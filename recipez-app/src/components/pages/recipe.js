@@ -21,7 +21,8 @@ class Recipe extends Component {
             loaded:false,
             data:'Loading . . . ',
             value: '',
-            active: false
+            active: false,
+            numHighlighted:0,
         }
         this.setRecipeData = this.setRecipeData.bind(this);
         this.updateReviews = this.updateReviews.bind(this);
@@ -29,6 +30,8 @@ class Recipe extends Component {
         this.client.loadRecipe(this.props.match.params.recipe,this.setRecipeData,this.props.match.params.user)
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.getRatingComponent = this.getRatingComponent.bind(this);
         // this.reload = this.reload.bind(this);
         this.user = User.getUser();
     }
@@ -45,6 +48,7 @@ class Recipe extends Component {
     }
 
     updateReviews(response){
+        console.log('review update: '+JSON.stringify(response));
         this.client.loadRecipe(this.props.match.params.recipe, this.setRecipeData, this.props.match.params.user)
         // this.setState({data:this.state.data})
     }
@@ -57,6 +61,27 @@ class Recipe extends Component {
         alert('A comment was submitted: ' + this.state.value);
         // this.forceUpdate();
         event.preventDefault();
+    }
+
+    getRatingComponent(){
+        let counter = (()=>{
+            let value = 0;
+            return (()=>value++);
+        })();
+        let starSet = [];
+        let numToHighlight = (this.state.userRating&&this.state.numHighlighted===0)?this.state.userRating:this.state.numHighlighted;
+        for(let i=0;i<5;i++){
+            let base = (<span 
+                            className='glyphicon glyphicon-star' 
+                            key={i+''} 
+                            onMouseOver={(e)=>this.setState({numHighlighted:i+1})}
+                            onClick={(e)=>{this.setState({userRating:i+1})}}/>);
+            if(i < numToHighlight){
+                base = (<span className='good-rating'>{base}</span>);
+            }
+            starSet.push(base)
+        }
+        return (<div className='rating-component' onMouseLeave={(e)=>this.setState({numHighlighted:0})}>{starSet}</div>);
     }
 
     // reload() {
@@ -101,8 +126,8 @@ class Recipe extends Component {
         var updateComment = {
             username: this.user.client.getUsername(),
             Comment: this.state.value,
-            Rating: '5',
-            timestamp: '-1'
+            Rating: this.state.userRating,
+            timestamp: '-1',
         }
         var defaultImage1 = "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ieqr7Lr2x6Ug/v0/800x-1.jpg"
         var defaultImage2 = "https://s3-ap-northeast-1.amazonaws.com/sharingkyoto2017/articles/KVxqUS8KsRCmG7LTCyM2Tx4xNAdk6s09IKEa5yTU.jpeg"
@@ -192,30 +217,32 @@ class Recipe extends Component {
                         {/* Nav bar content here */}
                         <div className="container">
                             <Tabs defaultActiveKey={1}>
-                                <Tab eventKey={1} title={"User Comment"}>
+                                <Tab eventKey={1} title={"Comments"}>
                                     <ul>{reviews}</ul>
                                 </Tab>
-                                <Tab eventKey={2} title={"Leave a Comment"}>
+                                <Tab eventKey={2} title={"Rate and Comment"}>
                                     <form onSubmit={this.handleSubmit}>
-                                        {/*<label>Leave your comment:</label>*/}
-                                        <i className="glyphicon glyphicon-pencil"/>
-                                        <textarea className="form-control" placeholder="Write a comment" name="comment"
-                                                  rows="8" id="comment" value={this.state.value}
-                                                  onChange={this.handleChange}/>
-
                                         <div className="form-group">
-                                            <div className="col-12">
+                                        {/*<label>Leave your comment:</label>*/}
+                                            {/*<i className="glyphicon glyphicon-pencil"/>*/}
+                                            <textarea className="form-control" placeholder="Write a comment" name="comment"
+                                                      rows="8" id="comment" value={this.state.value}
+                                                      onChange={this.handleChange}/>
+                                                <span className="pull-left">
+                                                    {this.getRatingComponent()}
+                                                </span>
                                                 <span className="pull-right">
-                                                    <br/>
                                                     <button onClick={(e) => {
-                                                        this.client.updateReview(this.state.data.Name, updateComment, this.updateReviews);
-                                                        /*this.reload()*/
+                                                        if(this.state.userRating){
+                                                            this.client.updateReview(this.state.data.Name, updateComment, this.updateReviews);
+                                                        } else {
+                                                            alert('Please leave a rating with your review!');
+                                                        }
                                                     }}
-                                                            className="btn btn-success btn-circle text-uppercase"
-                                                            type="submit" id="submitComment">
+                                                            className="btn btn-success comment-button"
+                                                            type="submit">
                                                         <span className="glyphicon glyphicon-send"/> Submit comment</button>
                                                 </span>
-                                            </div>
                                         </div>
                                     </form>
                                 </Tab>
