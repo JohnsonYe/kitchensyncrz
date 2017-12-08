@@ -286,35 +286,29 @@ class PreviewCard extends Component{
                 <div>
                     <ControlLabel>Add Ingredients</ControlLabel>
                 </div>
-                <div className={"row"}>
-
-                    <div className={"col-md-10"}>
-                        <form onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                this.addIngredient();
-                            }
-                        }}>
-                            <FormGroup
-                                controlId="formBasicText"
-                                validationState={this.state.validation}
-                            >
-                                <FormControl
-                                    type={"text"}
-                                    value={this.state.ingredientToAdd}
-                                    placeholder="Enter an ingredient, without units of measurement or additional information"
-                                    onChange={this.handleChangeInsertIngredient}
-                                />
-                                <FormControl.Feedback/>
-                            </FormGroup>
-                        </form>
-                    </div>
-                    <div className={"col-md-2"}>
-                        <div className={"btn btn-success"} onClick={this.addIngredient}>
-                            Add
-                        </div>
-                    </div>
-                </div>
+                <form onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.addIngredient();
+                    }
+                }}>
+                    <FormGroup controlId="formBasicText" validationState={this.state.validation}>
+                        <InputGroup>
+                            <FormControl
+                                type={"text"}
+                                value={this.state.ingredientToAdd}
+                                placeholder="Enter an ingredient, without units of measurement or additional information"
+                                onChange={this.handleChangeInsertIngredient}
+                            />
+                            <FormControl.Feedback/>
+                            <InputGroup.Button>
+                                <button className={"btn btn-success"} onClick={this.addIngredient}>
+                                    <span className='glyphicon glyphicon-plus'/>
+                                </button>
+                            </InputGroup.Button>
+                        </InputGroup>
+                    </FormGroup>
+                </form>
             </div>
         ;
 
@@ -427,7 +421,7 @@ class PreviewCard extends Component{
                             <div className={"btn btn-danger"} onClick={this.deletionOpen}>
                                 {this.props.personal ? 'Delete' : 'Remove'}
                             </div>
-                            <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image}/>
+                            <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image} button/>
                         </div>
                     </div>
 
@@ -468,7 +462,9 @@ class PreviewCard extends Component{
                         <div>
                             {insertionForm}
                         </div>
-                        {this.state.workingIngredientList}
+                        <FormGroup>
+                            {this.state.workingIngredientList}
+                        </FormGroup>
                         <div>
                             {directionForm}
                         </div>

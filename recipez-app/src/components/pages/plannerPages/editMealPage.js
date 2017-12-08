@@ -408,7 +408,7 @@ class MealEditor extends Component {
         }
 
         return (
-            <div className='btn btn-default'>
+            <div className={this.props.button?'btn btn-default':''}>
                 {button}
             <Modal show={this.state.showEditor} onHide={this.close}>
                 <Modal.Header>{this.props.recipe}</Modal.Header>

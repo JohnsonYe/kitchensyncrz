@@ -30,8 +30,11 @@ class PersonalRecipes extends Component{
 
         this.handleImgChange = this.handleImgChange.bind(this);
 
+        this.getImageForms = this.getImageForms.bind(this);
+
         this.state = {
             recipeList: [],
+            images:[''],
             modal: false,
             value: '',
             validation: '',
@@ -61,9 +64,9 @@ class PersonalRecipes extends Component{
         });
     }
 
-    createNewBlankRecipe(recipeName, imageURL) {
+    createNewBlankRecipe(recipeName, imageURLs) {
 
-        let newRecipe = this.recipeHelper.createRecipe(recipeName, [], [], "", "", [imageURL]);
+        let newRecipe = this.recipeHelper.createRecipe(recipeName, [], [], "", "", imageURLs);
         this.userInstance.saveCustomRecipe(newRecipe,this.getRecipeObjects);
         this.close();
 
@@ -107,7 +110,7 @@ class PersonalRecipes extends Component{
 
         this.recipeHelper.loadRecipe(recipeName,(recipe)=>{
             if (!recipe) {
-                this.createNewBlankRecipe(this.state.value, this.state.url);
+                this.createNewBlankRecipe(this.state.value, this.state.images);
                 this.setState({
                     validation: '',
                     value: '',
@@ -135,14 +138,63 @@ class PersonalRecipes extends Component{
         this.setState({ value: e.target.value });
     }
 
-    handleImgChange(e){
-        this.setState({url: e.target.value});
+    handleImgChange(idx){
+        return ((e)=>{
+            this.state.images.splice(idx,1,e.target.value)
+            this.setState({images:this.state.images});
+        });
     }
 
-    getImage() {
-        this.setState({
-            previewImage: <UpdatableImage src={this.state.url}/>,
+    getImage(index,url) {
+        return ((e)=>{
+            console.log(url);
+            let append = [((index===this.state.images.length-1)?'':undefined)];
+            this.state.images.splice(index,1,url);
+            this.setState({
+                previewImage: <UpdatableImage src={this.state.images[index]}/>,
+                images:this.state.images.concat(append),
+            })
         });
+    }
+
+    getImageForms(){
+        let getUrl = ((idx)=>{
+            return ((idx===this.state.images.length)?this.state.images[idx]:this.state.url);
+        });
+
+        let imgForm = ((idx)=>(
+            <form onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                }
+            }}>
+                <FormGroup controlId="formBasicText">
+                    <InputGroup>
+                        <FormControl
+                            type={"text"}
+                            value={this.state.images[idx]}
+                            placeholder="Enter Image URL"
+                            onChange={this.handleImgChange(idx)}
+                        />
+                        <FormControl.Feedback />
+                        <InputGroup.Button>
+                            <Button bsStyle='success' onClick={this.getImage(idx,this.state.images[idx])}>Add</Button>
+                        </InputGroup.Button>
+                    </InputGroup>
+                </FormGroup>
+            </form>
+        ));
+        let forms = [];
+        for(let i = 0; i < this.state.images.length;i++){
+            forms.push((
+                <div className={"row"}>
+                    <div className={"col-md-12"}>
+                        {imgForm(i)}
+                    </div>
+                </div>
+            ))
+        }
+        return forms;
     }
 
 
@@ -182,29 +234,6 @@ class PersonalRecipes extends Component{
             </form>
         ;
 
-        let imgForm =
-            <form onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                }
-            }}>
-                <FormGroup controlId="formBasicText">
-                    <InputGroup>
-                        <FormControl
-                            type={"text"}
-                            value={this.state.url}
-                            placeholder="Enter Image URL"
-                            onChange={this.handleImgChange}
-                        />
-                        <FormControl.Feedback />
-                        <InputGroup.Button>
-                            <Button bsStyle='success' onClick={this.getImage}>Add</Button>
-                        </InputGroup.Button>
-                    </InputGroup>
-                </FormGroup>
-            </form>
-
-
         let image = this.state.previewImage;
         return(
             <div>
@@ -230,11 +259,7 @@ class PersonalRecipes extends Component{
 
                     <Modal.Body>
                         {form}
-                        <div className={"row"}>
-                            <div className={"col-md-12"}>
-                                {imgForm}
-                            </div>
-                        </div>
+                        {this.getImageForms()}
                         {image}
                     </Modal.Body>
                     <Modal.Footer>
@@ -244,7 +269,7 @@ class PersonalRecipes extends Component{
                             }}>
                                 Create
                             </div>
-                            <div className={"btn btn-light"} onClick={this.close}>
+                            <div className={"btn btn-danger"} onClick={this.close}>
                                 Cancel
                             </div>
                         </div>
