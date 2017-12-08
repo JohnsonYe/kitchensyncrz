@@ -144,14 +144,6 @@ class Search extends Component {
     addIngredient(ingredient){
         this.ingredient = ingredient;
     }
-    updateState(sortedResults,value,status){
-
-        this.setState({
-            sorted:sortedResults,
-            ...this.updateIngredientState(value,status),
-            loading:false,
-        },this.updateURI)
-    }
     removeIngredient(value,status){
         // e.preventDefault();
         let update_state_and_close_dropdowns_fn = (sorted)=>{
@@ -196,7 +188,44 @@ class Search extends Component {
         });
         this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
     }
-    updateIngredientState(value,status){
+    handleReject(e){ //events from the "reject" button on the toolbar
+        let value = this.searchbar.getValue(); //get the searchbar state
+        let status = this.searchbar.getStatus();
+        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})
+
+    }
+    handleSubmit(e){ //catch form submission events from the searchbar element and the "add" button
+        this.startLoading();
+        e.preventDefault();
+
+        //check the searchbar state for state-specific handling
+        let value = this.searchbar.getValue()
+        let status = this.searchbar.getStatus()
+        let callbacks = {
+            successCallback: this.searchUpdateWrapper(value,status),
+            outputCallback: this.updateLoader,
+        }
+        this.client.updateIngredient(value,status,callbacks)
+
+    }
+    searchUpdateWrapper(value,status){ //getter function for specific ingredient values and update types
+        return ((sorted)=>this.searchUpdate(sorted,value,status));
+    }
+    searchUpdate(sorted,value,status){ //update the page based on search results
+        this.updateState(sorted,value,status); //update the lists based on the type of update
+        if(this.searchbar){ //reset the searchbar
+            this.searchbar.reset();
+        }
+        console.log('Updated search results: ' + JSON.stringify([value,status]))
+    }
+    updateState(sortedResults,value,status){
+        this.setState({
+            sorted:sortedResults,
+            ...this.updateIngredientState(value,status), //get updated include and exclude information
+            loading:false,
+        },this.updateURI) //update the uri once visual update completes
+    }
+    updateIngredientState(value,status){ //modify our copy of the ingredient and exlcude lists based on the value and status given
         if(status === 1){ //adding an ingredient to search -- we should load the data too
             return {ingredients:this.state.ingredients.add(value)};
         } else if(status===-1){
@@ -208,45 +237,17 @@ class Search extends Component {
         } else if(status===CLEAR_SEARCH){
             return {excluded:new Set(),ingredients:new Set()};
         } else if(status===ADD_MULTIPLE){
+            console.log('got here');
             return {ingredients:(()=>value.reduce((prev,next)=>prev.add(next),this.state.ingredients))()}
         } else {
             return {};
         }
     }
-    searchUpdateWrapper(value,status){
-        return ((sorted)=>this.searchUpdate(sorted,value,status));
-    }
-    searchUpdate(sorted,value,status){
-        this.updateState(sorted,value,status);
-        if(this.searchbar){
-            this.searchbar.reset();
-        }
-        console.log('Updated search results: ' + JSON.stringify([value,status]))
-    }
-    handleSubmit(e){
-        this.startLoading();
-        e.preventDefault();
-
-        let value = this.searchbar.getValue()
-        let status = this.searchbar.getStatus()
-        let callbacks = {
-            successCallback: this.searchUpdateWrapper(value,status),
-            outputCallback: this.updateLoader,
-        }
-        this.client.updateIngredient(value,status,callbacks)
-
-    }
-    updateURI(){
+    updateURI(){ //update the uri with the current include, exclude, and filter settings
         this.props.history.replace('/Search?'+
             'ingredients='+Array.from(this.state.ingredients).join(',')+
             '&excluded='+Array.from(this.state.excluded).join(',')+
             '&filter='+this.state.filter)
-    }
-    handleReject(e){
-        let value = this.searchbar.getValue()
-        let status = this.searchbar.getStatus()
-        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})
-
     }
     parseQueryString(search){
         return search.substring(1)
@@ -258,16 +259,18 @@ class Search extends Component {
 
     setFilter(filter){
         this.startLoading();
-        this.closeAllDropdowns()
+        this.closeAllDropdowns();
+        this.setState({filter:filter}); //set our state to reflect the current filter state
         if(filter === "custom"){ //special actions based on user preferences
-            this.doneLoading();
+            this.doneLoading(); //not currently implemented
         } else {
-            this.client.setFilter(filter,this.searchUpdateWrapper());
+            //set the filter type and pass the helper and handle for updating the state with new search ordering
+            this.client.setFilter(filter,this.searchUpdateWrapper());  
         }
 
-        this.setState({filter:filter});
     }
 
+    //debugging functions
     mortensButton2(){
         User.getUser('user001').addToPantry('fish','none',1)
     }
@@ -280,9 +283,14 @@ class Search extends Component {
             .then((auto)=>console.log(auto.getCompletion('')))
     }
 
-    toggleThumbnails(){
+    toggleThumbnails(){ //toggle the image thumbnail view for results
         this.setState({ viewThumbnails: !this.state.viewThumbnails })
     }
+
+    /**
+     * add a batch of ingredients from the user pantry and exclude list
+     * @param {Event} e click event generated by the add button, we don't really care about the info
+     */
     addFromPantry(e){
         console.log("Adding from user pantry . . .")
 
@@ -296,7 +304,8 @@ class Search extends Component {
             return items.filter((item)=>!!item); //check if the item is valid
         };
 
-        let sort_results_and_update_fn = (items)=>{
+        let sort_results_and_update_fn = (items)=>{ 
+            //have the client compile and sort the search results, then update our state through the normal pathway
             this.client.sortRecipeMap(this.searchUpdateWrapper(items,ADD_MULTIPLE))
         };
 
@@ -308,20 +317,31 @@ class Search extends Component {
                 //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
                     .map((updatePromise)=>updatePromise.catch(update_failed_fn))
             )
-                .then( filter_failed_results_fn )
-                .then( sort_results_and_update_fn )
-                .catch((err)=>console.error(err))
+            .then( filter_failed_results_fn )
+            .then( sort_results_and_update_fn )
+            .catch((err)=>console.error(err))
         })
     }
 
-    getGlyph(name){
+    getGlyph(name){ //bootstrap glyphicon convenience function
         return (<span className={"glyphicon glyphicon-"+name}></span>);
     }
 
-    getJustifiedGlyph(name){
+    getJustifiedGlyph(name){ //justified glyphicon convenience function
         return (<span className="pull-right">{this.getGlyph(name)}</span>);
     }
 
+    /**
+     * get a clickable dropdown item for each filter type
+     * @param  {String} message the text to display for each dropdown item
+     * @param  {String} icon    the name of the glyphicon to use for this button
+     * @param  {String} filter  the name of the filter that this button sets
+     * @param  {boolean} largest set to true if this button has the longest 
+     *                           string (necessary for proper wrapping)
+     *                           
+     * @return {JSX <div>}         <div> element compatible with bootstrap 
+     *                             dropdowns containing filter setting functionality
+     */
     getFilterButton(message,icon,filter,largest){
         let glyph = (<span className={"glyphicon glyphicon-"+icon+(largest?" pad-icon":"")}></span>);
         if(!largest){
@@ -331,7 +351,7 @@ class Search extends Component {
 
     }
 
-    clearSearch(e){
+    clearSearch(e){ //clear ingredient and exclude lists, search results and close all dropdowns
         this.props.history.push('/Search')
         this.client.clear(this.searchUpdateWrapper(null,CLEAR_SEARCH));
         this.closeAllDropdowns();

@@ -36,7 +36,7 @@ const UNAUTH_NAME = 'GUEST'
 
 var MAX_REQUEST_LENGTH = 100;
 
-var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+var exprRegex = /[[\]\s.,\/#!$%\^&\*;:{}=\-'"`~()]/g;
 
 
  class DBClient {
