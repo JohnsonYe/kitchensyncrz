@@ -38,7 +38,7 @@ class kitchen extends Component {
             grainData = [],
             fruitData = [],
             otherData = [],
-            outData = [],
+            outData = new Map(),
             excludeData = [],
             prefData = [],
             cookwareData = [],
@@ -178,7 +178,28 @@ class kitchen extends Component {
                     this.addOther(key[0]);
                     break;
                 case("Restock"):
-                    this.addOut(key[0]);
+                    switch(key[1].amount){
+                        case("1"):
+                            this.addOut(key[0], "Protein");
+                            break;
+                        case("2"):
+                            this.addOut(key[0], "Dairy");
+                            break;
+                        case("3"):
+                            this.addOut(key[0], "Vegetable");
+                            break;
+                        case("4"):
+                            this.addOut(key[0], "Fruit");
+                            break;
+                        case("5"):
+                            this.addOut(key[0], "Grain");
+                            break;
+                        case("6"):
+                            this.addOut(key[0], "Other");
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
@@ -268,7 +289,7 @@ class kitchen extends Component {
     addDairy(val){
         this.setState({dairy: this.state.dairy.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "Dairy", 1);
+        this.user.addToPantry(val, "Dairy", 2);
     }
 
     removeDairy(val){
@@ -295,7 +316,7 @@ class kitchen extends Component {
     addVegetable(val){
         this.setState({vegetable: this.state.vegetable.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "Vegetable", 1);
+        this.user.addToPantry(val, "Vegetable", 3);
     }
 
     removeVegetable(val){
@@ -322,7 +343,7 @@ class kitchen extends Component {
     addFruit(val){
         this.setState({fruit: this.state.fruit.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "Fruit", 1);
+        this.user.addToPantry(val, "Fruit", 4);
     }
 
     removeFruit(val){
@@ -349,7 +370,7 @@ class kitchen extends Component {
     addGrain(val){
         this.setState({grain: this.state.grain.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "Grain", 1);
+        this.user.addToPantry(val, "Grain", 5);
     }
 
     removeGrain(val){
@@ -376,7 +397,7 @@ class kitchen extends Component {
     addOther(val){
         this.setState({other: this.state.other.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "Other", 1);
+        this.user.addToPantry(val, "Other", 6);
     }
 
     removeOther(val){
@@ -457,10 +478,14 @@ class kitchen extends Component {
     }
 
     // Add to the Restock List
-    addOut(val){
-        this.setState({out: this.state.out.concat(val)});
+    addOut(val, state){
+
+        if(state == undefined){state = this.state.key}
+
+        this.setState({out: this.state.out.set(val, state)});
         this.setState({numRestock: (++this.state.numRestock)});
-        switch( this.state.key ){
+
+        switch( state ){
             case "Protein":
                 this.removeProtein(val);
                 break;
@@ -482,14 +507,41 @@ class kitchen extends Component {
             default:
                 break;
         }
-        this.user.addToPantry(val, "Restock", 1);
+
+        switch( state ){
+            case "Protein":
+                this.user.addToPantry(val, "Restock", 1);
+                break;
+            case "Dairy":
+                this.user.addToPantry(val, "Restock", 2);
+                break;
+            case "Vegetable":
+                this.user.addToPantry(val, "Restock", 3);
+                break;
+            case "Fruit":
+                this.user.addToPantry(val, "Restock", 4);
+                break;
+            case "Grain":
+                this.user.addToPantry(val, "Restock", 5);
+                break;
+            case "Other":
+                this.user.addToPantry(val, "Restock", 6);
+                break;
+            default:
+                break;
+        }
+
+
     }
 
     returnOut(val){
-        if( this.state.out.length > 0 ){
-            this.state.out.splice( this.state.out.indexOf(val), 1);
+
+        if( this.state.out.size > 0 ){
+            var currState = this.state.out.get(val);
+
+            this.state.out.delete( val );
             this.setState({numRestock: (--this.state.numRestock)});
-            switch( this.state.key ){
+            switch( currState ){
                 case "Protein":
                     this.addProtein(val);
                     break;
@@ -517,8 +569,8 @@ class kitchen extends Component {
 
     //Trashing
     removeOut(val){
-        if( this.state.out.length > 0 ) {
-            this.state.out.splice(this.state.out.indexOf(val), 1);
+        if( this.state.out.size > 0 ) {
+            this.state.out.delete( val );
             this.setState({numRestock: (--this.state.numRestock)});
             this.user.removeFromPantry(val);
         }
