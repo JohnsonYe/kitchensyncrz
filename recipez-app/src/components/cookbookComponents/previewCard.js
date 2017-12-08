@@ -72,6 +72,7 @@ class PreviewCard extends Component{
     }
 
     componentWillReceiveProps(newProps) {
+        // console.log("received props");
         let initialIngredientList = [];
         this.ingredientFormRefs = [];
         for (let original_ingredient of newProps.src.Ingredients) {
@@ -87,19 +88,19 @@ class PreviewCard extends Component{
         for (let direction_line of newProps.src.Directions) {
             initial_directions += direction_line + '\n';
         }
-        this.setState({
-            //deletionModal: false,
-            //editModal: false,
-            ingredientList: initialIngredientList.slice(),
-            workingIngredientList: initialIngredientList,
-            ingredientToAdd: '',
-            directions: initial_directions,
-            workingDirections: initial_directions,
-            difficulty: newProps.src.Difficulty,
-            workingDifficulty: newProps.src.Difficulty,
-            duration: newProps.src.TimeCost,
-            workingDuration: newProps.src.TimeCost,
-        })
+        // this.setState({
+        //     //deletionModal: false,
+        //     //editModal: false,
+        //     ingredientList: initialIngredientList.slice(),
+        //     workingIngredientList: initialIngredientList,
+        //     ingredientToAdd: '',
+        //     directions: initial_directions,
+        //     workingDirections: initial_directions,
+        //     difficulty: newProps.src.Difficulty,
+        //     workingDifficulty: newProps.src.Difficulty,
+        //     duration: newProps.src.TimeCost,
+        //     workingDuration: newProps.src.TimeCost,
+        // })
     }
 
     deletionOpen(e) {
@@ -149,8 +150,6 @@ class PreviewCard extends Component{
     }
 
     removeIngredient(ingredientToRemove) {
-
-
         let updatedWorkingIngredientList = [];
         for (let i in this.ingredientFormRefs) {
             if (this.ingredientFormRefs[i] === ingredientToRemove) {
@@ -169,7 +168,7 @@ class PreviewCard extends Component{
         }
         this.ingredientFormRefs = [];
         this.setState({
-            workingIngredientList: updatedWorkingIngredientList.slice(),
+            workingIngredientList: updatedWorkingIngredientList.slice(), //create a copy of the array
         });
 
     }
@@ -237,11 +236,14 @@ class PreviewCard extends Component{
                                                           }
                                                           }/>);
 
+        console.log('state set input: ');
+        console.log(updatedWorkingIngredientList);
+
 
         this.setState({
             workingIngredientList: updatedWorkingIngredientList.slice(),
             ingredientToAdd: '',
-        })
+        },()=>{console.log('after state set:');console.log(this.state.workingIngredientList)})
     }
 
     handleChangeDirections(e) {
@@ -263,7 +265,6 @@ class PreviewCard extends Component{
     }
 
     render() {
-
         let personalAddendum;
         if(this.props.personal) {
             personalAddendum =

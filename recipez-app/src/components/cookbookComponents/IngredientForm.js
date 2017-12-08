@@ -68,7 +68,7 @@ class IngredientForm extends Component {
                     <div className={"form-group col-md-4"}>
                         <FormControl type={"text"}
                                      value={this.state.additional}
-                                     placeHolder={"chopped, diced, etc."}
+                                     placeholder={"chopped, diced, etc."}
                                      onChange={this.handleAdditionalChange}
                         >
 

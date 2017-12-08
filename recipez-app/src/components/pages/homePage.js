@@ -91,9 +91,10 @@ class Homepage extends Component {
                             </p>
                         </Col>
                         <Col sm={7}>
-                            <Carousel className={"carousel-size"}>
+                            {/*<Carousel className={"carousel-size"}>*/}
+                            <Carousel>
                                 <Carousel.Item>
-                                    <img className="carousel-image" width={500} height={400} alt="900x500"
+                                    <Image className="carousel-image" width={500} height={400} alt="900x500"
                                          src={burgerImage}/>
                                     <Carousel.Caption>
                                         <h3>Cheeseburger & Fries</h3>
@@ -101,7 +102,7 @@ class Homepage extends Component {
                                     </Carousel.Caption>
                                 </Carousel.Item>
                                 <Carousel.Item>
-                                    <img className="carousel-image" width={500} height={400} alt="900x500"
+                                    <Image className="carousel-image" width={500} height={400} alt="900x500"
                                          src={steakImage}/>
                                     <Carousel.Caption>
                                         <h3>Lamb Steak & Garnishes</h3>
@@ -109,7 +110,7 @@ class Homepage extends Component {
                                     </Carousel.Caption>
                                 </Carousel.Item>
                                 <Carousel.Item>
-                                    <img className="carousel-image" width={500} height={400} alt="900x500"
+                                    <Image className="carousel-image" width={500} height={400} alt="900x500"
                                          src={chickenImage}/>
                                     <Carousel.Caption>
                                         <h3>Chicken wings</h3>

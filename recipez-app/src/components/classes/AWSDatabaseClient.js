@@ -87,7 +87,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
             'L': (l,p)=>({'L':l.map((item)=>(this.protoPack[p.type](item,p.inner)))}),
             'M': (m,p)=>({'M':Object.entries(m).reduce((prev,item)=>Object.assign({[item[0]]:this.protoPack[p.type](item[1],p.inner)},prev),{})}),
             'SS':(ss,p)=>({'SS':Array.from(ss)}),
-            'N': /*(n,p)=>({'N':n.toString()})*/castToNumber,
+            'N': (n,p)=>({'N':n.toString()})/*castToNumber*/,
             'SET': (n,p)=>{alert('this isnt set up yet')},
         }
 
@@ -114,13 +114,17 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
      * handle callback: function handle to send items to
      */
     getDBItems(tableName,keyField,keys,target){
+        if(keys.length === 0){
+            console.log('Received a request with zero keys, skipping database request');
+            return;
+        }
         if(keys.length > MAX_REQUEST_LENGTH){
             console.log('Recieved request with more than 100 keys! ('+keys.length+')')
             Promise.all((()=>{ //create a promise group out of max size batch requests
                 let pos = 0,requests = [];
                 while(pos < keys.length){ //split key array into size 100 chunks
                     requests.push(keys.slice(pos,pos+MAX_REQUEST_LENGTH));
-                    pos+=MAX_REQUEST_LENGTH
+                    pos+=MAX_REQUEST_LENGTH;
                 }
                 console.log('Split request into '+requests.length+' sub-requests')
                 //map the chunk array to a promise array, containing a DBItemPromise for each chunk
@@ -153,10 +157,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
      * @return {[Promise]}           [Promise object with pending DB response]
      */
     getDBItemPromise(tableName,keyField,keys){
-        if(keys.length > MAX_REQUEST_LENGTH){
-            console.error('Recieved request with more than 100 keys!('+keys.length+')')
-        }
-        return new Promise((pass,fail)=>{
+        return new Promise((pass,fail)=>{ //wrap a standard request in a promise
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
                     pass(response.payload)

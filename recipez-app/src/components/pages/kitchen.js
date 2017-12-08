@@ -172,7 +172,7 @@ class kitchen extends Component {
                     this.addFruit(key[0]);
                     break;
                 case("Grain"):
-                    this.addFruit(key[0]);
+                    this.addGrain(key[0]);
                     break;
                 case("from shopping list"):
                     this.addOther(key[0]);
@@ -754,7 +754,7 @@ class kitchen extends Component {
 
                         </div>
 
-                        <div className = "col-md-4" style={{background: 'gainsboro'}}>
+                        <div className = "col-md-4" style={{background: 'gainsboro',paddingBottom:'10px'}}>
                             <div className = "container-fluid mg-3">
                                 <h3>
                                     <span className="glyphicon glyphicon-alert"></span>

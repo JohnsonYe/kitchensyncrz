@@ -79,6 +79,8 @@ class Search extends Component {
 
         this.recipeLoader = Promise.resolve(new Map()) //set up an async chain for loading recipe info
 
+        this.comingSoon = ['Filter by Cookware','Filter by Cost'];
+
 
 
     }
@@ -187,9 +189,10 @@ class Search extends Component {
                     // console.log('recipe list: '+JSON.stringify(recipeList));
                     // console.log('recipe map: '+JSON.stringify(recipes));
                     this.doneLoading();
+                    console.log(recipeList);
                     return recipeList.reduce((prev,next)=>prev.set(next.Name,next),recipes);
                 })
-                .catch((err)=>{console.error('updateLoader: '+err);this.doneLoading();return recipes}));
+                .catch((err)=>{console.error('loader update error: '+err);this.doneLoading();return recipes}));
         });
         this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
     }
@@ -412,7 +415,7 @@ class Search extends Component {
                             let data = this.state.loadedRecipes.get(recipe[0]);
                             if(data){
                                 return(
-                                <SearchThumbnail data={data} />
+                                <SearchThumbnail key={recipe[0]} data={data} />
                                 );
                             }
                         })     
