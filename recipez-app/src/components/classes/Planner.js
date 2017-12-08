@@ -27,6 +27,7 @@ class PlannerHelper{
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
             alert("Planner Updated");
+            alert("Fuck");
             return true;
         }
 
@@ -35,70 +36,15 @@ class PlannerHelper{
             endHr = meal.endHr,
             endMin = meal.endMin;
 
-        //Handle Database Error
-        if (startMin === undefined) {
-            startMin = 0;
-        }
-
-        if (endMin === undefined) {
-            endMin = 0;
-        }
-
-        if (startHr === undefined) {
-            startHr = 0;
-        }
-
-        if (endHr === undefined) {
-            endHr = 0;
-        }
 
         let dstartHr = meals[0].startHr,
             dstartMin = meals[0].startMin,
             dendHr = meals[0].endHr,
             dendMin = meals[0].endMin;
 
-        //Handle Database Error
-        if (dstartMin === undefined) {
-            dstartMin = 0;
-        }
-
-        if (dendMin === undefined) {
-            dendMin = 0;
-        }
-
-        if (dstartHr === undefined) {
-            dstartHr = 0;
-        }
-
-        if (dendHr === undefined) {
-            dendHr = 0;
-        }
-
         // Go through meals looking at each end times to ensure that this meals
         // start time is greater than meal before's end time.
-        while ( startHr >= dendHr && mealIndex != meals.length) {
-            dstartHr = meals[mealIndex].startHr;
-            dstartMin = meals[mealIndex].startMin;
-            dendHr = meals[mealIndex].endHr;
-            dendMin = meals[mealIndex].endMin;
-
-            //Handle Database Error
-            if (dstartMin === undefined) {
-                dstartMin = 0;
-            }
-
-            if (dendMin === undefined) {
-                dendMin = 0;
-            }
-
-            if (dstartHr === undefined) {
-                dstartHr = 0;
-            }
-
-            if (dendHr === undefined) {
-                dendHr = 0;
-            }
-
+        do {
             //check min
             if( startHr == dendHr){
                 if( startMin < dendMin ) {
@@ -107,18 +53,27 @@ class PlannerHelper{
                 }
             }
             mealIndex += 1;
+
+            dstartHr = meals[mealIndex].startHr;
+            dstartMin = meals[mealIndex].startMin;
+            dendHr = meals[mealIndex].endHr;
+            dendMin = meals[mealIndex].endMin;
         }
+       	while ( startHr >= dendHr && mealIndex != meals.length);
 
         //if mealIndex is out of bound then add to the end
-        if (mealIndex == meals.length) {
+        if (mealIndex == meals.length)
+        {
             data.days[day].mealData.push(meal);
             alert("Planner Updated");
+            alert("Fuck1");
             return true;
         }
         // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
         else if(endHr < dstartHr) {
             data.days[day].mealData.splice(mealIndex, 0, meal);
             alert("Planner updated :D");
+            alert("Fuck3");
             return true;
         }else {
             alert("Time confliction ... Please schedule a different time");
