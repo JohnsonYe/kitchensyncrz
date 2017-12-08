@@ -180,7 +180,6 @@ class MealEditor extends Component {
         this.renderImg = this.renderImg.bind(this);
         //this.printMealList = this.printMealList.bind(this);
 
-        this.renderImg();
         // this.renderMealList();
 
     }
@@ -213,6 +212,7 @@ class MealEditor extends Component {
     /**Method that opens Modal*/
     open() {
         this.setState( {showEditor: true} );
+        this.renderImg();
     }
 
     /**Method that closes modal*/
@@ -364,13 +364,21 @@ class MealEditor extends Component {
     }
 
     renderImg() {
-        let recipeHelper = new RecipeHelper();
 
-        recipeHelper.loadRecipe(this.props.recipe, (data) => {
-            if(data&&data.Image) {
-                this.setState({img: Array.from(data.Image)[0]});
-            }
-        });
+        if(this.props.personal) {
+            this.setState({img: this.props.url});
+        }
+        else
+        {
+
+            let recipeHelper = new RecipeHelper();
+
+            recipeHelper.loadRecipe(this.props.recipe, (data) => {
+                if (data && data.Image) {
+                    this.setState({img: Array.from(data.Image)[0]});
+                }
+            });
+        }
     }
 
     render() {

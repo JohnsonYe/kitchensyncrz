@@ -189,12 +189,15 @@ class PlannerHelper{
     /** Gives the an array of meals for that day
      * @param day - day you want the meal list of*/
     getDayMealList(data, day) {
-        return data.days[day].mealData;
+        if(data.days[day].mealData) {
+            return data.days[day].mealData;
+        }
+        else return [];
      }
 
     getMealRecipeName(data, day, mealIndex) {
         //alert(JSON.stringify(data.days));
-        if (data.days[day].mealData[mealIndex].recipes) {
+        if (data.days[day].mealData[mealIndex]) {
             return data.days[day].mealData[mealIndex].recipes[0];
 
         } else return "Unavailable";
@@ -219,14 +222,14 @@ class PlannerHelper{
              hour = (hour - 12);
              noon = "pm"
          }
-         else if(hour === undefined) {  //undefined
+         else if(hour == 0) {  //undefined
              hour = 12;
              noon = "am";
          }
 
         if (min < 10) {
             min = "0" + min;
-        } else if (min === undefined) { //undefined
+        } else if (min == 0) { //undefined
             min = "00";
         }
 
@@ -244,33 +247,13 @@ class PlannerHelper{
             endHr = meal.endHr,
             endMin = meal.endMin;
 
-        if (meal.startMin === undefined) {
-            startMin = 0;
-        }
-
-        if (meal.endMin === undefined) {
-            endMin = 0;
-        }
-
-        if (meal.startHr === undefined) {
-            startHr = 0;
-        }
-
-        if (meal.endHr === undefined) {
-            endHr = 0;
-        }
-
         let min = endMin - startMin;
         let hr = endHr - startHr;
 
         //alert(JSON.stringify(meal.endMin));
 
-        if (min === undefined) {
-            min = "0";
-        }
-
-        if (hr === undefined) {
-            hr = "0";
+        if (min < 0) {
+            min = 60 + min;
         }
 
          if( endHr - startHr == 0) {
@@ -298,14 +281,14 @@ class PlannerHelper{
             hour = (hour - 12);
             noon = "pm"
         }
-        else if (hour === undefined) {  //undefined
+        else if (hour == 0) {  //undefined
             hour = 12;
             noon = "am";
         }
 
         if (min < 10) {
             min = "0" + min;
-        } else if (min === undefined) { //undefined
+        } else if (min == 0) { //undefined
             min = "00";
         }
 
@@ -325,7 +308,6 @@ class PlannerHelper{
          for(let i = 0; i < 7; i++) {
              total += data.days[i].mealData.length;
          }
-
          return total;
      }
 }
