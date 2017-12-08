@@ -76,7 +76,7 @@ class Homepage extends Component {
                         {/*<p className="banner-style"><Image src={bannerImage} responsive /></p>*/}
                     </div>
                 </Jumbotron>
-                <button className='btn btn-success' onClick={mortensButton}>Morten's Button</button>
+                {/*<button className='btn btn-success' onClick={mortensButton}>Morten's Button</button>*/}
                 <Grid>
                     <Row>
                         <Col sm={5} >
@@ -123,7 +123,7 @@ class Homepage extends Component {
                     <hr class="featurette-divider"/>
                     <Row>
                         <Col sm={3}>
-                            <Image src={browseIcon} circle responsive />
+                            <Link to="/Search" ><Image src={browseIcon} circle responsive /></Link>
                             <h2 className="feature-style">Browse</h2>
                             <p> Browse will enable the user to dive into our extensive database of recipes
                                 and find something that they wish to create. Users will also have an option to
@@ -139,7 +139,7 @@ class Homepage extends Component {
                         </Col>
 
                         <Col sm={3}>
-                            <Image src={cookbookIcon} circle responsive />
+                            <Link to="/Cookbook" ><Image src={cookbookIcon} circle responsive /></Link>
                             <h2 className="feature-style">Cookbook</h2>
                             <p> Cookbook is where you can save your favorite recipes for easy access. It will
                                 also serve as the home for any recipes the user uploaded to Kitchen Sync’s
@@ -154,7 +154,7 @@ class Homepage extends Component {
                         </Col>
 
                         <Col sm={3}>
-                            <Image src={kitchenIcon} circle responsive />
+                            <Link to="/Kitchen" ><Image src={kitchenIcon} circle responsive /></Link>
                             <h2 className="feature-style">Kitchen</h2>
                             <p> Kitchen is where users can personalize the app and set their preferences. They
                                 can add and remove items in their Pantry, which will tell Kitchen Sync
@@ -169,7 +169,7 @@ class Homepage extends Component {
                         </Col>
 
                         <Col sm={3}>
-                            <Image src={calendarIcon} circle responsive />
+                            <Link to="/Planner" ><Image src={calendarIcon} circle responsive /></Link>
                             <h2 className="feature-style">Planner</h2>
                             <p> Meal Planner will help users to plan ahead and be ready for meals they plan to
                                 cook. Users will be able to plan a recipe for a certain date, and Kitchen
