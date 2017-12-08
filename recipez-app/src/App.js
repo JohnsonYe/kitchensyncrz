@@ -149,7 +149,7 @@ class App extends Component {
                                     <Link to="/" onClick={this.closeNav}>Home</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Search" onClick={this.closeNav}>Browse</Link>
+                                    <Link to="/Search" onClick={this.closeNav}>Search</Link>
                                 </li>
                                 <li>
                                     <Link to="/Cookbook" onClick={this.closeNav}>Cookbook</Link>

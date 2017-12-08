@@ -172,7 +172,7 @@ class kitchen extends Component {
                     this.addFruit(key[0]);
                     break;
                 case("Grain"):
-                    this.addFruit(key[0]);
+                    this.addGrain(key[0]);
                     break;
                 case("from shopping list"):
                     this.addOther(key[0]);
