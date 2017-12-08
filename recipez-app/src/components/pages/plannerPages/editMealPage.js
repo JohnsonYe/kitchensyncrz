@@ -385,7 +385,7 @@ class MealEditor extends Component {
 
         var editButton = (
                 <a
-                    className="card-link"
+                    className="card-link planner-hover"
                     onClick={this.open}>{this.props.recipe}
                 </a>
             ),

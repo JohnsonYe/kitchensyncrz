@@ -40,9 +40,10 @@ function UpNextCard(props) {
 
 function DailyPlannerItem(props) {
     return (
-        <div className="card m-3 planner-hover">
+        <div className="card m-3">
                 <div className="card-body ">
-                    <MealEditor data={props.data}
+                    <MealEditor className="planner-hover"
+                                data={props.data}
                                 recipe={props.recipe}
                                 day={props.day}
                                 mealIndex={props.mealIndex}
@@ -50,7 +51,7 @@ function DailyPlannerItem(props) {
                                 edit={true}
                                 update={props.update}
                     />
-                    <p className="">{props.start} to {props.end} - {props.dur}</p>
+                    <p>{props.start} to {props.end} - {props.dur}</p>
                 </div>
             </div>
     );

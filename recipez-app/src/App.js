@@ -119,6 +119,7 @@ class App extends Component {
         this.client.user = 'user001';
         User.getUser().reload();
         //alert(this.client.isLoggedIn());
+        this.closeNav;
     }
 
     render() {
