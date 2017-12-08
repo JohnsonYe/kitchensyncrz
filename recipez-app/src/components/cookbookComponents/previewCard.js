@@ -88,19 +88,19 @@ class PreviewCard extends Component{
         for (let direction_line of newProps.src.Directions) {
             initial_directions += direction_line + '\n';
         }
-        // this.setState({
-        //     //deletionModal: false,
-        //     //editModal: false,
-        //     ingredientList: initialIngredientList.slice(),
-        //     workingIngredientList: initialIngredientList,
-        //     ingredientToAdd: '',
-        //     directions: initial_directions,
-        //     workingDirections: initial_directions,
-        //     difficulty: newProps.src.Difficulty,
-        //     workingDifficulty: newProps.src.Difficulty,
-        //     duration: newProps.src.TimeCost,
-        //     workingDuration: newProps.src.TimeCost,
-        // })
+        this.setState({
+            //deletionModal: false,
+            //editModal: false,
+            ingredientList: initialIngredientList.slice(),
+            workingIngredientList: initialIngredientList,
+            ingredientToAdd: '',
+            directions: initial_directions,
+            workingDirections: initial_directions,
+            difficulty: newProps.src.Difficulty,
+            workingDifficulty: newProps.src.Difficulty,
+            duration: newProps.src.TimeCost,
+            workingDuration: newProps.src.TimeCost,
+        })
     }
 
     deletionOpen(e) {
@@ -275,7 +275,7 @@ class PreviewCard extends Component{
         let editButton;
         if(this.props.personal){
             editButton =
-                <div className="btn btn-primary" onClick={this.editOpen}>
+                <div className="btn btn-primary col-4" onClick={this.editOpen}>
                     Edit
                 </div>
         }

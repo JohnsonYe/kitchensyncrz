@@ -196,8 +196,10 @@
 
 
 .planner-hover:hover{
-  border:solid 1px black;
+  //border:solid 1px black;
   cursor:pointer;
+  margin-left: 1px;
+  
 }
 
 .padding-down{
@@ -222,4 +224,14 @@
 
 .form-list-spacer{
   margin-bottom:5px;
+}
+
+.mealeditor-hover:hover {
+  border: solid 1px black;
+  cursor: pointer;
+
+}
+
+.glyphicon-time {
+  margin-right: 4px;
 }
