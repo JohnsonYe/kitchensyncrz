@@ -55,14 +55,14 @@ class App extends Component {
         }
         this.client = DBClient.getClient();
 
-        this.moveCallback = ((e)=>{
+        /*this.moveCallback = ((e)=>{
             this.setState({
                 transform:{
                     'left': e.pageX-this.state.cursorWidth/2,
                     'top' : e.pageY-this.state.cursorHeight/2 ,
                 }
             });
-        });
+        });*/
     }
 
     async componentDidMount() {
@@ -82,8 +82,8 @@ class App extends Component {
 
     componentWillMount() {
 
-        window.addEventListener('click', this.closeNav);
-        window.addEventListener('mousemove',this.moveCallback)
+        //window.addEventListener('click', this.closeNav);
+        //window.addEventListener('mousemove',this.moveCallback)
         this.setState({
             isNavMenuOpened: false,
             isAuthenticating: true,
@@ -91,8 +91,8 @@ class App extends Component {
     }
 
     componentWillUnmount() {
-        window.removeEventListener('click', this.closeNav);
-        window.removeEventListener('mousemove',this.moveCallback);
+        //window.removeEventListener('click', this.closeNav);
+        //window.removeEventListener('mousemove',this.moveCallback);
     }
 
     handleClick(e) {
@@ -102,7 +102,7 @@ class App extends Component {
 
     closeNav(e) {
         e.stopPropagation();
-       this.setState({isNavMenuOpened: false});
+        this.setState({isNavMenuOpened: false});
     }
 
     toggleFunMode() {
@@ -187,9 +187,9 @@ class App extends Component {
                     <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Morten's Button</button>
                     </span>
                     </div>
-                    <div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
+                    {/*<div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
                         <img src='/images/Peanut-butter-jelly-time.gif' width={this.state.cursorWidth+'px'} height={this.state.cursorHeight+'px'}/>
-                    </div>
+                    </div>*/}
                 </div>
             </Router>
         );

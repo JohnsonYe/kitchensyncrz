@@ -10,6 +10,7 @@ import {Modal, FormGroup, FormControl, ControlLabel, InputGroup, Image} from 're
 import {Link} from 'react-router-dom';
 import IngredientForm from './IngredientForm';
 import RecipeHelper from '../classes/RecipeHelper';
+import MealEditor from "../pages/plannerPages/editMealPage";
 /**
  * TODO: Andrew's add-to-planner button
  * TODO: Review stars/forks
@@ -425,7 +426,7 @@ class PreviewCard extends Component{
                         <div className={"btn btn-danger"} onClick={this.deletionOpen}>
                             {this.props.personal ? 'Delete' : 'Remove'}
                         </div>
-
+                        <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image}/>
                     </div>
 
                 </div>
@@ -484,6 +485,7 @@ class PreviewCard extends Component{
                         </div>
                     </Modal.Footer>
                 </Modal>
+
             </div>
 
 

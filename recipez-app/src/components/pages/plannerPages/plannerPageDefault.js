@@ -112,6 +112,9 @@ class Planner extends Component {
             index = 0;
 
         let meals = this.plannerHelper.getDayMealList(this.state.mealData, today);
+
+
+
         for(let i = 0; i < meals.length ;i++) {
             let hr = this.plannerHelper.getMealStartTime(this.state.mealData, today, i);
             hr = parseInt(hr);
