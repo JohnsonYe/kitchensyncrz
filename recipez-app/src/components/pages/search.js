@@ -79,6 +79,8 @@ class Search extends Component {
 
         this.recipeLoader = Promise.resolve(new Map()) //set up an async chain for loading recipe info
 
+        this.comingSoon = ['Filter by Cookware','Filter by Cost'];
+
 
 
     }
