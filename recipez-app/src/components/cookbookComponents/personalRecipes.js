@@ -8,7 +8,7 @@
 import React, {Component} from 'react';
 import PreviewCard from '../cookbookComponents/previewCard';
 // import AndrewPreviewCard from '../cookbookComponents/andrew_previewCard'
-import {FormGroup, FormControl, HelpBlock, ControlLabel, Modal, Image} from 'react-bootstrap';
+import {FormGroup, FormControl, HelpBlock, ControlLabel, Modal, Image,InputGroup,Button} from 'react-bootstrap';
 import RecipeHelper from '../classes/RecipeHelper.js';
 
 
@@ -189,13 +189,18 @@ class PersonalRecipes extends Component{
                 }
             }}>
                 <FormGroup controlId="formBasicText">
-                    <FormControl
-                        type={"text"}
-                        value={this.state.url}
-                        placeholder="Enter Image URL"
-                        onChange={this.handleImgChange}
-                    />
-                    <FormControl.Feedback />
+                    <InputGroup>
+                        <FormControl
+                            type={"text"}
+                            value={this.state.url}
+                            placeholder="Enter Image URL"
+                            onChange={this.handleImgChange}
+                        />
+                        <FormControl.Feedback />
+                        <InputGroup.Button>
+                            <Button bsStyle='success' onClick={this.getImage}>Add</Button>
+                        </InputGroup.Button>
+                    </InputGroup>
                 </FormGroup>
             </form>
 
@@ -226,11 +231,8 @@ class PersonalRecipes extends Component{
                     <Modal.Body>
                         {form}
                         <div className={"row"}>
-                            <div className={"col-md-10"}>
+                            <div className={"col-md-12"}>
                                 {imgForm}
-                            </div>
-                            <div className={"btn col-md-2 btn-success mb-4"} onClick={this.getImage}>
-                                Add
                             </div>
                         </div>
                         {image}

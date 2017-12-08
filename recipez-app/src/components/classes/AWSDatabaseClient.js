@@ -157,7 +157,7 @@ var exprRegex = /[\s.,\/#!$%\^&\*;:{}=\-_`~()]/g;
      * @return {[Promise]}           [Promise object with pending DB response]
      */
     getDBItemPromise(tableName,keyField,keys){
-        return new Promise((pass,fail)=>{
+        return new Promise((pass,fail)=>{ //wrap a standard request in a promise
             this.getDBItems(tableName,keyField,keys,(response)=>{
                 if(response.status){//call succeeded, pass
                     pass(response.payload)
