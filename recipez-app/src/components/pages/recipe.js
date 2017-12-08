@@ -68,11 +68,11 @@ class Recipe extends Component {
             return <div><h1>{this.state.data}</h1></div>
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) =>(
-            <li class="list-group-item col-sm-5">
+            <li className="list-group-item col-sm-5">
                 <span>
                     <button onClick={(e) => this.user.addToShoppingList(ingredient)} className="shopping button"
-                            type="button" class="btn btn-circle" id="shoppoing_cart">
-                        <i class="glyphicon glyphicon-shopping-cart"/>
+                            type="button" className="btn btn-circle" id="shoppoing_cart">
+                        <i className="glyphicon glyphicon-shopping-cart"/>
                     </button>
                     &nbsp;&nbsp;
                     {ingredient}
@@ -81,20 +81,20 @@ class Recipe extends Component {
         ));
 
         var directions = this.state.data.Directions.map((step) =>(
-            <li class="list-group-item">
-                <i class="glyphicon glyphicon-cutlery" id="forksize"/>{step}
+            <li className="list-group-item">
+                <i className="glyphicon glyphicon-cutlery" id="forksize"/>{step}
             </li>
         ));
 
         // alert(JSON.stringify(this.state.data))
         var reviews = Object.entries(this.state.data.Reviews?this.state.data.Reviews:{}).map((review) =>
             <li>
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i
-                        class="glyphicon glyphicon-user"/>&nbsp;&nbsp;{review[1].username}&nbsp;<img src={'/star.jpg'}
+                <div className="panel panel-default">
+                    <div className="panel-heading"><i
+                        className="glyphicon glyphicon-user"/>&nbsp;&nbsp;{review[1].username}&nbsp;<img src={'/star.jpg'}
                                                                                                      height='21'
                                                                                                      width='21'/></div>
-                    <div class="panel-body"><p>{review[1].Comment}</p></div>
+                    <div className="panel-body"><p>{review[1].Comment}</p></div>
                 </div>
             </li>)
 
@@ -111,17 +111,17 @@ class Recipe extends Component {
             <Carousel>
                 <Carousel.Item className="CarouselSize">
                     <img src={this.state.data.Image ? Array.from(this.state.data.Image)[0] : defaultImage1}
-                         class="img-fluid"/>
+                         className="img-fluid"/>
                 </Carousel.Item>
 
                 <Carousel.Item className="CarouselSize">
                     <img src={this.state.data.Image ? Array.from(this.state.data.Image)[1] : defaultImage2}
-                         class="img-fluid "/>
+                         className="img-fluid "/>
                 </Carousel.Item>
 
                 <Carousel.Item className="CarouselSize">
                     <img src={this.state.data.Image ? Array.from(this.state.data.Image)[2] : defaultImage3}
-                         class="img-fluid "/>
+                         className="img-fluid "/>
                 </Carousel.Item>
             </Carousel>
         );
@@ -134,9 +134,9 @@ class Recipe extends Component {
                 <h1 className="PageHeader">{this.state.data.Name}</h1>
                 <br/>
 
-                <div class="container">
-                    <div class="row">
-                        <div class="col-8">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-8">
                             {/*show picture*/}
                             <div>
                                 {carouselInstance}
@@ -146,44 +146,48 @@ class Recipe extends Component {
                             <div className='col-sm-3'>
                                 <div className='row padding-down'>
                                     <h2>
-                                        <i class="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;
+                                        <i className="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;
                                     </h2>
                                     <h2>    
-                                        <i class="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}
+                                        <i className="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}
                                     </h2>
                                 </div>
                                 <div className='row'>
-                                    <div class="btn=group btn-group-lg">
-                                        {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} class="btn btn-outline-primary">  UPDATE  </button>*/}
+                                    {this.props.match.params.user?null:
+                                    <div className="btn=group btn-group-lg">
+                                        {/*<button onClick={(e)=>this.client.updateReview(this.state.data.Name,dummyReviewObject,this.updateReviews)} type={"button"} className="btn btn-outline-primary">  UPDATE  </button>*/}
                                         <button
                                             onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
-                                            type={"button"} class="btn btn-outline-primary">
-                                            <i class="glyphicon glyphicon-book"/> add to cookbook
+                                            type={"button"} className="btn btn-outline-primary">
+                                            <i className="glyphicon glyphicon-book"/> add to cookbook
                                         </button>
                                         <button
                                             onClick={(e) => this.user.deleteRecipe(this.state.data.Name)}
-                                            type={"button"} class="btn btn-outline-primary">
-                                            <i class="glyphicon glyphicon-trash"/> remove from cookbook
+                                            type={"button"} className="btn btn-outline-primary">
+                                            <i className="glyphicon glyphicon-trash"/> remove from cookbook
                                         </button>
-                                    </div>
+                                    </div>}
                                 </div>
                             </div>
 
                             {/*====button group====*/}
                     </div>
-                    <div class="row">
-                        <div class="col-sm-6" className="Ingredient" float='left'>
+                    <div className="row">
+                        <div className="Ingredient col-12" float='left'>
                             <h2>Ingredients:</h2>
                             <ul>{ingredients}</ul>
                         </div>
                     </div>
-                    <div class="row">
-                        <h2 className="Direction">Directions:</h2>
-                        <ol>{directions}</ol>
+                    <div className="row">
+                        <div className="Direction col-12" float='left'>
+                            <h2 className="Directions">Directions:</h2>
+                            <ol>{directions}</ol>
+                        </div>  
                     </div>
                 </div>
 
-                <div class="container">
+                {this.props.match.params.user?null:
+                <div className="container">
                     <div>
                         {/* Nav bar content here */}
                         <div className="container">
@@ -194,22 +198,22 @@ class Recipe extends Component {
                                 <Tab eventKey={2} title={"Leave a Comment"}>
                                     <form onSubmit={this.handleSubmit}>
                                         {/*<label>Leave your comment:</label>*/}
-                                        <i class="glyphicon glyphicon-pencil"/>
-                                        <textarea class="form-control" placeholder="Write a comment" name="comment"
+                                        <i className="glyphicon glyphicon-pencil"/>
+                                        <textarea className="form-control" placeholder="Write a comment" name="comment"
                                                   rows="8" id="comment" value={this.state.value}
                                                   onChange={this.handleChange}/>
 
-                                        <div class="form-group">
-                                            <div class="col-12">
+                                        <div className="form-group">
+                                            <div className="col-12">
                                                 <span className="pull-right">
                                                     <br/>
                                                     <button onClick={(e) => {
                                                         this.client.updateReview(this.state.data.Name, updateComment, this.updateReviews);
                                                         /*this.reload()*/
                                                     }}
-                                                            class="btn btn-success btn-circle text-uppercase"
+                                                            className="btn btn-success btn-circle text-uppercase"
                                                             type="submit" id="submitComment">
-                                                        <span class="glyphicon glyphicon-send"/> Summit comment</button>
+                                                        <span className="glyphicon glyphicon-send"/> Submit comment</button>
                                                 </span>
                                             </div>
                                         </div>
@@ -218,7 +222,7 @@ class Recipe extends Component {
                             </Tabs>
                         </div>
                     </div>
-                </div>
+                </div>}
 
             </div>
         )

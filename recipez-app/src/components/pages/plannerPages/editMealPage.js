@@ -390,7 +390,7 @@ class MealEditor extends Component {
                 </a>
             ),
             addButton = (
-                <a className="btn btn-dark"
+                <a className="btn-block"
                     onClick={this.open}>
                     <img alt="planner"
                          width="18"
