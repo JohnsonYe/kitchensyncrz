@@ -90,7 +90,7 @@ class SearchThumbail extends Component {
                              src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png"/>
 
                     </a>
-                    <div className="col-4">
+                    <div className="col-4 btn btn-dark">
                         <MealEditor url={this.props.data.Image? this.props.data.Image[0]: imgsrc} recipe={this.props.data.Name} 
                         dur={this.props.data.TimeCost} />
                     </div>
