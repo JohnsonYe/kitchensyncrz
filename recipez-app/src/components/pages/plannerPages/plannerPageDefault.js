@@ -40,9 +40,10 @@ function UpNextCard(props) {
 
 function DailyPlannerItem(props) {
     return (
-        <div className="card m-3 planner-hover">
+        <div className="card m-3">
                 <div className="card-body ">
-                    <MealEditor data={props.data}
+                    <MealEditor className="planner-hover"
+                                data={props.data}
                                 recipe={props.recipe}
                                 day={props.day}
                                 mealIndex={props.mealIndex}
@@ -50,7 +51,7 @@ function DailyPlannerItem(props) {
                                 edit={true}
                                 update={props.update}
                     />
-                    <p className="">{props.start} to {props.end} - {props.dur}</p>
+                    <p>{props.start} to {props.end} - {props.dur}</p>
                 </div>
             </div>
     );
@@ -145,12 +146,19 @@ class Planner extends Component {
 
     /** Render Items Start **/
     renderMeal(day, mealIndex) {
+        let end;
+        if (this.plannerHelper.getMealEndTime(this.state.mealData, day, mealIndex) === "0") {
+            end = "00";
+        }
+        else {
+            end = this.plannerHelper.getMealEndTime(this.state.mealData, day, mealIndex);
+        }
         return (
             <DailyPlannerItem
                 data={this.state.mealData}
                 recipe={this.plannerHelper.getMealRecipeName(this.state.mealData, day, mealIndex)}
                 start={this.plannerHelper.getMealStartTime(this.state.mealData, day, mealIndex)}
-                end={this.plannerHelper.getMealEndTime(this.state.mealData, day, mealIndex)}
+                end={end}
                 day={day}
                 dur={this.plannerHelper.getDuration(this.plannerHelper.getMeal(this.state.mealData, day, mealIndex))}
                 mealIndex = {mealIndex}

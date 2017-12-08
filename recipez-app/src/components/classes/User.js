@@ -55,12 +55,12 @@ class User {
         this.loadStream = Promise.resolve({ //create a new user data object locally
             username:       username,
             cookbook:       {},
-            cookware:       new Set(['dirt']), //this can't be empty
-            exclude:        new Set(['mercury']),
-            pantry:         {mercury: {unit: 'none', amount: '1'}},
+            cookware:       new Set(['---']), //this can't be empty
+            exclude:        new Set(['---']),
+            pantry:         {},
             planner:        {days: (()=>{let l = [];for(let i=0;i<7;i++)l.push({mealData: []});return l})()},
-            preferences:    new Set(['mercury']),
-            shoppingList:   new Set(['mercury']),
+            preferences:    new Set(['---']),
+            shoppingList:   new Set(['---']),
 
         })
             .then((data)=>{ //attempt to push the data to the database, which will break the chain if something goes wrong

@@ -25,6 +25,18 @@ Util.loadCompiledAutocompleteTree = function(treeName,id){
         .catch(console.error)
 }
 
+Util.parseQueryString = function(search){
+    return search.substring(1)
+        .split('&')
+        .map((param)=>(param.split('=')))
+        .map((splitParam)=>({[splitParam[0]]:splitParam[1]?splitParam[1].split(',').map((val)=>decodeURIComponent(val)):undefined}))
+        .reduce((prev,item)=>Object.assign(item,prev),{})
+}
+
+Util.updateURI = function(history,base,fields){ //update the uri to encode some basic object
+    history.replace('/'+base+'?'+Object.entries(fields).map((kvp)=>kvp[0]+'='+Array.from(kvp[1]).join(',')).join('&'));
+}
+
 Util.NonVegetarian = [
     "beef", "chicken","pork","fish",
 ];

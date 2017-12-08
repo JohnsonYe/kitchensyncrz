@@ -144,7 +144,7 @@ export const RestockList = ( {items, remove, addBack} ) => {
                      remove={remove}
                      addBack = {addBack} />));
 
-    return (<div> {itemNode}  </div>);
+    return (<div className='restocklist'> {itemNode} </div>);
 }
 
 
@@ -183,7 +183,7 @@ export const ItemForm = ( {addProtein,
                     case "Grain":
                         addGrain(this.searchbar.getValue());
                         break;
-                    case "from shopping list":
+                    case "Other":
                         addOther(this.searchbar.getValue());
                         break;
                     default:

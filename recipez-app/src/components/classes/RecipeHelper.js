@@ -68,11 +68,12 @@ class RecipeHelper {
             this.client.buildUpdateRequest('Recipes','Name',recipeName,this.client.buildFieldCreateExpression('Reviews',{M:{}})),
             function (e1,r1){ //chain update calls to keep them synced up
                 if (e1) {
+                    console.log('submitting comment: '+JSON.stringify(revObj));
                     this.client.updateItem( //add the review to the reviews field once the create call resolves
                         this.client.buildUpdateRequest(
                             'Recipes',
                             'Name', recipeName,
-                            this.client.buildMapUpdateExpression('Reviews', revObj.username, RecipeHelper.packReview(revObj))),
+                            this.client.buildMapUpdateExpression('Reviews', revObj.username, {M:this.client.packItem(revObj,RecipeHelper.ReviewPrototype)})),
                         callback)
                 } else {
                     //field creation failed (!) (?)

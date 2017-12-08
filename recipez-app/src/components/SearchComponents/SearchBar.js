@@ -88,6 +88,8 @@ class SearchBar extends Component{
     }
 
     handleKeyDown(e){
+        this.allowMouseSelection = false;
+        // setTimeout((()=>this.allowMouseSelection=true),10);
         switch(e.keyCode){
             case 16/*SHIFT*/:
                 this.setState({shiftDown:true})
@@ -193,12 +195,14 @@ class SearchBar extends Component{
                     value={(this.state.selection>=0?this.state.completions[this.state.selection]:this.state.value)}
                     // style={{'z-index':1,'position':'relative'}}
                     />
-                <div className="dropdown-menu" onMouseOut={(e)=>{this.setState({selection:-1})}}>
+                <div className="dropdown-menu" 
+                     onMouseOut={(e)=>{this.setState({selection:-1})}}
+                     onMouseMove={(e)=>this.allowMouseSelection=true}>
                     {this.state.completions.map((key)=>{
                         let count = counter();
                         return (
                         <div className={'dropdown-item'+(count==this.state.selection?' active':'')} 
-                             onMouseOver={(e)=>{this.query=key;this.setState({selection:count})}}
+                             onMouseOver={(e)=>{if(this.allowMouseSelection){this.query=key;this.setState({selection:count})}}}
                              key={count}>
                             <p>
                                 {key}

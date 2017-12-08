@@ -195,7 +195,8 @@ import Util from "../classes/Util";
         console.log('Sorting recipe map . . .')
         this.sorted = this.getRecipeList();
         return Promise.resolve(this.sorted) //use a promise to account for potential asynchronous sort
-            .then((sorted)=>sorted.filter((entry)=>(entry[1][0]===0)&&(entry[1][1]!==0))) //filter rejected items
+            .then(this.rejectedItemsFilter) //filter rejected items
+            // .then(this.alphabeticalFilter)//sort alphabetically for consistency
             .then(this.currentFilter) //apply filter -- may be asynchronous --> promise chain handles this gracefully
             .then(callback);
     }
@@ -302,6 +303,14 @@ import Util from "../classes/Util";
         return recipe?(recipe.Difficulty==='Easy'?1:(recipe.Difficulty==='Hard'?0:-1)):-2;
     }
 
+
+    rejectedItemsFilter(unsorted){
+        return unsorted.filter((entry)=>(entry[1][0]===0)&&(entry[1][1]!==0))//filter rejected items
+    }
+
+    alphabeticalFilter(unsorted){
+        return unsorted.sort((a,b)=>(b[0]>a[0]?-1:1));
+    }
 
     autocomplete(base,callback){
         this.asyncCompletions.then((auto)=>callback(auto.getCompletion(base))).catch((err)=>'Error when loading autocomplete')

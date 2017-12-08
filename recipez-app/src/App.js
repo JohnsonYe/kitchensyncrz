@@ -113,12 +113,15 @@ class App extends Component {
     
 
     handleLogout = event => {
+        this.setState( {isNavMenuOpened: false} );
+        //alert(this.state.isNavMenuOpened);
         //this.handleClick();
         this.client.signOutUser();
         this.client.authenticated = false;
         this.client.user = 'user001';
         User.getUser().reload();
         //alert(this.client.isLoggedIn());
+        
     }
 
     render() {
@@ -149,7 +152,7 @@ class App extends Component {
                                     <Link to="/" onClick={this.closeNav}>Home</Link>
                                 </li>
                                 <li>
-                                    <Link to="/Search" onClick={this.closeNav}>Browse</Link>
+                                    <Link to="/Search" onClick={this.closeNav}>Search</Link>
                                 </li>
                                 <li>
                                     <Link to="/Cookbook" onClick={this.closeNav}>Cookbook</Link>
@@ -163,7 +166,7 @@ class App extends Component {
                                 <li>
                                     {
                                         this.client.authenticated ?
-                                            <Link to='/Search' onClick={this.handleLogout}>Sign Out</Link> :
+                                            <Link to='/Search' onClick={this.handleLogout.bind(this)}>Sign Out</Link> :
                                             <Link to='/SignIn' onClick={this.handleClick.bind(this)}>Sign in</Link>
                                     }
                                 </li>

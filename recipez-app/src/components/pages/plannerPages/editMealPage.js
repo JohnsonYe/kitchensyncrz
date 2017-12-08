@@ -142,8 +142,12 @@ class MealEditor extends Component {
         if (this.props.dur.includes("h")) {
             let temp, temp2;
             temp = this.props.dur.slice(0, 2);
-            temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
-
+            if (this.props.dur.includes("m")){
+                temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
+            }
+            else {
+                temp2 = "00";
+            }
             //total min
             dur = parseInt(temp) * 60 + parseInt(temp2);
         } else {
@@ -279,6 +283,10 @@ class MealEditor extends Component {
         while (hr >= 24) {
             hr = hr - 24;  //converts to correct time
         }
+        
+        if(total < 10) {
+            total = "0"+total;
+        }
 
         return hr+":"+total;
     }
@@ -384,19 +392,19 @@ class MealEditor extends Component {
     render() {
 
         var editButton = (
-                <a
-                    className="card-link"
+                <div
+                    className="card-link planner-hover"
                     onClick={this.open}>{this.props.recipe}
-                </a>
+                </div>
             ),
             addButton = (
-                <a className="btn-block"
+                <div
                     onClick={this.open}>
                     <img alt="planner"
                          width="18"
                          height="18"
                          src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
-                </a>
+                </div>
             ),
             button;
 
@@ -408,7 +416,7 @@ class MealEditor extends Component {
         }
 
         return (
-            <div>
+            <div className={this.props.button?'btn btn-default':''}>
                 {button}
             <Modal show={this.state.showEditor} onHide={this.close}>
                 <Modal.Header>{this.props.recipe}</Modal.Header>

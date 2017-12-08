@@ -172,9 +172,9 @@ class kitchen extends Component {
                     this.addFruit(key[0]);
                     break;
                 case("Grain"):
-                    this.addFruit(key[0]);
+                    this.addGrain(key[0]);
                     break;
-                case("from shopping list"):
+                case("Other"):
                     this.addOther(key[0]);
                     break;
                 case("Restock"):
@@ -195,7 +195,7 @@ class kitchen extends Component {
 
     processExcluded(data){
         Array.from(data).forEach((key) => {
-            if(key !== "mercury") {
+            if(key !== "---") {
                 this.addExclude(key);
             }
         })
@@ -220,7 +220,7 @@ class kitchen extends Component {
 
     processCookware(data){
         Array.from(data).forEach((key) => {
-            if( key !== "dirt") {
+            if( key !== "---") {
                 this.addCookware(key);
             }
         })
@@ -376,7 +376,7 @@ class kitchen extends Component {
     addOther(val){
         this.setState({other: this.state.other.concat(val)});
         this.setState({numItems: (++this.state.numItems)});
-        this.user.addToPantry(val, "from shopping list", 1);
+        this.user.addToPantry(val, "Other", 1);
     }
 
     removeOther(val){
@@ -505,7 +505,7 @@ class kitchen extends Component {
                 case "Grain":
                     this.addGrain(val);
                     break;
-                case "from shopping list":
+                case "Other":
                     this.addOther(val);
                     break;
                 default:
@@ -722,7 +722,7 @@ class kitchen extends Component {
                                                 Grain
                                             </NavItem>
                                             <NavItem eventKey="Other">
-                                                Shopping List
+                                                Other
                                             </NavItem>
                                         </Nav>
                                     </div>
@@ -754,7 +754,7 @@ class kitchen extends Component {
 
                         </div>
 
-                        <div className = "col-md-4" style={{background: 'gainsboro'}}>
+                        <div className = "col-md-4" style={{background: 'gainsboro',paddingBottom:'10px'}}>
                             <div className = "container-fluid mg-3">
                                 <h3>
                                     <span className="glyphicon glyphicon-alert"></span>

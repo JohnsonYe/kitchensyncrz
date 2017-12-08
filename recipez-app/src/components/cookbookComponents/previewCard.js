@@ -72,6 +72,7 @@ class PreviewCard extends Component{
     }
 
     componentWillReceiveProps(newProps) {
+        // console.log("received props");
         let initialIngredientList = [];
         this.ingredientFormRefs = [];
         for (let original_ingredient of newProps.src.Ingredients) {
@@ -149,8 +150,6 @@ class PreviewCard extends Component{
     }
 
     removeIngredient(ingredientToRemove) {
-
-
         let updatedWorkingIngredientList = [];
         for (let i in this.ingredientFormRefs) {
             if (this.ingredientFormRefs[i] === ingredientToRemove) {
@@ -169,7 +168,7 @@ class PreviewCard extends Component{
         }
         this.ingredientFormRefs = [];
         this.setState({
-            workingIngredientList: updatedWorkingIngredientList.slice(),
+            workingIngredientList: updatedWorkingIngredientList.slice(), //create a copy of the array
         });
 
     }
@@ -237,11 +236,14 @@ class PreviewCard extends Component{
                                                           }
                                                           }/>);
 
+        console.log('state set input: ');
+        console.log(updatedWorkingIngredientList);
+
 
         this.setState({
             workingIngredientList: updatedWorkingIngredientList.slice(),
             ingredientToAdd: '',
-        })
+        },()=>{console.log('after state set:');console.log(this.state.workingIngredientList)})
     }
 
     handleChangeDirections(e) {
@@ -263,7 +265,6 @@ class PreviewCard extends Component{
     }
 
     render() {
-
         let personalAddendum;
         if(this.props.personal) {
             personalAddendum =
@@ -274,7 +275,7 @@ class PreviewCard extends Component{
         let editButton;
         if(this.props.personal){
             editButton =
-                <div className="btn btn-primary" onClick={this.editOpen}>
+                <div className="btn btn-primary col-4" onClick={this.editOpen}>
                     Edit
                 </div>
         }
@@ -285,35 +286,29 @@ class PreviewCard extends Component{
                 <div>
                     <ControlLabel>Add Ingredients</ControlLabel>
                 </div>
-                <div className={"row"}>
-
-                    <div className={"col-md-10"}>
-                        <form onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                this.addIngredient();
-                            }
-                        }}>
-                            <FormGroup
-                                controlId="formBasicText"
-                                validationState={this.state.validation}
-                            >
-                                <FormControl
-                                    type={"text"}
-                                    value={this.state.ingredientToAdd}
-                                    placeholder="Enter an ingredient, without units of measurement or additional information"
-                                    onChange={this.handleChangeInsertIngredient}
-                                />
-                                <FormControl.Feedback/>
-                            </FormGroup>
-                        </form>
-                    </div>
-                    <div className={"col-md-2"}>
-                        <div className={"btn btn-success"} onClick={this.addIngredient}>
-                            Add
-                        </div>
-                    </div>
-                </div>
+                <form onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.addIngredient();
+                    }
+                }}>
+                    <FormGroup controlId="formBasicText" validationState={this.state.validation}>
+                        <InputGroup>
+                            <FormControl
+                                type={"text"}
+                                value={this.state.ingredientToAdd}
+                                placeholder="Enter an ingredient, without units of measurement or additional information"
+                                onChange={this.handleChangeInsertIngredient}
+                            />
+                            <FormControl.Feedback/>
+                            <InputGroup.Button>
+                                <button className={"btn btn-success"} onClick={this.addIngredient}>
+                                    <span className='glyphicon glyphicon-plus'/>
+                                </button>
+                            </InputGroup.Button>
+                        </InputGroup>
+                    </FormGroup>
+                </form>
             </div>
         ;
 
@@ -421,11 +416,13 @@ class PreviewCard extends Component{
                         {/*TODO: Reviews display*/}
                         <p>
                         </p>
-                        {editButton}
-                        <div className={"btn btn-danger"} onClick={this.deletionOpen}>
-                            {this.props.personal ? 'Delete' : 'Remove'}
+                        <div className='btn-group-vertical preview-buttons'>
+                            {editButton}
+                            <div className={"btn btn-danger"} onClick={this.deletionOpen}>
+                                {this.props.personal ? 'Delete' : 'Remove'}
+                            </div>
+                            <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image} button/>
                         </div>
-                        <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image}/>
                     </div>
 
                 </div>
@@ -465,7 +462,9 @@ class PreviewCard extends Component{
                         <div>
                             {insertionForm}
                         </div>
-                        {this.state.workingIngredientList}
+                        <FormGroup>
+                            {this.state.workingIngredientList}
+                        </FormGroup>
                         <div>
                             {directionForm}
                         </div>

@@ -52,32 +52,25 @@ class IngredientForm extends Component {
 
     render() {
         return (
+            <div className='input-group form-list-spacer'>
+                <input       className='form-control'
+                             type={"text"}
+                             value={this.state.quantity_unit}
+                             placeholder={"Quantity"}
+                             onChange={this.handleQuantityChange}>
+                </input>
+                <div className='input-group-addon'>{this.state.ingredient}</div>
+                <input       className='form-control'
+                             type={"text"}
+                             value={this.state.additional}
+                             placeholder={"chopped, diced, etc."}
+                             onChange={this.handleAdditionalChange}
+                >
 
-            <div>
-                <div className={"row"}>
-                    <div className={"form-group col-md-4"}>
-                        <FormControl type={"text"}
-                                     value={this.state.quantity_unit}
-                                     placeholder={"Quantity"}
-                                     onChange={this.handleQuantityChange}>
-                        </FormControl>
-                    </div>
-                    <div className={"col-md-2"} style={{'marginTop': '10px'}}>
-                        {this.state.ingredient}
-                    </div>
-                    <div className={"form-group col-md-4"}>
-                        <FormControl type={"text"}
-                                     value={this.state.additional}
-                                     placeHolder={"chopped, diced, etc."}
-                                     onChange={this.handleAdditionalChange}
-                        >
-
-                        </FormControl>
-                    </div>
-                    <div className={"col-md-2"}>
-                        <div className={"btn btn-danger pb-3"} onClick={this.removeThis}>
-                            X
-                        </div>
+                </input>
+                <div className='input-group-btn'>
+                    <div className={"btn btn-danger"} onClick={this.removeThis}>
+                        <span className='glyphicon glyphicon-remove'/>
                     </div>
                 </div>
             </div>
