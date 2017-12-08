@@ -46,9 +46,11 @@ class Recipe extends Component {
             // alert(notFound)
             return
         }
-        let review = recipeObject.Reviews[this.user.client.getUsername()]
-        if(review){
-            this.setState({value:review.Comment,userRating:review.Rating})
+        if(recipeObject.Reviews){
+            let review = recipeObject.Reviews[this.user.client.getUsername()]
+            if(review){
+                this.setState({value:review.Comment,userRating:review.Rating})
+            }
         }
         this.setState({data:recipeObject,loaded:true})
     }

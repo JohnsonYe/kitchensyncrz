@@ -81,10 +81,10 @@ class ShoppingList extends Component{
         return (
             <div className='input-group input-group-sm spaced' key={name} style={this.getListItemStyle(name)} onTransitionEnd={this.getHandleTransition(name)}>
                 <div className={'input-group-btn'+(this.state.active===name&&!this.state.buying&&!this.state.removing?' open':'')}>
-                        <div className='btn btn-success btn-group-end dropdown-toggle' onClick={dropdownToggle}>{this.getGlyph('ok')}</div>
-                        <div className='dropdown-menu'>
-                            {categories.map((category)=>getCategoryOption(category))}
-                        </div>
+                    <div className='btn btn-success btn-group-end dropdown-toggle' onClick={dropdownToggle}>{this.getGlyph('ok')}</div>
+                    <div className='dropdown-menu'>
+                        {categories.map((category)=>getCategoryOption(category))}
+                    </div>
                 </div>
                 <div className='form-control'>{name}</div>
                 <div className='input-group-btn'>

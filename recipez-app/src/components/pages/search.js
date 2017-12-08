@@ -64,7 +64,7 @@ class Search extends Component {
 
 
         //{Responses:{Ingredients:[{recipes:{L:[{M:{Name:{S:''}}}]}}]}}
-        let query = this.parseQueryString(this.props.history.location.search)
+        let query = Util.parseQueryString(this.props.history.location.search)
         console.log('query parse: '+JSON.stringify(query))
         this.state = {  ingredients:new Set(query.ingredients?query.ingredients:[]),
             excluded: new Set(query.excluded?query.excluded:[]),
@@ -244,17 +244,12 @@ class Search extends Component {
         }
     }
     updateURI(){ //update the uri with the current include, exclude, and filter settings
-        this.props.history.replace('/Search?'+
-            'ingredients='+Array.from(this.state.ingredients).join(',')+
-            '&excluded='+Array.from(this.state.excluded).join(',')+
-            '&filter='+this.state.filter)
-    }
-    parseQueryString(search){
-        return search.substring(1)
-            .split('&')
-            .map((param)=>(param.split('=')))
-            .map((splitParam)=>({[splitParam[0]]:splitParam[1]?splitParam[1].split(',').map((val)=>decodeURIComponent(val)):undefined}))
-            .reduce((prev,item)=>Object.assign(item,prev),{})
+        let params = {
+            ingredients:this.state.ingredients,
+            excluded:this.state.excluded,
+            filter:[this.state.filter],
+        };
+        Util.updateURI(this.props.history,'Search',params)
     }
 
     setFilter(filter){

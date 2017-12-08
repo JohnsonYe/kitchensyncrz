@@ -422,11 +422,13 @@ class PreviewCard extends Component{
                         {/*TODO: Reviews display*/}
                         <p>
                         </p>
-                        {editButton}
-                        <div className={"btn btn-danger"} onClick={this.deletionOpen}>
-                            {this.props.personal ? 'Delete' : 'Remove'}
+                        <div className='btn-group-vertical preview-buttons'>
+                            {editButton}
+                            <div className={"btn btn-danger"} onClick={this.deletionOpen}>
+                                {this.props.personal ? 'Delete' : 'Remove'}
+                            </div>
+                            <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image}/>
                         </div>
-                        <MealEditor recipe={this.props.src.Name} dur={this.state.duration} personal={this.props.personal} url={image}/>
                     </div>
 
                 </div>

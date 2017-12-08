@@ -384,19 +384,19 @@ class MealEditor extends Component {
     render() {
 
         var editButton = (
-                <a
+                <div
                     className="card-link"
                     onClick={this.open}>{this.props.recipe}
-                </a>
+                </div>
             ),
             addButton = (
-                <a className="btn-block"
+                <div
                     onClick={this.open}>
                     <img alt="planner"
                          width="18"
                          height="18"
                          src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/calendar-512.png" />
-                </a>
+                </div>
             ),
             button;
 
@@ -408,7 +408,7 @@ class MealEditor extends Component {
         }
 
         return (
-            <div>
+            <div className='btn btn-default'>
                 {button}
             <Modal show={this.state.showEditor} onHide={this.close}>
                 <Modal.Header>{this.props.recipe}</Modal.Header>
