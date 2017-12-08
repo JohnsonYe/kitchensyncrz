@@ -142,8 +142,12 @@ class MealEditor extends Component {
         if (this.props.dur.includes("h")) {
             let temp, temp2;
             temp = this.props.dur.slice(0, 2);
-            temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
-
+            if (this.props.dur.includes("m")){
+                temp2 = this.props.dur.slice(this.props.dur.indexOf("h") + 1, this.props.dur.length);
+            }
+            else {
+                temp2 = "00";
+            }
             //total min
             dur = parseInt(temp) * 60 + parseInt(temp2);
         } else {
@@ -278,6 +282,10 @@ class MealEditor extends Component {
         //check if hr passed to the next day
         while (hr >= 24) {
             hr = hr - 24;  //converts to correct time
+        }
+        
+        if(total < 10) {
+            total = "0"+total;
         }
 
         return hr+":"+total;

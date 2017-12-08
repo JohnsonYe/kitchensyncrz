@@ -146,12 +146,19 @@ class Planner extends Component {
 
     /** Render Items Start **/
     renderMeal(day, mealIndex) {
+        let end;
+        if (this.plannerHelper.getMealEndTime(this.state.mealData, day, mealIndex) === "0") {
+            end = "00";
+        }
+        else {
+            end = this.plannerHelper.getMealEndTime(this.state.mealData, day, mealIndex);
+        }
         return (
             <DailyPlannerItem
                 data={this.state.mealData}
                 recipe={this.plannerHelper.getMealRecipeName(this.state.mealData, day, mealIndex)}
                 start={this.plannerHelper.getMealStartTime(this.state.mealData, day, mealIndex)}
-                end={this.plannerHelper.getMealEndTime(this.state.mealData, day, mealIndex)}
+                end={end}
                 day={day}
                 dur={this.plannerHelper.getDuration(this.plannerHelper.getMeal(this.state.mealData, day, mealIndex))}
                 mealIndex = {mealIndex}
