@@ -138,8 +138,11 @@ export const ExcludeCookwareList = ( {items, remove} ) => {
 
 // Maps each item into a node
 export const RestockList = ( {items, remove, addBack} ) => {
-    const itemNode = items.map( (item) =>
-        (<AddRestock item = {item}
+
+    //alert(items.keys())
+
+    const itemNode = Array.from(items).map( (item) =>
+        (<AddRestock item = {item[0]}
                      key={item.id}
                      remove={remove}
                      addBack = {addBack} />));
