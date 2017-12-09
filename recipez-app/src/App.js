@@ -190,7 +190,7 @@ class App extends Component {
                     <Footer />
                     <div className="row">
                     <span className="col-2 pull-right fun-button">
-                    <button className="btn btn-primary btn-xs" onClick={this.toggleFunMode}>Morten's Button</button>
+                    <button className="btn btn-primary btn-xs mortensbutton" onClick={this.toggleFunMode}>Morten's Button</button>
                     </span>
                     </div>
                     {/*<div className='pbj-follower' style={{...this.state.transform,cursor:'none',display:this.state.showFollower?'inline':'none'}}>
