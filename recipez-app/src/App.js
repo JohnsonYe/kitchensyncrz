@@ -147,10 +147,10 @@ class App extends Component {
                             </div>
                         </OffCanvasBody>
                         <OffCanvasMenu className="navbar-menu">
-                            <div>
-                                <p className="username" >{this.client.authenticated? "Welcome, " + this.client.getUsername():this.state.userGreeting}</p>
-                            </div>
                             <ul>
+                                <div className="username" >{this.client.authenticated? "Welcome, " + this.client.getUsername():this.state.userGreeting}</div>
+                            
+                            
                                 <li className="first">
                                     <Link to="/" onClick={this.closeNav}>Home</Link>
                                 </li>
