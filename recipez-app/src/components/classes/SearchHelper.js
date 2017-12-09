@@ -121,7 +121,8 @@ import Util from "../classes/Util";
                         .catch( get_failed_to_load_fn(ingredientMap) )//invalid DB key? fail quietly so the chain stays alive
                     )
                 } else {
-                    return this.updateResultList(ingredientMap.set(ingredient,[search,ingredientMap.get(ingredient)[1],ingredientMap.get(ingredient)[2]]),ingredient,successCallback,nosort) 
+                    let ingredientInfo = [search,ingredientMap.get(ingredient)[1],ingredientMap.get(ingredient)[2]];
+                    return this.updateResultList(ingredientMap.set(ingredient,ingredientInfo),ingredient,successCallback,nosort) 
                 }                   
                 //since this ingredient is already in the map, dont modify the map or fire the callback
                 //callers should not rely on this method to use the callback for any given set of arguments
@@ -139,6 +140,7 @@ import Util from "../classes/Util";
         let status = map.get(ingredient)[2];
         if(updateType===ADD_TO_SEARCH||updateType===REMOVE_FROM_SEARCH){ //use ingredient in search
             if((updateType===ADD_TO_SEARCH&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_SEARCH&&status!==INCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
+                callback(ingredient);
                 return map;
             }
             map.get(ingredient)[2] = updateType===ADD_TO_SEARCH?INCLUDED_STATUS:UNUSED_STATUS;
@@ -164,6 +166,7 @@ import Util from "../classes/Util";
             }
         } else if(updateType===ADD_TO_EXCLUDE||updateType===REMOVE_FROM_EXCLUDE){ //reject or un-reject ingredient from search
             if((updateType===ADD_TO_EXCLUDE&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_EXCLUDE&&status!==EXCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
+                ingredient(callback);
                 return map;
             }
             map.get(ingredient)[2] = updateType===REMOVE_FROM_EXCLUDE?UNUSED_STATUS:EXCLUDED_STATUS;
