@@ -311,11 +311,11 @@ class Planner extends Component {
 
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-sm-12 col-md-6">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
                             {this.renderDayPlanner()}
                         </div>
 
-                        <div className="col-sm-12 col-md-6">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
                             {this.renderShoppingList()}
                         </div>
                     </div>
