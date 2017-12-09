@@ -10,8 +10,8 @@ import {Tabs, Tab} from 'react-bootstrap';
 import '../../css/recipes.css';
 import User from '../classes/User'
 import '../../css/review.css';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'react-bootstrap-carousel/dist/react-bootstrap-carousel.css';
+// import 'bootstrap/dist/css/bootstrap.css';
+// import 'react-bootstrap-carousel/dist/react-bootstrap-carousel.css';
 import {Carousel} from 'react-bootstrap';
 
 class Recipe extends Component {
@@ -94,7 +94,7 @@ class Recipe extends Component {
             }
             starSet.push(base)
         }
-        return (<div className='rating-component' onMouseLeave={(e)=>this.setState({numHighlighted:0})}>{starSet}</div>);
+        return (<div className='rating-component' onMouseLeave={(e)=>this.setState({numHighlighted:0,userRating:this.state.numHighlighted})}>{starSet}</div>);
     }
 
     getRatingSymbols(numStars){
@@ -123,16 +123,14 @@ class Recipe extends Component {
             return <div><h1>{this.state.data}</h1></div>
         }
         var ingredients = this.state.data.Ingredients.map((ingredient) =>(
-            <li className="list-group-item col-sm-5">
-                <span>
-                    <button onClick={(e) => this.user.addToShoppingList(ingredient)} className="shopping button"
+            <div className="d-flex p-4 panel panel-default" style={{margin:'5px',padding:'5px'}} >
+                    <button onClick={(e) => this.user.addToShoppingList(ingredient)}
                             type="button" className="btn btn-circle" id="shoppoing_cart">
                         <i className="glyphicon glyphicon-shopping-cart"/>
                     </button>
                     &nbsp;&nbsp;
                     {ingredient}
-                </span>
-            </li>
+            </div>
         ));
 
         var directions = this.state.data.Directions.map((step) =>(
@@ -177,7 +175,7 @@ class Recipe extends Component {
         var defaultImage = ["https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ieqr7Lr2x6Ug/v0/800x-1.jpg",
                             "https://s3-ap-northeast-1.amazonaws.com/sharingkyoto2017/articles/KVxqUS8KsRCmG7LTCyM2Tx4xNAdk6s09IKEa5yTU.jpeg",
                             "http://cdn-api.skim.gs/images/view/54be909e3847cf000069016b"];
-        let imageSet = this.state.data.Image?this.state.data.Image:defaultImage;
+        let imageSet = Array.from(this.state.data.Image?this.state.data.Image:defaultImage);
         const carouselInstance = (
             <Carousel>
                 {imageSet.filter((url)=>url!=='').map((image)=>(
@@ -190,6 +188,12 @@ class Recipe extends Component {
             </Carousel>
         );
 
+        let leaveCommentTitle = this.state.data.Reviews&&this.state.data.Reviews[this.user.client.getUsername()]
+                                    ?"Edit Comment"
+                                    :"Rate and Comment";
+        let rateAndCommentTitle = (<span>{leaveCommentTitle} <span className='glyphicon glyphicon-pencil'/></span>);
+        let commentSectionTitle = (<span>Comments <span className='badge'>{reviews.length}</span></span>);
+
         return (
             <div>
                 <div className="jumbotron">
@@ -198,92 +202,84 @@ class Recipe extends Component {
                 <h1 className="PageHeader">{this.state.data.Name}</h1>
                 <br/>
 
-                <div className="container">
+                <div className="container-fluid">
                     <div className="row">
-                        <div className="col-8">
+                        <div className="col-sm-8">
                             {/*show picture*/}
                             <div>
                                 {carouselInstance}
                             </div>
                         </div>
-                            {/*====button group====*/}
-                            <div className='col-sm-3'>
-                                <div className='row padding-down'>
-                                    <h2>
-                                        <i className="glyphicon glyphicon-time"/>&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;
-                                    </h2>
-                                    <h2>    
-                                        <i className="glyphicon glyphicon-wrench"/>&nbsp;{this.state.data.Difficulty}
-                                    </h2>
-                                </div>
-                                <div className='row'>
-                                    {this.props.match.params.user?null:
-                                    <div className="btn=group btn-group-lg">
-                                        <button
-                                            onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
-                                            type={"button"} className="btn btn-outline-primary">
-                                            <i className="glyphicon glyphicon-book"/> add to cookbook
-                                        </button>
-                                        <button
-                                            onClick={(e) => this.user.deleteRecipe(this.state.data.Name)}
-                                            type={"button"} className="btn btn-outline-primary">
-                                            <i className="glyphicon glyphicon-trash"/> remove from cookbook
-                                        </button>
-                                    </div>}
+                        {/*====button group====*/}
+                        <div className='col-sm-4'>
+                            <div className='well text-nowrap recipe-info'>
+                                <i className="glyphicon glyphicon-time"/>:&nbsp;&nbsp;{this.state.data.TimeCost}&nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div className='well text-nowrap recipe-info'>
+                                <i className="glyphicon glyphicon-wrench"/>:&nbsp;{this.state.data.Difficulty}
+                            </div>
+                                {
+                                this.props.match.params.user?null:
+                                    <button
+                                        onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
+                                        type={"button"} className="btn btn-secondary btn-lg btn-block well-lookalike">
+                                        <span className='pull-left'>
+                                            <i className="glyphicon glyphicon-book"/> Add to Cookbook
+                                        </span>
+                                    </button>
+                                }
+                        </div>
+                        {/*====button group====*/}
+                    </div>
+                    <div className="container-fluid">
+                        <div className="panel panel-default">
+                            <div className='panel-heading'><h2>Ingredients:</h2></div>
+                            <div className='panel-body'>
+                                <div className='d-flex flex-wrap'>
+                                    {ingredients}
                                 </div>
                             </div>
-                            {/*====button group====*/}
+                        </div>  
                     </div>
-                    <div className="row">
-                        <div className="Ingredient col-12" float='left'>
-                            <h2>Ingredients:</h2>
-                            <ul>{ingredients}</ul>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="Direction col-12" float='left'>
-                            <h2 className="Directions">Directions:</h2>
-                            <ol>{directions}</ol>
+                    <div className="container-fluid">
+                        <div className="panel panel-default">
+                            <div className='panel-heading'><h2>Directions:</h2></div>
+                            <ul className='list-group'>{directions}</ul>
                         </div>  
                     </div>
                 </div>
 
                 {this.props.match.params.user?null:
-                <div className="container">
-                    <div>
-                        {/* Nav bar content here */}
-                        <div className="container">
-                            <Tabs activeKey={this.state.key} defaultActiveKey={1} onSelect={this.handleSelect}>
-                                <Tab eventKey={1} title={"Comments"}>
-                                    {reviews}
-                                </Tab>
-                                <Tab eventKey={2} title={"Rate and Comment"}>
-                                    <form onSubmit={this.handleSubmit}>
-                                        <div className="form-group">
-                                            <textarea className="form-control" placeholder="Write a comment" name="comment"
-                                                      rows="8" id="comment" value={this.state.value}
-                                                      onChange={this.handleChange}/>
-                                                <span className="pull-left">
-                                                    {this.getRatingComponent()}
-                                                </span>
-                                                <span className="pull-right">
-                                                    <button onClick={(e) => {
-                                                        if(this.state.userRating){
-                                                            this.client.updateReview(this.state.data.Name, updateComment, this.updateReviews);
-                                                        } else {
-                                                            alert('Please leave a rating with your review!');
-                                                        }
-                                                    }}
-                                                            className="btn btn-success comment-button"
-                                                            type="submit">
-                                                        <span className="glyphicon glyphicon-send"/> Submit comment</button>
-                                                </span>
-                                        </div>
-                                    </form>
-                                </Tab>
-                            </Tabs>
-                        </div>
-                    </div>
+                <div className="container-fluid">
+                    <Tabs activeKey={this.state.key} defaultActiveKey={1} onSelect={this.handleSelect}>
+                        <Tab eventKey={1} title={commentSectionTitle}>
+                            {reviews}
+                        </Tab>
+                        <Tab eventKey={2} title={rateAndCommentTitle}>
+                            <form onSubmit={this.handleSubmit}>
+                                <div className="form-group">
+                                    <textarea className="form-control" placeholder="Write a comment" name="comment"
+                                              rows="8" id="comment" value={this.state.value}
+                                              onChange={this.handleChange}/>
+                                        <span className="pull-left">
+                                            {this.getRatingComponent()}
+                                        </span>
+                                        <span className="pull-right">
+                                            <button onClick={(e) => {
+                                                if(this.state.userRating){
+                                                    this.client.updateReview(this.state.data.Name, updateComment, this.updateReviews);
+                                                } else {
+                                                    alert('Please leave a rating with your review!');
+                                                }
+                                            }}
+                                                    className="btn btn-success comment-button"
+                                                    type="submit">
+                                                <span className="glyphicon glyphicon-send"/> Submit comment</button>
+                                        </span>
+                                </div>
+                            </form>
+                        </Tab>
+                    </Tabs>
                 </div>}
 
             </div>
