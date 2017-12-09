@@ -287,11 +287,12 @@ class PreviewCard extends Component{
                     <ControlLabel>Add Ingredients</ControlLabel>
                 </div>
                 <form onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.addIngredient();
-                    }
-                }}>
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.addIngredient();
+                        }
+                    }}
+                      onSubmit={(e)=>e.preventDefault()}>
                     <FormGroup controlId="formBasicText" validationState={this.state.validation}>
                         <InputGroup>
                             <FormControl

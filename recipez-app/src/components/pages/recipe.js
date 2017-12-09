@@ -4,7 +4,7 @@
  * Date Created: 11/11/2017
  * Description: This file will load and display a recipe
  */
-import React,{ Component } from 'react';
+import React,{ Component, Image} from 'react';
 import RecipeHelper from '../classes/RecipeHelper';
 import {Tabs, Tab} from 'react-bootstrap';
 import '../../css/recipes.css';
@@ -177,12 +177,14 @@ class Recipe extends Component {
         var defaultImage = ["https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ieqr7Lr2x6Ug/v0/800x-1.jpg",
                             "https://s3-ap-northeast-1.amazonaws.com/sharingkyoto2017/articles/KVxqUS8KsRCmG7LTCyM2Tx4xNAdk6s09IKEa5yTU.jpeg",
                             "http://cdn-api.skim.gs/images/view/54be909e3847cf000069016b"];
+        let imageSet = this.state.data.Image?this.state.data.Image:defaultImage;
         const carouselInstance = (
             <Carousel>
-                {[0,1,2].map((key)=>(
-                    <Carousel.Item className="CarouselSize">
-                        <img src={this.state.data.Image ? Array.from(this.state.data.Image)[key] : defaultImage[key]}
-                             className="img-fluid"/>
+                {imageSet.filter((url)=>url!=='').map((image)=>(
+                    <Carousel.Item className="CarouselSize" overflow>
+                        <div style={{overflow:'hidden'}}>
+                            <img src={image} className="img-fluid" style={{margin:'auto',display:'block'}} />
+                        </div>
                     </Carousel.Item>
                 ))}
             </Carousel>
