@@ -36,6 +36,7 @@ class Recipe extends Component {
         this.handleSelect = this.handleSelect.bind(this);
         // this.reload = this.reload.bind(this);
         this.user = User.getUser();
+        this.user.getShoppingList((list)=>this.setState({shoppingList:list}))
     }
 
     setRecipeData(recipeObject,err){
@@ -122,10 +123,20 @@ class Recipe extends Component {
         if(!this.state.loaded) {
             return <div><h1>{this.state.data}</h1></div>
         }
+        let shoppingListAdder = ((ingredient)=>{ //get an onClick for the shopping list button
+            return ((e) => { //onClick event to add to shopping list
+                this.user.addToShoppingList(ingredient,(()=>{ //add this ingredient to the list
+                    this.user.getShoppingList((list)=>{//then fetch the list afterwards
+                        this.setState({shoppingList:list}); //update our state with the fetched list
+                    });
+                }));
+            });
+        });
         var ingredients = this.state.data.Ingredients.map((ingredient) =>(
             <div className="d-flex p-4 panel panel-default" style={{margin:'5px',padding:'5px'}} >
-                    <button onClick={(e) => this.user.addToShoppingList(ingredient)}
-                            type="button" className="btn btn-circle" id="shoppoing_cart">
+                    <button onClick={shoppingListAdder(ingredient)}
+                            type="button" className={"btn btn-circle"+(this.state.shoppingList&&this.state.shoppingList.has(ingredient)?' active':'')}
+                            id="shoppoing_cart">
                         <i className="glyphicon glyphicon-shopping-cart"/>
                     </button>
                     &nbsp;&nbsp;
