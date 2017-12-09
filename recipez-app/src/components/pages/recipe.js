@@ -121,12 +121,12 @@ class Recipe extends Component {
 
     render() {
         if(!this.state.loaded) {
-            return <div><h1>{this.state.data}</h1></div>
+            return (<div><h1>{this.state.data}</h1></div>);
         }
         let shoppingListAdder = ((ingredient)=>{ //get an onClick for the shopping list button
             return ((e) => { //onClick event to add to shopping list
                 this.user.addToShoppingList(ingredient,(()=>{ //add this ingredient to the list
-                    this.user.getShoppingList((list)=>{//then fetch the list afterwards
+                    this.user.getShoppingList((list)=>{//then fetch the list afterwards (in the callback)
                         this.setState({shoppingList:list}); //update our state with the fetched list
                     });
                 }));
@@ -167,7 +167,9 @@ class Recipe extends Component {
                 <div className="panel panel-default">
                     <div className="panel-heading">
                         <span>
-                            {(this.user.client.getUsername()===review[1].username)?editButton(review[1].username):otherUser(review[1].username)}
+                            {(this.user.client.getUsername()===review[1].username)
+                                ?editButton(review[1].username)
+                                :otherUser(review[1].username)}
                             {this.getRatingSymbols(review[1].Rating)}
                         </span>
                     </div>
@@ -231,13 +233,13 @@ class Recipe extends Component {
                             </div>
                                 {
                                 this.props.match.params.user?null:
-                                    <button
+                                    (<button
                                         onClick={(e) => this.user.saveExternalRecipe(this.state.data.Name)}
                                         type={"button"} className="btn btn-secondary btn-lg btn-block well-lookalike">
                                         <span className='pull-left'>
                                             <i className="glyphicon glyphicon-book"/> Add to Cookbook
                                         </span>
-                                    </button>
+                                    </button>)
                                 }
                         </div>
                         {/*====button group====*/}
