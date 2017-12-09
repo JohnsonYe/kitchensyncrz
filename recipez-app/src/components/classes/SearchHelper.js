@@ -166,7 +166,7 @@ import Util from "../classes/Util";
             }
         } else if(updateType===ADD_TO_EXCLUDE||updateType===REMOVE_FROM_EXCLUDE){ //reject or un-reject ingredient from search
             if((updateType===ADD_TO_EXCLUDE&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_EXCLUDE&&status!==EXCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
-                ingredient(callback);
+                callback(ingredient);
                 return map;
             }
             map.get(ingredient)[2] = updateType===REMOVE_FROM_EXCLUDE?UNUSED_STATUS:EXCLUDED_STATUS;
