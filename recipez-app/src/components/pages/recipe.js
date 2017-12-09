@@ -243,18 +243,18 @@ class Recipe extends Component {
                         </div>
                         {/*====button group====*/}
                     </div>
-                        <div className="panel panel-default">
-                            <div className='panel-heading'><h2>Ingredients:</h2></div>
-                            <div className='panel-body'>
-                                <div className='d-flex flex-wrap'>
-                                    {ingredients}
-                                </div>
+                    <div className="panel panel-default">
+                        <div className='panel-heading'><h2>Ingredients:</h2></div>
+                        <div className='panel-body'>
+                            <div className='d-flex flex-wrap'>
+                                {ingredients}
                             </div>
-                        </div>  
-                        <div className="panel panel-default">
-                            <div className='panel-heading'><h2>Directions:</h2></div>
-                            <ul className='list-group'>{directions}</ul>
-                        </div>  
+                        </div>
+                    </div>  
+                    <div className="panel panel-default">
+                        <div className='panel-heading'><h2>Directions:</h2></div>
+                        <ul className='list-group'>{directions}</ul>
+                    </div>  
 
                 {this.props.match.params.user?null:
                     <Tabs activeKey={this.state.key} defaultActiveKey={1} onSelect={this.handleSelect}>

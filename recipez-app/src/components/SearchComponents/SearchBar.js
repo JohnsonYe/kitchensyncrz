@@ -136,7 +136,7 @@ class SearchBar extends Component{
     getValue(){
         console.log('searchbar returned: ' + this.query)
         if(this.query)
-            return this.query.trim();
+            return this.query.toLowerCase().trim();
         return '';
     }
 
