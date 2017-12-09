@@ -138,7 +138,7 @@ class User {
             })
     }
 
-    saveExternalRecipe(recipeName){
+    saveExternalRecipe(recipeName,callback){
         //save just the recipe name to the cookbook so we know to load it froma public recipe page
         this.client.updateItem( //basic update request, expects a complicated syntax that we build below
             this.client.buildUpdateRequest( //construct the params syntax according to the action we want
@@ -151,7 +151,7 @@ class User {
                     this.addUserData((data)=>{
                         data.cookbook[recipeName]='none';
                         return data;
-                    })
+                    },callback)
                 } else {
                     //the request failed, what should we do?
                     console.error(response.payload)
@@ -221,7 +221,7 @@ class User {
         })
     }
 
-    removeFromPantry(ingredient){
+    removeFromPantry(ingredient,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -233,7 +233,7 @@ class User {
                     this.addUserData((data)=>{
                         delete data.pantry[ingredient];
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }
@@ -245,7 +245,7 @@ class User {
     }
 
 
-    addToCookbook(recipe, info){
+    addToCookbook(recipe, info,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -257,14 +257,14 @@ class User {
                     this.addUserData((data)=>{
                         data.cookbook[recipe] = {info:info};
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }
             })
     }
 
-    removeFromCookbook(recipe){
+    removeFromCookbook(recipe,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -276,7 +276,7 @@ class User {
                     this.addUserData((data)=>{
                         delete data.cookbook[recipe];
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }
@@ -289,7 +289,7 @@ class User {
         return this.getUserData('cookware').then(callback).catch(console.error);
     }
 
-    addToCookware(item) {
+    addToCookware(item,callback) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -301,14 +301,14 @@ class User {
                     this.addUserData((data)=>{
                         data.cookware[item] = {item:item};
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }
             })
     }
 
-    removeFromCookware(item) {
+    removeFromCookware(item,callback) {
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -320,7 +320,7 @@ class User {
                     this.addUserData((data)=>{
                         delete data.cookware[item];
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }
@@ -333,7 +333,7 @@ class User {
 
     }
 
-    addToExclusionList(ingredient){
+    addToExclusionList(ingredient,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -345,7 +345,7 @@ class User {
                     this.addUserData((data)=>{
                         data.exclude[ingredient] = {ingredient:ingredient};
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }
@@ -353,7 +353,7 @@ class User {
     }
 
 
-    removeFromExclusionList(ingredient){
+    removeFromExclusionList(ingredient,callback){
         this.client.updateItem(
             this.client.buildUpdateRequest(
                 'User',
@@ -365,7 +365,7 @@ class User {
                     this.addUserData((data)=>{
                         delete data.exclude[ingredient];
                         return data
-                    })
+                    },callback)
                 }else {
                     console.error(response.payload)
                 }

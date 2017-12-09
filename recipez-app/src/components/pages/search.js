@@ -130,6 +130,8 @@ class Search extends Component {
                     return result //pass the result to the next link
                 })
                 .then((result)=>this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted,loading:false})))
+        } else if(this.state.filter) {
+            this.setFilter(this.state.filter)
         }
     }
     componentWillUnmount(){
