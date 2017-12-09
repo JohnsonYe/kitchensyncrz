@@ -139,7 +139,6 @@ class App extends Component {
                         <OffCanvasBody className="navbar-icon">
                             <div onClick={this.handleClick.bind(this)} style={{cursor:'pointer'}}>
                                 {this.state.isNavMenuOpened ?
-                                    //set to null if you want banana man to kill himself
                                     <img className="ks-icon" src={imgsrc}/>
                                     //null
                                     :
