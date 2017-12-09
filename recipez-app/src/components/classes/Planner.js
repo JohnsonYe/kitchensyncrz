@@ -27,7 +27,6 @@ class PlannerHelper{
         if (meals.length == 0) {
             data.days[day].mealData.push(meal);
             alert("Planner Updated");
-            alert("Fuck");
             return true;
         }
 
@@ -71,14 +70,12 @@ class PlannerHelper{
         {
             data.days[day].mealData.push(meal);
             alert("Planner Updated");
-            alert("Fuck1");
             return true;
         }
         // Make sure this meals end time is less than meal afters start time (i.e. no overlap)
         else if(endHr < dstartHr) {
             data.days[day].mealData.splice(mealIndex, 0, meal);
             alert("Planner updated :D");
-            alert("Fuck3");
             return true;
         }else {
             alert("Time confliction ... Please schedule a different time");
