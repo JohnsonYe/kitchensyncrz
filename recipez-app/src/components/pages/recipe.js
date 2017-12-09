@@ -73,7 +73,6 @@ class Recipe extends Component {
     }
 
     handleSelect(key){
-        console.log('handling select');
         this.setState({key});
     }
 
@@ -244,7 +243,6 @@ class Recipe extends Component {
                         </div>
                         {/*====button group====*/}
                     </div>
-                    <div className="container-fluid">
                         <div className="panel panel-default">
                             <div className='panel-heading'><h2>Ingredients:</h2></div>
                             <div className='panel-body'>
@@ -253,17 +251,12 @@ class Recipe extends Component {
                                 </div>
                             </div>
                         </div>  
-                    </div>
-                    <div className="container-fluid">
                         <div className="panel panel-default">
                             <div className='panel-heading'><h2>Directions:</h2></div>
                             <ul className='list-group'>{directions}</ul>
                         </div>  
-                    </div>
-                </div>
 
                 {this.props.match.params.user?null:
-                <div className="container-fluid">
                     <Tabs activeKey={this.state.key} defaultActiveKey={1} onSelect={this.handleSelect}>
                         <Tab eventKey={1} title={commentSectionTitle}>
                             {reviews}
@@ -293,8 +286,8 @@ class Recipe extends Component {
                             </form>
                         </Tab>
                     </Tabs>
-                </div>}
-
+                }
+                </div>
             </div>
         )
     }
