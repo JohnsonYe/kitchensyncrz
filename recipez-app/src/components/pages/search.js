@@ -90,9 +90,9 @@ class Search extends Component {
     massUpdateSearch(items,action,shouldLoad){
         let getCallbacks = (item,pass,fail)=>{
             return ({
-                successCallback: ()=>{pass(item)},
+                successCallback: ()=>{console.log('passed: '+item);pass(item)},
                 outputCallback: shouldLoad?((ingredient)=>this.updateLoader(ingredient)):undefined,
-                failureCallback: ()=>{fail(item)},
+                failureCallback: ()=>{console.error('failed: '+item);fail(item)},
             });
         };
 
@@ -129,7 +129,7 @@ class Search extends Component {
                     this.setFilter(this.state.filter) //set the helper's filter method, based on whatever we parsed
                     return result //pass the result to the next link
                 })
-                .then((result)=>this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted})))
+                .then((result)=>this.client.sortRecipeMap((sorted)=>this.setState({sorted:sorted,loading:false})))
         }
     }
     componentWillUnmount(){
@@ -174,14 +174,14 @@ class Search extends Component {
         this.recipeLoader = this.recipeLoader.then((recipes)=>{
             // console.log('updating loader: '+JSON.stringify(recipes))
             let recipeNames =  Array.from(new Set(ingredient.recipes.map((recipe)=>recipe.Name))); //remove duplicates
-            console.log('Loading new ingredient data: ' + ingredient.Name)
+            console.log('Loading new ingredient data: ' + ingredient.Name);
             // return (new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch([ingredient],pass,fail))
             return (new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch(recipeNames,pass,fail))
                 .then((recipeList)=>{
                     // console.log('recipe list: '+JSON.stringify(recipeList));
                     // console.log('recipe map: '+JSON.stringify(recipes));
                     this.doneLoading();
-                    console.log(recipeList);
+                    // console.log(recipeList);
                     return recipeList.reduce((prev,next)=>prev.set(next.Name,next),recipes);
                 })
                 .catch((err)=>{console.error('loader update error: '+err);this.doneLoading();return recipes}));
@@ -189,6 +189,7 @@ class Search extends Component {
         this.recipeLoader.then((recipes)=>this.setState({loadedRecipes:recipes}))
     }
     handleReject(e){ //events from the "reject" button on the toolbar
+        this.startLoading();
         let value = this.searchbar.getValue(); //get the searchbar state
         let status = this.searchbar.getStatus();
         this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})
@@ -238,7 +239,10 @@ class Search extends Component {
             return {excluded:new Set(),ingredients:new Set()};
         } else if(status===ADD_MULTIPLE){
             console.log('got here');
-            return {ingredients:(()=>value.reduce((prev,next)=>prev.add(next),this.state.ingredients))()}
+            return {
+                ingredients:(()=>value[0].reduce((prev,next)=>prev.add(next),this.state.ingredients))(),
+                exclude:    (()=>value[1].reduce((prev,next)=>prev.add(next),this.state.excluded   ))(),
+            }
         } else {
             return {};
         }
@@ -249,7 +253,7 @@ class Search extends Component {
             excluded:this.state.excluded,
             filter:[this.state.filter],
         };
-        Util.updateURI(this.props.history,'Search',params)
+        Util.updateURI(this.props.history,'Search',params);
     }
 
     setFilter(filter){
@@ -292,11 +296,14 @@ class Search extends Component {
         let update_failed_fn = (item)=>{
             //this item couldn't be updated -- probably not found in database
             //return null: the promise.all doesn't care what values we get
+            console.error('updating '+item+' failed :(');
             return null;
         };
 
         let filter_failed_results_fn = (items)=>{
-            return items.filter((item)=>!!item); //check if the item is valid
+            console.log('filtering failed queries');
+            console.log(items);
+            return items.map((resultSet)=>resultSet.filter((item)=>!!item)); //check if the item is valid
         };
 
         let sort_results_and_update_fn = (items)=>{ 
@@ -304,14 +311,26 @@ class Search extends Component {
             this.client.sortRecipeMap(this.searchUpdateWrapper(items,ADD_MULTIPLE))
         };
 
-        User.getUser(this.user.client.getUsername()).getUserData('pantry').then((data)=>{
-            Promise.all(
-
+        let ingredientsToAdd = User.getUser().getUserData('pantry').then((data)=>{
+            return Promise.all(
                 //get an array of update promises
                 this.massUpdateSearch(Object.keys(data),1/* ADD */,true)
                 //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
                     .map((updatePromise)=>updatePromise.catch(update_failed_fn))
-            )
+            )        
+        });
+
+        let ingredientsToExclude = User.getUser().getUserData('exclude').then((data)=>{
+            return Promise.all(
+                //get an array of update promises
+                this.massUpdateSearch(Array.from(data),0/* EXCLUDE */,true)
+                //"map" the array to append .catch() clauses which prevent the Promise.all from aborting
+                    .map((updatePromise)=>updatePromise.catch(update_failed_fn))
+            )        
+        });
+
+        User.getUser(this.user.client.getUsername()).getUserData('pantry').then((data)=>{
+            Promise.all([ingredientsToAdd, ingredientsToExclude])
             .then( filter_failed_results_fn )
             .then( sort_results_and_update_fn )
             .catch((err)=>console.error(err))
@@ -364,7 +383,7 @@ class Search extends Component {
                         <div className='input-group'>
                             <div className={this.dropdownState('ingredients','input-group-btn')} onClick={this.blockPropagation}>
                                 <button className='btn btn-default dropdown-toggle' type='button' data-toggle="dropdown" onClick={(e)=>this.toggleDropdown(e,'ingredients')}>
-                                    {this.getGlyph('list')}
+                                    {this.state.loading?this.getGlyph('refresh loading-icon'):this.getGlyph('list')}
                                 </button>
                                 <div className="dropdown-menu">
                                     <div className='dropdown-item' onClick={this.addFromPantry}>
