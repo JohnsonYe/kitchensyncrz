@@ -39,7 +39,7 @@ class SignIn extends Component {
             //alert(this.client.getUsername());
             this.props.history.push("/Search");
         } catch (e) {
-            alert('signin submit: ' + e);
+            alert('Your username or password was incorrect. Please try again!');
         }
     };
 
