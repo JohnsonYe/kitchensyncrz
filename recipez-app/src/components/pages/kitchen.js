@@ -160,42 +160,56 @@ class kitchen extends Component {
         Object.entries(data).forEach((key)=> {
             switch (key[1].unit) {
                 case("Protein"):
-                    this.addProtein(key[0]);
+                    this.setState({protein: this.state.protein.concat(key[0])});
+                    this.setState({numItems: (++this.state.numItems)});
                     break;
                 case("Dairy"):
-                    this.addDairy(key[0]);
+                    this.setState({dairy: this.state.dairy.concat(key[0])});
+                    this.setState({numItems: (++this.state.numItems)});
                     break;
                 case("Vegetable"):
-                    this.addVegetable(key[0]);
+                    this.setState({vegetable: this.state.vegetable.concat(key[0])});
+                    this.setState({numItems: (++this.state.numItems)});
                     break;
                 case("Fruit"):
-                    this.addFruit(key[0]);
+                    this.setState({fruit: this.state.fruit.concat(key[0])});
+                    this.setState({numItems: (++this.state.numItems)});
                     break;
                 case("Grain"):
-                    this.addGrain(key[0]);
+                    this.setState({grain: this.state.grain.concat(key[0])});
+                    this.setState({numItems: (++this.state.numItems)});
                     break;
                 case("Other"):
-                    this.addOther(key[0]);
+                    this.setState({other: this.state.other.concat(key[0])});
+                    this.setState({numItems: (++this.state.numItems)});
                     break;
                 case("Restock"):
-                    switch(key[1].amount){
-                        case("1"):
-                            this.addOut(key[0], "Protein");
+
+                    switch(~~key[1].amount){
+
+                        case(1):
+                            this.setState({out: this.state.out.set(key[0], "Protein")});
+                            this.setState({numRestock: (++this.state.numRestock)});
                             break;
-                        case("2"):
-                            this.addOut(key[0], "Dairy");
+                        case(2):
+                            this.setState({out: this.state.out.set(key[0], "Dairy")});
+                            this.setState({numRestock: (++this.state.numRestock)});
                             break;
-                        case("3"):
-                            this.addOut(key[0], "Vegetable");
+                        case(3):
+                            this.setState({out: this.state.out.set(key[0], "Vegetable")});
+                            this.setState({numRestock: (++this.state.numRestock)});
                             break;
-                        case("4"):
-                            this.addOut(key[0], "Fruit");
+                        case(4):
+                            this.setState({out: this.state.out.set(key[0], "Fruit")});
+                            this.setState({numRestock: (++this.state.numRestock)});
                             break;
-                        case("5"):
-                            this.addOut(key[0], "Grain");
+                        case(5):
+                            this.setState({out: this.state.out.set(key[0], "Grain")});
+                            this.setState({numRestock: (++this.state.numRestock)});
                             break;
-                        case("6"):
-                            this.addOut(key[0], "Other");
+                        case(6):
+                            this.setState({out: this.state.out.set(key[0], "Other")});
+                            this.setState({numRestock: (++this.state.numRestock)});
                             break;
                         default:
                             break;
@@ -478,58 +492,46 @@ class kitchen extends Component {
     }
 
     // Add to the Restock List
-    addOut(val, state){
+    addOut(val){
 
-        if(state == undefined){state = this.state.key}
-
-        this.setState({out: this.state.out.set(val, state)});
+        this.setState({out: this.state.out.set(val, this.state.key)});
         this.setState({numRestock: (++this.state.numRestock)});
 
-        switch( state ){
+        switch( this.state.key ){
             case "Protein":
-                this.removeProtein(val);
-                break;
-            case "Dairy":
-                this.removeDairy(val);
-                break;
-            case "Vegetable":
-                this.removeVegetable(val);
-                break;
-            case "Fruit":
-                this.removeFruit(val);
-                break;
-            case "Grain":
-                this.removeGrain(val);
-                break;
-            case "Other":
-                this.removeOther(val);
-                break;
-            default:
-                break;
-        }
-
-        switch( state ){
-            case "Protein":
+                this.state.protein.splice( this.state.protein.indexOf(val), 1);
+                this.setState({numItems: (--this.state.numItems)});
                 this.user.addToPantry(val, "Restock", 1);
                 break;
             case "Dairy":
+                this.state.dairy.splice( this.state.dairy.indexOf(val), 1);
+                this.setState({numItems: (--this.state.numItems)});
                 this.user.addToPantry(val, "Restock", 2);
                 break;
             case "Vegetable":
+                this.state.vegetable.splice( this.state.vegetable.indexOf(val), 1);
+                this.setState({numItems: (--this.state.numItems)});
                 this.user.addToPantry(val, "Restock", 3);
                 break;
             case "Fruit":
+                this.state.fruit.splice( this.state.fruit.indexOf(val), 1);
+                this.setState({numItems: (--this.state.numItems)});
                 this.user.addToPantry(val, "Restock", 4);
                 break;
             case "Grain":
-                this.user.addToPantry(val, "Restock", 5);
+                this.state.grain.splice( this.state.grain.indexOf(val), 1);
+                this.setState({numItems: (--this.state.numItems)});
+                this.removeGrain(val, this.user.addToPantry(val, "Restock", 5));
                 break;
             case "Other":
-                this.user.addToPantry(val, "Restock", 6);
+                this.state.other.splice( this.state.other.indexOf(val), 1);
+                this.setState({numItems: (--this.state.numItems)});
+                this.removeOther(val, this.user.addToPantry(val, "Restock", 6));
                 break;
             default:
                 break;
         }
+
 
 
     }
