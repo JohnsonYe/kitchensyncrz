@@ -52,6 +52,7 @@ class App extends Component {
             funMode: false,
             cursorWidth:100,
             cursorHeight:100,
+            userGreeting: ""
         }
         this.client = DBClient.getClient();
 
@@ -147,6 +148,9 @@ class App extends Component {
                             </div>
                         </OffCanvasBody>
                         <OffCanvasMenu className="navbar-menu">
+                            <div>
+                                <p className="username" >{this.client.authenticated? "Welcome, " + this.client.getUsername():this.state.userGreeting}</p>
+                            </div>
                             <ul>
                                 <li className="first">
                                     <Link to="/" onClick={this.closeNav}>Home</Link>
