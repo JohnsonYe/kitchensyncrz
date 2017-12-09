@@ -53,6 +53,11 @@ class PlannerHelper{
                 }
             }
             mealIndex += 1;
+            
+            //Keeps next lines from going out of bounds
+            if(mealIndex == meals.length){
+                break;
+            }
 
             dstartHr = meals[mealIndex].startHr;
             dstartMin = meals[mealIndex].startMin;
