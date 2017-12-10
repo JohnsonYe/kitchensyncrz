@@ -114,7 +114,7 @@ class Search extends Component {
                 //have search manager skip sorting after each update to improve speed
                 this.massUpdateSearch(this.state.ingredients,1,false),this.massUpdateSearch(this.state.excluded,0,false)
             )
-                .catch((err)=>console.error(err))
+                .catch((err)=>{console.error('error when loading from uri');console.error(err)})
                 //do one sort once everything is done loading
                 .then((result)=>{ //get the loaded recipes and load them in one batch, then pass the result
                     this.recipeLoader = new Promise((pass,fail)=>this.recipeHelper.loadRecipeBatch(this.client.getRecipeList().map((entry)=>entry[0]),pass,fail))
@@ -194,7 +194,11 @@ class Search extends Component {
         this.startLoading();
         let value = this.searchbar.getValue(); //get the searchbar state
         let status = this.searchbar.getStatus();
-        this.client.updateIngredient(value,0,{successCallback:this.searchUpdateWrapper(value,status)})
+        let callbacks = {
+            successCallback:this.searchUpdateWrapper(value,status),
+            failureCallback: ()=>this.doneLoading(),
+        }
+        this.client.updateIngredient(value,0,callbacks)
 
     }
     handleSubmit(e){ //catch form submission events from the searchbar element and the "add" button
@@ -207,6 +211,7 @@ class Search extends Component {
         let callbacks = {
             successCallback: this.searchUpdateWrapper(value,status),
             outputCallback: this.updateLoader,
+            failureCallback: ()=>this.doneLoading(),
         }
         this.client.updateIngredient(value,status,callbacks)
 
@@ -222,6 +227,7 @@ class Search extends Component {
         console.log('Updated search results: ' + JSON.stringify([value,status]))
     }
     updateState(sortedResults,value,status){
+        console.log(sortedResults);
         this.setState({
             sorted:sortedResults,
             ...this.updateIngredientState(value,status), //get updated include and exclude information

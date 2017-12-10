@@ -89,7 +89,7 @@ import Util from "../classes/Util";
         };
 
         let update_result_list_fn = (recipeMap)=>{
-            return this.updateResultList(recipeMap,ingredient,successCallback,nosort);
+            return this.updateResultList(recipeMap,ingredient,callbacks,nosort);
         };
 
         let failed_to_load_fn = (err,ingredientMap)=>{
@@ -122,7 +122,7 @@ import Util from "../classes/Util";
                     )
                 } else {
                     let ingredientInfo = [search,ingredientMap.get(ingredient)[1],ingredientMap.get(ingredient)[2]];
-                    return this.updateResultList(ingredientMap.set(ingredient,ingredientInfo),ingredient,successCallback,nosort) 
+                    return update_result_list_fn(ingredientMap.set(ingredient,ingredientInfo)); 
                 }                   
                 //since this ingredient is already in the map, dont modify the map or fire the callback
                 //callers should not rely on this method to use the callback for any given set of arguments
@@ -135,13 +135,30 @@ import Util from "../classes/Util";
      * [rejection score,raw score,importance score]
      */
 
-    updateResultList(map,ingredient,callback,nosort){
+    updateResultList(map,ingredient,callbacks,nosort){
+        let {successCallback,outputCallback,failureCallback} = {...callbacks}; //successCallback must be defined
         let updateType = map.get(ingredient)[0];
         let status = map.get(ingredient)[2];
+        
+        let statusFailure = (()=>{
+            console.error('attempted illegal action ['+updateType+'] on: '+ingredient+' (status: '+status+')');
+            if(failureCallback){
+                failureCallback(ingredient);
+            }
+            return map;
+        });
+
+        let updateDoneAction = (()=>{
+            if(!nosort){
+                this.sortRecipeMap(successCallback); //continue to sorter, pass it the callback for when its done
+            } else {
+                successCallback(ingredient);
+            }
+        });
+
         if(updateType===ADD_TO_SEARCH||updateType===REMOVE_FROM_SEARCH){ //use ingredient in search
             if((updateType===ADD_TO_SEARCH&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_SEARCH&&status!==INCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
-                callback(ingredient);
-                return map;
+                return statusFailure();
             }
             map.get(ingredient)[2] = updateType===ADD_TO_SEARCH?INCLUDED_STATUS:UNUSED_STATUS;
             let recipeTracker = new Set()
@@ -159,15 +176,10 @@ import Util from "../classes/Util";
             })
             //this should only get called from a Promise chain
             //branch the chain into the supplied callback
-            if(!nosort){
-                this.sortRecipeMap(callback)
-            } else {
-                callback(ingredient)
-            }
+            updateDoneAction();
         } else if(updateType===ADD_TO_EXCLUDE||updateType===REMOVE_FROM_EXCLUDE){ //reject or un-reject ingredient from search
             if((updateType===ADD_TO_EXCLUDE&&status!==UNUSED_STATUS)||(updateType===REMOVE_FROM_EXCLUDE&&status!==EXCLUDED_STATUS)){ //query doesn't fit the current status, reject it and do nothing
-                callback(ingredient);
-                return map;
+                return statusFailure();
             }
             map.get(ingredient)[2] = updateType===REMOVE_FROM_EXCLUDE?UNUSED_STATUS:EXCLUDED_STATUS;
             let adjustment = (updateType===0)?1:-1;
@@ -178,11 +190,7 @@ import Util from "../classes/Util";
             })
             //this should only get called from a Promise chain
             //branch the chain into the supplied callback
-            if(!nosort){
-                this.sortRecipeMap(callback)
-            } else {
-                callback(ingredient)
-            }
+            updateDoneAction();
         } else {
             //well this is awkward
             console.error('Incorrect query code found when updating recipe map: '+updateType)

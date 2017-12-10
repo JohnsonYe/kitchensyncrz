@@ -121,7 +121,7 @@ class SearchBar extends Component{
     }
 
     reset(){
-        this.setState({value:'',completions:[],shiftDown:false,selection:-1})
+        this.setState({value:'',query:undefined,completions:[],shiftDown:false,selection:-1})
     }
 
     /**
